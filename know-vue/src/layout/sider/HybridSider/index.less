@@ -1,0 +1,205 @@
+.layout-hybrid-sider {
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: @primary-dark-bg;
+  overflow: hidden;
+  transition: all 0.2s ease 0s;
+
+  &-dom {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+    transition: all 0.2s ease 0s;
+  }
+
+  .main-menu {
+    position: relative;
+    padding-top: 1px;
+
+    &__item {
+      position: relative;
+      padding: 12px 0;
+      color: rgb(255 255 255 / 65%);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &-icon {
+        vertical-align: 0;
+        margin-bottom: 4px;
+        transition: all 0.2s;
+      }
+
+      &-name {
+        display: block;
+        height: 22px;
+        margin-bottom: 0;
+        line-height: 22px;
+        transition: all 0.2s;
+      }
+
+      &:hover {
+        color: @white;
+      }
+
+      &.is-active {
+        color: @white;
+      }
+    }
+  }
+
+  &.light {
+    background: @white;
+    box-shadow: 2px 0 8px 0 rgb(29 35 41 / 5%);
+
+    .main-menu {
+
+      &__item {
+        color: rgb(0 0 0 / 65%);
+
+        &:hover,
+        &.is-active {
+          background: @white;
+
+          &::before {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2px;
+            height: 100%;
+            content: '';
+          }
+        }
+      }
+    }
+
+    .trigger-btn {
+
+      &:deep(svg) {
+        color: @primary-dark-bg;
+      }
+    }
+
+    .sub-menu {
+      background: @white;
+      box-shadow: 2px 0 8px 0 rgb(29 35 41 / 5%);
+
+      &__title {
+        border-bottom: 1px solid @border-color;
+
+        .pushpin {
+          color: @primary-dark-bg;
+        }
+      }
+
+      &__content {
+        border-left: 1px solid @border-color;
+      }
+    }
+  }
+
+  &.dark {
+
+    .sub-menu {
+
+      &__title {
+        border-bottom: 1px solid #0c2135;
+      }
+
+      &__content {
+        border-left: 1px solid #0c2135;
+      }
+    }
+  }
+
+  &.mini .main-menu {
+    &__item {
+      &-name {
+        display: none;
+      }
+
+      &-icon {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .trigger-btn {
+    z-index: 199;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 14px;
+    color: rgb(255 255 255 / 65%);
+    text-align: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    height: 36px;
+    line-height: 36px;
+  }
+
+  .sub-menu {
+    position: fixed;
+    top: 0;
+    height: 100%;
+    background: @primary-dark-bg;
+    transition: all 0.2s;
+
+    &__title {
+      display: flex;
+      height: 48px;
+      opacity: 0%;
+      transition: unset;
+      align-items: center;
+      justify-content: space-between;
+
+      img {
+        width: 140px;
+        height: 17.5px;
+      }
+
+      &.show {
+        min-width: 130px;
+        opacity: 100%;
+        transition: all 0.5s ease;
+      }
+
+      .pushpin {
+        margin-right: 6px;
+        color: rgb(255 255 255 / 65%);
+        cursor: pointer;
+
+        &:hover {
+          color: @white;
+        }
+      }
+    }
+
+    &__content {
+      height: calc(100% - 48px) !important;
+
+      .scrollbar__wrap {
+        height: 100%;
+        overflow-x: hidden;
+      }
+
+      .scrollbar__bar.is-horizontal {
+        display: none;
+      }
+
+      .ant-menu {
+        height: 100%;
+      }
+
+      .ant-menu-inline,
+      .ant-menu-vertical,
+      .ant-menu-vertical-left {
+        border-right: 1px solid transparent;
+      }
+    }
+  }
+}

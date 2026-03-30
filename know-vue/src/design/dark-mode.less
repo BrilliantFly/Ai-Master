@@ -1,0 +1,94 @@
+[data-theme='dark'] {
+  body {
+    background-color: @dark-mode-bg;
+    color: @dark-mode-color;
+  }
+
+  // 组织树(Tree-Org) 暗黑模式
+  .zm-tree-org {
+    background: @dark-mode-bg;
+
+    .tree-org-node__inner {
+      border: @dark-mode-border;
+    }
+
+    .zm-tree-handle-item {
+      background: @dark-mode-bg;
+      color: @dark-mode-color;
+      border: @dark-mode-border;
+    }
+  }
+
+  // 富文本编辑器 暗黑模式
+  .rich-text-wrapper {
+    border: @dark-mode-border;
+
+    .toolbar-box {
+      border-bottom: @dark-mode-border;
+    }
+  }
+
+  .feature-divider {
+    border-color: @dark-mode-color;
+  }
+
+  .ant-layout-sider {
+    border-right: @dark-mode-border;
+
+    .ant-menu-inline {
+      border-right: none;
+    }
+  }
+
+  .layout-hybrid-sider {
+    border-right: @dark-mode-border;
+    background: @dark-mode-bg;
+
+    &.open {
+      border-right: none;
+
+      .sub-menu {
+        border-right: @dark-mode-border;
+        background: @dark-mode-bg;
+
+        &__title {
+          border-bottom: @dark-mode-border;
+        }
+
+        &__content {
+          border-left: @dark-mode-border;
+        }
+      }
+    }
+  }
+
+  .layout-hybrid-header {
+    background: @dark-mode-bg;
+    border-bottom: @dark-mode-border;
+    box-sizing: border-box;
+  }
+
+  .layout-tags {
+    border-top: @dark-mode-border;
+    border-bottom: @dark-mode-border;
+
+    &.single-tags {
+      border-top: none;
+    }
+  }
+}
+
+// 富文编辑器(wangEditor) 暗黑模式
+html.dark {
+  --w-e-textarea-color: @dark-mode-color;
+  --w-e-textarea-bg-color: @dark-mode-bg;
+  --w-e-textarea-border-color: @dark-mode-border-color;
+
+  // toolbar - css vars
+  --w-e-toolbar-color: @dark-mode-color;
+  --w-e-toolbar-bg-color: @dark-mode-bg;
+  --w-e-toolbar-border-color: @dark-mode-border-color;
+  --w-e-toolbar-active-color: @dark-mode-color;
+  --w-e-toolbar-active-bg-color: @dark-mode-border-color;
+
+}

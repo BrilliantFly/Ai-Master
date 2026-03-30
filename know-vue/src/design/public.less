@@ -1,0 +1,65 @@
+span.icon-btn {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.batch-upload {
+  height: auto!important;
+}
+
+.list-upload {
+  .ant-upload {
+    width: 100%;
+  }
+
+  .ant-btn {
+    display: block;
+    margin: 0 auto 8px;
+  }
+}
+
+.feature-divider {
+  height: 50%;
+  margin: 0;
+  border-color: rgba(0, 0, 0, .2);
+}
+
+.ant-layout-sider-light {
+  border-right: solid 1px @border-color;
+
+  .ant-menu-inline {
+    border-right: none!important;
+  }
+}
+
+// ScrollContainer组件样式
+.scroll-container {
+  width: 100%;
+  height: 100%;
+
+  .scrollbar__wrap {
+    margin-bottom: 18px !important;
+    overflow-x: hidden;
+  }
+
+  .scrollbar__view {
+    box-sizing: border-box;
+  }
+}
+
+// Iframe container 样式
+.iframe-wrapper {
+  background: @white;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  .ant-spin-nested-loading {
+
+    & >div>.ant-spin {
+      max-height: 100%
+    }
+  }
+}
+

@@ -1,0 +1,84 @@
+{
+  "menu": {
+    "siderMenu": "左侧菜单",
+    "headerMenu": "顶部菜单",
+    "hybridMenu": "混合菜单",
+    "collapseBtnPosition": {
+      "hidden": "隐藏",
+      "header": "顶部",
+      "sider": "侧边栏"
+    }
+  },
+  "theme": {
+    "daybreakBlue": "拂晓蓝",
+    "dustRed": "薄暮",
+    "volcano": "火山",
+    "sunsetOrange": "日暮",
+    "cyan": "明青",
+    "polarGreen": "极光绿",
+    "geekBlue": "极客蓝",
+    "goldenPurple": "酱紫"
+  },
+  "tags": {
+    "closeLeft": "关闭左侧",
+    "closeRight": "关闭右侧",
+    "closeOther": "关闭其它",
+    "closeAll": "关闭所有"
+  },
+  "feature": {
+    "search": "搜索",
+    "language": "多语言",
+    "document": "文档",
+    "fullScreen": "全屏",
+    "exitFullScreen": "退出全屏",
+    "lockScreen": "锁定屏幕",
+    "logout": "退出登录"
+  },
+  "setting": {
+    "systemMode": "系统风格",
+    "darkMode": "暗色",
+    "lightMode": "亮色",
+    "menuStyle": "菜单模式",
+    "themeColor": "主题颜色",
+    "interfaceFunction": "界面功能",
+    "menuSplit": "菜单分割",
+    "menuDrag": "菜单宽度拖拽",
+    "menuFixed": "菜单固定",
+    "menuCollapse": "菜单折叠",
+    "menuCollapseShowTitle": "菜单折叠显示名称",
+    "tagsCached": "标签缓存",
+    "menuCollapseButton": "菜单折叠按钮",
+    "expandedMenuWidth": "菜单展开宽度",
+    "autoScreenLock": "自动锁屏",
+    "notAutoScreenLock": "不自动锁屏",
+    "minute": "分钟",
+    "interfaceShow": "界面显示",
+    "breadcrumb": "面包屑",
+    "tags": "标签页",
+    "search": "搜索",
+    "fullScreen": "全屏显示",
+    "language": "国际化",
+    "footer": "页脚",
+    "colorWeak": "色弱模式",
+    "grayMode": "灰色模式",
+    "animationSetting": "动画设置",
+    "progress": "顶部进度条",
+    "switchAnimation": "切换动画",
+    "animationType": "切换动画类型",
+    "copyBtn": "拷贝",
+    "resetBtn": "重置",
+    "clearBtn": "清空缓存并返回登录页",
+    "resetSuccess": "重置成功！",
+    "operatingContent": "复制成功,请到 src/settings/appBaseSetting.ts 中修改配置！"
+  },
+  "lock": {
+    "lockScreen": "锁定屏幕",
+    "unlockBtn": "点击解锁",
+    "unlockPlaceholder": "请输入锁屏密码",
+    "cancelBtn": "取消解锁",
+    "loginBtn": "前往登录",
+    "confirmBtn": "进入系统",
+    "pwdPlaceholder": "请输入锁屏密码或用户密码",
+    "pwdError": "锁屏密码或用户密码错误！"
+  }
+}

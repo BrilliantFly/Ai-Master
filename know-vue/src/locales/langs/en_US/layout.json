@@ -1,0 +1,84 @@
+{
+  "menu": {
+    "siderMenu": "Sider menu",
+    "headerMenu": "Header menu",
+    "hybridMenu": "Hybrid menu",
+    "collapseBtnPosition": {
+      "hidden": "Hidden",
+      "header": "Header",
+      "sider": "Sider"
+    }
+  },
+  "theme": {
+    "daybreakBlue": "Daybreak blue",
+    "dustRed": "Dust red",
+    "volcano": "Volcano",
+    "sunsetOrange": "Sunset orange",
+    "cyan": "Cyan",
+    "polarGreen": "Polar green",
+    "geekBlue": "Geek blue",
+    "goldenPurple": "Golden purple"
+  },
+  "tags": {
+    "closeLeft": "Close left",
+    "closeRight": "Close right",
+    "closeOther": "Close other",
+    "closeAll": "Close all"
+  },
+  "feature": {
+    "search": "Search",
+    "language": "Language",
+    "document": "Document",
+    "fullScreen": "Full screen",
+    "exitFullScreen": "Exit full screen",
+    "lockScreen": "Lock screen",
+    "logout": "Logout"
+  },
+  "setting": {
+    "systemMode": "System mode",
+    "darkMode": "Dark",
+    "lightMode": "Light",
+    "menuStyle": "Menu style",
+    "themeColor": "Theme color",
+    "interfaceFunction": "Interface function",
+    "menuSplit": "Split menu",
+    "menuDrag": "Drag sidebar",
+    "menuFixed": "Fixed menu",
+    "menuCollapse": "Collapse menu",
+    "menuCollapseShowTitle": "Collapse menu show title",
+    "tagsCached": "Keep alive",
+    "menuCollapseButton": "Menu collapse button",
+    "expandedMenuWidth": "Expanded menu width",
+    "autoScreenLock": "Auto screen lock",
+    "notAutoScreenLock": "Not auto lock",
+    "minute": "Minute",
+    "interfaceShow": "Interface show",
+    "breadcrumb": "Breadcrumbs",
+    "tags": "Tags",
+    "search": "Search",
+    "fullScreen": "Full screen",
+    "language": "Language",
+    "footer": "Footer",
+    "colorWeak": "Color weak mode",
+    "grayMode": "Gray mode",
+    "animationSetting": "Animation setting",
+    "progress": "Progress",
+    "switchAnimation": "Switch animation",
+    "animationType": "Animation type",
+    "copyBtn": "Copy",
+    "resetBtn": "Reset",
+    "clearBtn": "Clear cache and to the login page",
+    "resetSuccess": "Successfully reset!",
+    "operatingContent": "The copy is successful, please go to src/settings/appBaseSetting.ts to modify the configuration!"
+  },
+  "lock": {
+    "lockScreen": "Lock screen",
+    "unlockBtn": "Unlock",
+    "unlockPlaceholder": "Please enter the lock screen password",
+    "cancelBtn": "Cancel",
+    "loginBtn": "Back to login",
+    "confirmBtn": "Enter the system",
+    "pwdPlaceholder": "Please enter the lock screen password or user password",
+    "pwdError": "The lock screen password or user password is incorrect！"
+  }
+}
