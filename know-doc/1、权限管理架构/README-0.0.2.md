@@ -372,9 +372,227 @@ sys_oper_log {
 
 ---
 
+---
+
+### 十一、数据字典实现
+
+#### 11.1 数据库设计
+
+##### 字典类型表 (sys_dict_type)
+
+```sql
+CREATE TABLE `sys_dict_type` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `dict_name` varchar(100) NOT NULL COMMENT '字典名称',
+  `dict_type` varchar(100) NOT NULL COMMENT '字典类型（唯一标识）',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `status` tinyint DEFAULT 1 COMMENT '状态 [0=停用, 1=正常]',
+  `create_time` bigint DEFAULT NULL COMMENT '创建时间',
+  `update_time` bigint DEFAULT NULL COMMENT '更新时间',
+  `delete_time` bigint DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_dict_type` (`dict_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
+```
+
+##### 字典数据表 (sys_dict_data)
+
+```sql
+CREATE TABLE `sys_dict_data` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `dict_type_id` bigint NOT NULL COMMENT '字典类型ID',
+  `dict_label` varchar(100) NOT NULL COMMENT '字典标签',
+  `dict_value` varchar(100) NOT NULL COMMENT '字典值',
+  `dict_code` varchar(100) DEFAULT NULL COMMENT '字典编码（业务使用）',
+  `sort` int DEFAULT 0 COMMENT '排序',
+  `status` tinyint DEFAULT 1 COMMENT '状态 [0=停用, 1=正常]',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `create_time` bigint DEFAULT NULL COMMENT '创建时间',
+  `update_time` bigint DEFAULT NULL COMMENT '更新时间',
+  `delete_time` bigint DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_dict_type_id` (`dict_type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
+```
+
+#### 11.2 实体类
+
+##### DictType.java
+
+```java
+@Data
+@ApiModel("字典类型实体")
+public class DictType implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id", type = IdType.AUTO)
+    @ApiModelProperty("ID")
+    private Long id;
+
+    @ApiModelProperty("字典名称")
+    private String dictName;
+
+    @ApiModelProperty("字典类型")
+    private String dictType;
+
+    @ApiModelProperty("备注")
+    private String remark;
+
+    @ApiModelProperty("状态 [0=停用, 1=正常]")
+    private Integer status;
+
+    @TableField(fill = FieldFill.INSERT)
+    @ApiModelProperty("创建时间")
+    private Long createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ApiModelProperty("更新时间")
+    private Long updateTime;
+
+    @TableLogic
+    @ApiModelProperty("删除时间")
+    private Long deleteTime;
+}
+```
+
+##### DictData.java
+
+```java
+@Data
+@ApiModel("字典数据实体")
+public class DictData implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id", type = IdType.AUTO)
+    @ApiModelProperty("ID")
+    private Long id;
+
+    @ApiModelProperty("字典类型ID")
+    private Long dictTypeId;
+
+    @ApiModelProperty("字典标签")
+    private String dictLabel;
+
+    @ApiModelProperty("字典值")
+    private String dictValue;
+
+    @ApiModelProperty("字典编码")
+    private String dictCode;
+
+    @ApiModelProperty("排序")
+    private Integer sort;
+
+    @ApiModelProperty("状态 [0=停用, 1=正常]")
+    private Integer status;
+
+    @ApiModelProperty("备注")
+    private String remark;
+
+    @TableField(fill = FieldFill.INSERT)
+    @ApiModelProperty("创建时间")
+    private Long createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ApiModelProperty("更新时间")
+    private Long updateTime;
+
+    @TableLogic
+    @ApiModelProperty("删除时间")
+    private Long deleteTime;
+}
+```
+
+#### 11.3 Service 实现要点
+
+```java
+@Service
+public class DictDataServiceImpl implements IDictDataService {
+
+    // 按类型ID查询（带缓存）
+    @Cacheable(value = "dict", key = "#dictTypeId")
+    @Override
+    public List<DictData> listByTypeId(Long dictTypeId) {
+        return list(new LambdaQueryWrapper<DictData>()
+                .eq(DictData::getDictTypeId, dictTypeId)
+                .eq(DictData::getStatus, 1)
+                .orderByAsc(DictData::getSort));
+    }
+
+    // 按类型编码查询
+    @Cacheable(value = "dict", key = "#dictTypeCode")
+    @Override
+    public List<DictData> listByTypeCode(String dictTypeCode) {
+        DictType dictType = dictTypeService.getOne(new LambdaQueryWrapper<DictType>()
+                .eq(DictType::getDictType, dictTypeCode));
+        if (dictType == null) {
+            return Collections.emptyList();
+        }
+        return listByTypeId(dictType.getId());
+    }
+
+    // 增删改时清除缓存
+    @CacheEvict(value = "dict", allEntries = true)
+    @Override
+    public boolean add(DictDataDTO dto) { ... }
+
+    @CacheEvict(value = "dict", allEntries = true)
+    @Override
+    public boolean update(DictDataDTO dto) { ... }
+
+    @CacheEvict(value = "dict", allEntries = true)
+    @Override
+    public boolean delete(Long id) { ... }
+}
+```
+
+#### 11.4 接口列表
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| /system/dict/type/page | GET | 分页查询字典类型 |
+| /system/dict/type/list | GET | 获取所有正常类型 |
+| /system/dict/type | POST | 新增字典类型 |
+| /system/dict/type | PUT | 修改字典类型 |
+| /system/dict/type/{id} | DELETE | 删除字典类型 |
+| /system/dict/data/page | GET | 分页查询字典数据 |
+| /system/dict/data/type/{dictTypeId} | GET | 按类型ID查询 |
+| /system/dict/data/typeCode/{dictTypeCode} | GET | 按类型编码查询 |
+| /system/dict/data | POST | 新增字典数据 |
+| /system/dict/data | PUT | 修改字典数据 |
+| /system/dict/data/{id} | DELETE | 删除字典数据 |
+
+#### 11.5 前端工具函数
+
+```typescript
+// 字典缓存
+const dictCache = new Map<string, any[]>()
+
+// 获取字典数据
+export async function getDictData(dictTypeCode: string): Promise<any[]> {
+  if (dictCache.has(dictTypeCode)) {
+    return dictCache.get(dictTypeCode)!
+  }
+  const res = await getDictDataByTypeCode(dictTypeCode)
+  if (res.code === 200) {
+    dictCache.set(dictTypeCode, res.data)
+  }
+  return res.data || []
+}
+
+// 获取字典标签
+export function getDictLabel(dictTypeCode: string, dictValue: string): string {
+  const dictData = dictCache.get(dictTypeCode) || []
+  const item = dictData.find((d: any) => d.dictValue === dictValue)
+  return item ? item.dictLabel : dictValue
+}
+```
+
+---
+
 ### 附录：版本历史
 
 | 版本 | 更新内容 |
 |------|----------|
 | 0.0.1 | 初版，基础功能列举 |
 | 0.0.2 | 完善数据库设计、补全安全机制、增加缓存策略、添加审计日志、完善租户权限 |
+| 0.0.3 | 新增数据字典完整实现方案 |
