@@ -43,8 +43,99 @@ WIFI模块 → 获取WIFI列表/连接WIFI
 
 ### 2.2 WIFI连接流程
 
-**方案：用户手动输入WIFI密码（推荐）**
+连接WIFI后，自动扫描该WIFI下的摄像头设备（与手机当前连接的WIFI无关）
 
+**方案：用户手动输入WIFI密码 + 配网协议**
+
+```
+1. 移动端输入目标WIFI名称+密码
+2. APP通过配网协议发送WIFI信息给摄像头
+3. 摄像头连接目标WIFI并上线
+4. 移动端在局域网发现摄像头
+5. 移动端通过RTSP/ONVIF访问摄像头
+```
+
+#### 2.2.1 配网协议
+
+| 协议 | 说明 | 适用设备 |
+|------|------|----------|
+| SmartConfig | UDP广播配网 | 乐鑫ESP8266 |
+| Airkiss | 微信配网方案 | 通用 |
+| 快连 | 一键配网 | 通用 |
+| 蓝牙配网 | 蓝牙辅助配网 | 部分设备 |
+| 二维码配网 | 摄像头扫描二维码 | 部分设备 |
+
+```javascript
+// 配网示例（以UDP广播为例）
+class WiFiConfig {
+  constructor() {
+    this.udp = null
+  }
+  
+  // 开始配网
+  async startConfig(ssid, password) {
+    // 组装配网数据
+    const data = this.buildConfigPacket(ssid, password)
+    
+    // 持续广播配网信息
+    this.broadcastConfig(data)
+    
+    // 等待摄像头联网成功
+    return await this.waitForDeviceOnline(30000)
+  }
+  
+  // 构建配网数据包
+  buildConfigPacket(ssid, password) {
+    // 不同厂商协议格式不同
+    // 返回二进制数据
+  }
+  
+  // 广播配网
+  broadcastConfig(data) {
+    // UDP广播到 255.255.255.255:端口
+  }
+  
+  // 等待设备上线
+  async waitForDeviceOnline(timeout) {
+    // 持续监听设备响应
+  }
+}
+```
+
+#### 2.2.2 完整连接流程
+
+```
+移动端                    摄像头                    目标WIFI
+  │                        │                        │
+  │  1.输入WIFI信息        │                        │
+  │───────────────────────→│                        │
+  │  2.UDP广播配网         │                        │
+  │───────────────────────→│                        │
+  │                        │  3.连接目标WIFI        │
+  │                        │──────────────────────→│
+  │                        │                        │ 
+  │  4.局域网发现设备       │                        │
+  │←───────────────────────│                        │
+  │                        │                        │
+  │  5.RTSP/ONVIF连接      │                        │
+  │←───────────────────────│                        │
+  │  6.获取视频流           │                        │
+```
+
+#### 2.2.3 备选：系统WIFI列表（部分支持）
+
+```
+1. 获取当前WIFI信息
+   uni.getConnectedWifi()
+   
+2. 获取WIFI列表（需定位权限）
+   uni.getWifiList()
+   
+3. 选择已有WIFI连接
+   uni.addWifiDevice({
+     SSID: 'xxx',
+     password: 'xxx'
+   })
 ```
 1. 用户在APP上手动输入WIFI名称和密码
 2. APP将WIFI信息传递给摄像头设备
