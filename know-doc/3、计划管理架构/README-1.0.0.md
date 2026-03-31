@@ -51,7 +51,7 @@
 
 ```sql
 -- 四象限分类表
-CREATE TABLE `sys_quadrant` (
+CREATE TABLE `plan_quadrant` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(20) NOT NULL COMMENT '象限名称',
   `code` varchar(20) NOT NULL COMMENT '象限编码',
@@ -67,7 +67,7 @@ CREATE TABLE `sys_quadrant` (
 );
 
 -- 初始数据
-INSERT INTO `sys_quadrant` VALUES
+INSERT INTO `plan_quadrant` VALUES
 (1, '重要且紧急', 'Q1', '#FF6B6B', '需要立即处理', 1, 1, NULL, NULL),
 (2, '重要不紧急', 'Q2', '#4ECDC4', '需要规划安排', 2, 1, NULL, NULL),
 (3, '不重要紧急', 'Q3', '#FFE66D', '可委托他人', 3, 1, NULL, NULL),
@@ -93,7 +93,7 @@ INSERT INTO `sys_quadrant` VALUES
 
 ```sql
 -- 计划表
-CREATE TABLE `sys_plan` (
+CREATE TABLE `plan_info` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `plan_name` varchar(100) NOT NULL COMMENT '计划名称',
   `plan_type` varchar(50) NOT NULL COMMENT '计划分类',
@@ -127,7 +127,7 @@ CREATE TABLE `sys_plan` (
 
 ```sql
 -- 计划类型表
-CREATE TABLE `sys_plan_type` (
+CREATE TABLE `plan_info_type` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `type_name` varchar(50) NOT NULL COMMENT '类型名称',
   `type_code` varchar(50) NOT NULL COMMENT '类型编码',
@@ -140,7 +140,7 @@ CREATE TABLE `sys_plan_type` (
 );
 
 -- 初始数据
-INSERT INTO `sys_plan_type` VALUES
+INSERT INTO `plan_info_type` VALUES
 (1, '生活习惯', 'life', '🏃', '#67C23A', 1, 1),
 (2, '认知提升', 'cognition', '📚', '#409EFF', 2, 1),
 (3, '工作技能', 'skill', '💼', '#E6A23C', 3, 1),
@@ -157,7 +157,7 @@ INSERT INTO `sys_plan_type` VALUES
 
 ```sql
 -- 日程表
-CREATE TABLE `sys_schedule` (
+CREATE TABLE `plan_schedule` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `title` varchar(100) NOT NULL COMMENT '日程标题',
   `content` varchar(500) DEFAULT NULL COMMENT '日程内容',
@@ -191,6 +191,80 @@ CREATE TABLE `sys_schedule` (
 | 周视图 | 周一至周日展示 |
 | 月视图 | 月历形式展示 |
 | 象限视图 | 按四象限分类展示 |
+
+### 4.3 打卡功能设计
+
+#### 4.3.1 打卡任务表
+
+```sql
+-- 打卡任务表
+CREATE TABLE `plan_clock_in` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(100) NOT NULL COMMENT '打卡名称',
+  `icon` varchar(100) DEFAULT NULL COMMENT '图标',
+  `color` varchar(20) DEFAULT NULL COMMENT '颜色',
+  `plan_id` bigint DEFAULT NULL COMMENT '关联计划ID',
+  `clock_type` tinyint DEFAULT 1 COMMENT '打卡类型: 1-每日, 2-自定义',
+  `clock_days` varchar(100) DEFAULT NULL COMMENT '自定义打卡日期,如:1,2,3表示周一二三',
+  `start_time` bigint DEFAULT NULL COMMENT '每日开始时间',
+  `end_time` bigint DEFAULT NULL COMMENT '每日结束时间',
+  `remind_enabled` tinyint DEFAULT 1 COMMENT '是否开启提醒',
+  `remind_time` varchar(10) DEFAULT NULL COMMENT '提醒时间,如:09:00',
+  `status` tinyint DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
+  `create_by` bigint DEFAULT NULL,
+  `create_time` bigint DEFAULT NULL,
+  `update_by` bigint DEFAULT NULL,
+  `update_time` bigint DEFAULT NULL,
+  `delete_time` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_plan_id` (`plan_id`)
+);
+```
+
+#### 4.3.2 打卡记录表
+
+```sql
+-- 打卡记录表
+CREATE TABLE `plan_clock_in_record` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `clock_in_id` bigint NOT NULL COMMENT '打卡任务ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `clock_date` date NOT NULL COMMENT '打卡日期',
+  `clock_time` bigint DEFAULT NULL COMMENT '打卡时间戳',
+  `status` tinyint DEFAULT 0 COMMENT '状态: 0-未打卡, 1-已打卡, 2-漏打卡',
+  `remark` varchar(200) DEFAULT NULL COMMENT '备注',
+  `create_time` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_clock_date` (`clock_in_id`, `clock_date`, `user_id`)
+);
+```
+
+#### 4.3.3 打卡统计视图
+
+```sql
+-- 打卡统计（可用视图或查询）
+SELECT 
+  pci.name as打卡名称,
+  COUNT(pcirl.id) as 累计打卡次数,
+  SUM(CASE WHEN pcirl.status = 1 THEN 1 ELSE 0 END) as 实际打卡次数,
+  MAX(pcirl.clock_date) as 最后打卡日期
+FROM plan_clock_in pci
+LEFT JOIN plan_clock_in_record pcirl ON pci.id = pcirl.clock_in_id
+WHERE pcirl.user_id = ?
+GROUP BY pci.id;
+```
+
+#### 4.3.4 打卡功能接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| /api/clockin/page | GET | 分页查询打卡任务 |
+| /api/clockin | POST | 新增打卡任务 |
+| /api/clockin/{id} | PUT | 修改打卡任务 |
+| /api/clockin/{id}/delete | DELETE | 删除打卡任务 |
+| /api/clockin/{id}/clock | POST | 立即打卡 |
+| /api/clockin/today | GET | 今日打卡列表 |
+| /api/clockin/stats | GET | 打卡统计 |
 
 ---
 
