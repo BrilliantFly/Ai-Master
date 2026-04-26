@@ -12,11 +12,12 @@ const isProduction = import.meta.env.PROD
 // Service configuration
 const serviceConfig = {
   // Gateway base URL - production uses env var, dev uses proxy
-  baseURL: isProduction ? (import.meta.env.VITE_API_BASE_URL || '/api') : '/api',
+  // 后端不需要 /api 前缀，所以这里留空
+  baseURL: isProduction ? (import.meta.env.VITE_API_BASE_URL || '') : '',
 
   // Service path mapping
   serviceMap: {
-    java: '/plan', // Java services (plan, system, etc.)
+    java: '', // 直接代理到后端
     python: '/python' // Python AI services
   },
   timeout: 10 * 1000
@@ -40,7 +41,11 @@ const handleError = (error: AxiosError): Promise<AxiosError> => {
 
 // Request interceptors configuration
 service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = getToken()
+  // 优先从 localStorage 读取 token
+  let token = localStorage.getItem('token')
+  if (!token) {
+    token = getToken() as string
+  }
   if (token) {
     ;(config as Recordable).headers['Authorization'] = `${token}`
   }
@@ -58,12 +63,16 @@ service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 // Respose interceptors configuration
 service.interceptors.response.use((response: AxiosResponse) => {
   const data = response.data
+  console.log('Axios 响应原始数据:', data)
 
-  if (data.code === 0) {
-    return data.data
+  // 后端成功 code=0 或 code=1 或 code=2
+  if (data.code === 0 || data.code === 1 || data.code === 2 || data.code === 200) {
+    console.log('Axios 判定为成功')
+    // 统一返回 data
+    return data
   } else {
-    message.error(data.message)
-
+    console.log('Axios 判定为失败，code:', data.code, 'msg:', data.msg)
+    message.error(data.msg || data.message || '操作失败')
     return Promise.reject('error')
   }
 }, handleError)

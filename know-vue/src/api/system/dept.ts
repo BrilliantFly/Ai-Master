@@ -8,13 +8,14 @@ export interface DeptQuery extends Pagination {
 
 export interface Dept {
   id?: number
-  parentId: number
-  title: string
-  deptSort: number
-  leader: string
-  phone: string
-  email: string
-  enabled: boolean
+  parentId?: number
+  deptName: string
+  deptCode?: string
+  sort?: number
+  leader?: string
+  phone?: string
+  email?: string
+  status?: number
   createTime?: string
   children?: Dept[]
 }
@@ -61,5 +62,30 @@ export function deleteDept(id: number): Promise<any> {
   return service({
     url: `/system/dept/${id}`,
     method: 'delete'
+  })
+}
+
+// 获取部门下的用户列表
+export function getDeptUsers(deptId: number): Promise<any> {
+  return service({
+    url: `/system/dept/${deptId}/users`,
+    method: 'get'
+  })
+}
+
+// 获取部门关联的岗位ID列表
+export function getDeptJobs(deptId: number): Promise<any> {
+  return service({
+    url: `/system/dept/${deptId}/jobs`,
+    method: 'get'
+  })
+}
+
+// 分配岗位给部门
+export function assignJobsToDept(deptId: number, jobIds: number[]): Promise<any> {
+  return service({
+    url: '/system/dept/assignJobs',
+    method: 'post',
+    data: { deptId, jobIds }
   })
 }
