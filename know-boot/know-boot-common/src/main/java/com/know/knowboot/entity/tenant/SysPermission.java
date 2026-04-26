@@ -4,18 +4,20 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 
+/**
+ * 权限表
+ */
 @Data
-@TableName("sys_menu")
-@ApiModel("菜单权限实体")
-public class SysMenu implements Serializable {
+@TableName("sys_permission")
+@ApiModel("权限实体")
+public class SysPermission implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -23,51 +25,55 @@ public class SysMenu implements Serializable {
     @ApiModelProperty("主键")
     private Long id;
 
-    @ApiModelProperty("父菜单ID (0:根)")
+    @ApiModelProperty("父权限ID (0:根)")
     private Long parentId;
 
-    @ApiModelProperty("菜单名称")
-    private String menuName;
+    @ApiModelProperty("权限名称")
+    private String name;
 
-    @ApiModelProperty("路由地址")
+    @ApiModelProperty("权限编码 (system:user:add)")
+    private String code;
+
+    @ApiModelProperty("权限类型 (button/api/data)")
+    private String permissionType;
+
+    @ApiModelProperty("资源类型 (button/menu/api)")
+    private String resourceType;
+
+    @ApiModelProperty("路由/接口路径")
     private String path;
 
-    @ApiModelProperty("组件路径")
+    @ApiModelProperty("前端组件路径")
     private String component;
 
-    @ApiModelProperty("权限标识")
-    private String perms;
-
-    @ApiModelProperty("菜单图标")
+    @ApiModelProperty("图标")
     private String icon;
-
-    @ApiModelProperty("类型 (1:目录, 2:菜单, 3:按钮)")
-    private Integer menuType;
 
     @ApiModelProperty("排序")
     private Integer sort;
 
-    @ApiModelProperty("状态 (1:显示, 0:隐藏)")
+    @ApiModelProperty("状态 (1:启用, 0:禁用)")
     private Integer status;
-
-    @ApiModelProperty("租户ID (空为系统级)")
-    private Long tenantId;
 
     @ApiModelProperty("创建人")
     private String createBy;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private Long createTime;
 
     @ApiModelProperty("更新人")
     private String updateBy;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("更新时间")
-    private Date updateTime;
+    private Long updateTime;
 
     @TableLogic
     @ApiModelProperty("删除标志")
     private Integer delFlag;
+
+    /**
+     * 子权限列表（用于树形结构）
+     */
+    @ApiModelProperty("子权限列表")
+    private List<SysPermission> children;
 }

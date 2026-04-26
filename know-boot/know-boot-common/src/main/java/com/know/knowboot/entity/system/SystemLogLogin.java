@@ -36,7 +36,7 @@ public class SystemLogLogin implements Serializable {
     @ApiModelProperty("操作状态: [1=成功, 2=失败]")
     private Integer status;
 
-    @ApiModelProperty("创建时间")
-    private Long createTime;
+    @ApiModelProperty("登录时间")
+    private Long loginTime;
 
 }
