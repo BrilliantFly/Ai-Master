@@ -27,12 +27,11 @@ const requestHooks: RequestHooks = {
             options.url = `${baseUrl}${options.url}`;
         }
         const token = getToken();
-        // 添加token
-        if (withToken && !options.header.token) {
-            options.header.token = token;
+        // 添加token (Sa-Token使用satoken请求头)
+        if (withToken && token) {
+            options.header['satoken'] = token;
         }
         options.header.version = appConfig.version;
-        // options.header.terminal = getClient();
         return options;
     },
     async responseInterceptorsHook(response, config) {

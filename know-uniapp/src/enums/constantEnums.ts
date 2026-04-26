@@ -2,6 +2,7 @@
 
 //token
 export const TOKEN_KEY = 'token'
+export const TOKEN_NAME = 'tokenName'
 
 // 搜索历史记录
 export const HISTORY = 'history'

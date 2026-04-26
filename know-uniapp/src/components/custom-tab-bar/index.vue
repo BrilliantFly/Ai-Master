@@ -8,19 +8,19 @@
                 :class="{ active: currentIndex === index }"
                 @click="handleClick(item, index)"
             >
-                <template v-if="item.is_big === 1">
+                <template v-if="item.isBig === 1">
                     <view class="big-button" :style="bigButtonStyle">
-                        <image v-if="item.big_icon" :src="getImageUrl(item.big_icon)" class="big-icon" mode="aspectFit" />
+                        <image v-if="item.bigIcon" :src="getImageUrl(item.bigIcon)" class="big-icon" mode="aspectFit" />
                         <text v-else class="iconfont icon-plus"></text>
                     </view>
                 </template>
                 <template v-else>
                     <image
-                        :src="currentIndex === index ? getImageUrl(item.selected) : getImageUrl(item.unselected)"
+                        :src="currentIndex === index ? getImageUrl(item.selectedIcon) : getImageUrl(item.icon)"
                         class="tab-icon"
                         mode="aspectFit"
                     />
-                    <text class="tab-text">{{ item.name }}</text>
+                    <text class="tab-text">{{ item.menuName }}</text>
                 </template>
             </view>
         </view>
@@ -35,7 +35,7 @@
                     @click="handlePopupClick(menu)"
                 >
                     <image v-if="menu.icon" :src="getImageUrl(menu.icon)" class="popup-icon" mode="aspectFit" />
-                    <text class="popup-text">{{ menu.name }}</text>
+                    <text class="popup-text">{{ menu.menuName || menu.name }}</text>
                 </view>
             </view>
         </view>
@@ -49,16 +49,20 @@ import { navigateTo } from '@/utils/util'
 
 interface TabbarItem {
     id: number
-    name: string
-    selected: string
-    unselected: string
+    menuName: string
+    path: string
+    icon: string
+    selectedIcon: string
     link: any
-    is_show: number
-    is_big: number
-    big_icon: string
-    big_type: string
-    big_position: number
-    big_list: any[]
+    isShow: number
+    isBig: number
+    bigIcon: string
+    bigType: string
+    bigPosition: number
+    bigList: any[]
+    renderType: number
+    renderConfig: string
+    permissionCode: string
 }
 
 const appStore = useAppStore()
@@ -69,7 +73,7 @@ const currentPopupItem = ref<TabbarItem | null>(null)
 
 const tabList = computed(() => {
     return appStore.getTabbarConfig
-        ?.filter((item: any) => item.is_show == 1)
+        ?.filter((item: any) => item.isShow == 1)
         .sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0))
         || []
 })
@@ -84,26 +88,26 @@ const getImageUrl = (url: string) => {
 }
 
 const handleClick = (item: TabbarItem, index: number) => {
-    if (item.is_big === 1) {
+    if (item.isBig === 1) {
         currentPopupItem.value = item
-        if (item.big_type === 'popup' && item.big_list?.length) {
-            popupList.value = item.big_list
+        if (item.bigType === 'popup' && item.bigList?.length) {
+            popupList.value = item.bigList
             showPopup.value = true
-        } else {
-            navigateTo(item.link, 'reLaunch')
+        } else if (item.path) {
+            navigateTo({ path: item.path }, 'switchTab')
         }
         return
     }
 
     currentIndex.value = index
-    const link = item.link || {}
-    const navigateType = link.canTab ? 'switchTab' : 'navigateTo'
-    navigateTo(link, navigateType)
+    if (item.path) {
+        navigateTo({ path: item.path }, 'switchTab')
+    }
 }
 
 const handlePopupClick = (menu: any) => {
     showPopup.value = false
-    navigateTo(menu.link || {}, 'navigateTo')
+    navigateTo({ path: menu.path }, 'navigateTo')
 }
 
 const closePopup = () => {
@@ -116,8 +120,8 @@ const updateCurrentIndex = () => {
     const currentPath = '/' + currentPage.route
 
     const index = tabList.value.findIndex((item: TabbarItem) => {
-        if (item.is_big === 1) return false
-        return item.link?.path === currentPath
+        if (item.isBig === 1) return false
+        return item.path === currentPath
     })
 
     if (index >= 0) {

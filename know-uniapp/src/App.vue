@@ -2,26 +2,27 @@
 import { onLaunch } from '@dcloudio/uni-app'
 import { useAppStore } from './stores/app'
 import { useUserStore } from './stores/user'
+import { useDictStore } from './stores/dict'
 import { useThemeStore } from './stores/theme'
-import { useRoute, useRouter } from 'uniapp-router-next'
+import { useRouter, useRoute } from 'uniapp-router-next'
+
 const appStore = useAppStore()
-const { getUser } = useUserStore()
-const { getTheme } = useThemeStore()
+const userStore = useUserStore()
+const dictStore = useDictStore()
+const themeStore = useThemeStore()
 const router = useRouter()
 const route = useRoute()
 
 //#ifdef H5
 const setH5WebIcon = () => {
     const config = appStore.getWebsiteConfig
-    let favicon: HTMLLinkElement = document.querySelector('link[rel="icon"]')!
-    if (favicon) {
-        favicon.href = config.h5_favicon
-        return
+    let favicon: HTMLLinkElement = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+    if (!favicon) {
+        favicon = document.createElement('link') as HTMLLinkElement
+        favicon.rel = 'icon'
+        document.head.appendChild(favicon)
     }
-    favicon = document.createElement('link')
-    favicon.rel = 'icon'
     favicon.href = config.h5_favicon
-    document.head.appendChild(favicon)
 }
 //#endif
 
@@ -32,22 +33,36 @@ const getConfig = async () => {
     //#endif
     const { status, page_status, page_url } = appStore.getH5Config
     if (route.meta.webview) return
-    //处理关闭h5渠道
     //#ifdef H5
     if (status == 0) {
-        if (page_status == 1) return (location.href = page_url)
+        if (page_status == 1) {
+            location.href = page_url
+            return
+        }
         router.reLaunch('/pages/empty/empty')
     }
     //#endif
 }
 
+// 初始化数据
+const initData = async () => {
+    await userStore.getUser()
+    await dictStore.loadDictData()
+    // 加载用户菜单配置（带权限）
+    await appStore.loadUserMenuConfig()
+}
+
 onLaunch(async () => {
-    getTheme()
-    getConfig()
+    await themeStore.getTheme()
+    await getConfig()
     //#ifdef H5
     setH5WebIcon()
     //#endif
-    await getUser()
+    
+    // 如果已登录则加载数据
+    if (userStore.isLogin) {
+        await initData()
+    }
 })
 </script>
 <style lang="scss">

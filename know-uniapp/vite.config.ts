@@ -33,5 +33,10 @@ export default defineConfig({
     },
     server: {
         port: 8991
+    },
+    build: {
+        rollupOptions: {
+            external: ['E:\\System Volume Information']
+        }
     }
 })

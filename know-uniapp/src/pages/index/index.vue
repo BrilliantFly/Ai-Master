@@ -75,18 +75,31 @@
 <script setup lang="ts">
 	import { ref, reactive, onMounted } from 'vue'
 	import { onShow } from '@dcloudio/uni-app'
+	import { useAppStore } from '@/stores/app'
+	import { useUserStore } from '@/stores/user'
 	import { getHomeConfig } from '@/api/plan/home'
 
+	const appStore = useAppStore()
+	const userStore = useUserStore()
 	const bannerList = ref<any[]>([])
 	const noticeList = ref<any[]>([])
 	const menuList = ref<any[]>([])
 	const gridList = ref<any[]>([])
 
-	const userId = 1
-	const roleId = '1'
-
 	const loadConfig = async () => {
+		// 优先使用新版API获取菜单配置
+		const homeMenu = appStore.getHomeMenu
+		if (homeMenu?.length) {
+			// 过滤首页菜单
+			const menus = homeMenu.filter((m: any) => m.renderType === 1)
+			menuList.value = menus.slice(0, 5) // 滚动菜单
+			gridList.value = menus // 九宫格
+		}
+		
+		// 尝试加载旧版配置（兼容）
 		try {
+			const userId = userStore.userInfo?.id || 1
+			const roleId = userStore.userInfo?.roleId || '1'
 			const data = await getHomeConfig({ userId, roleId })
 			const config = data || {}
 
@@ -107,26 +120,6 @@
 					noticeList.value = content.notices || []
 				} catch (e) {
 					noticeList.value = []
-				}
-			}
-
-			// 解析滚动菜单
-			if (config.menu && config.menu.content) {
-				try {
-					const content = JSON.parse(config.menu.content)
-					menuList.value = content.menus || []
-				} catch (e) {
-					menuList.value = []
-				}
-			}
-
-			// 解析九宫格
-			if (config.grid && config.grid.content) {
-				try {
-					const content = JSON.parse(config.grid.content)
-					gridList.value = content.grids || []
-				} catch (e) {
-					gridList.value = []
 				}
 			}
 		} catch (e) {
