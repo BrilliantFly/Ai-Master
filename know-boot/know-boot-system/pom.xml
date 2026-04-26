@@ -56,11 +56,13 @@
         </dependency>
 
         <!-- 代码生成 -->
+        <!--
         <dependency>
             <groupId>com.know</groupId>
             <artifactId>know-boot-generator</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        -->
 
         <!-- 验证码 -->
         <dependency>
@@ -99,6 +101,7 @@
         </dependency>
 
         <!-- Plan 模块 - 单机模式使用 -->
+        <!--
         <dependency>
             <groupId>com.know</groupId>
             <artifactId>know-boot-plan</artifactId>
@@ -122,6 +125,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        -->
 
         <!-- Swagger3 -->
         <dependency>

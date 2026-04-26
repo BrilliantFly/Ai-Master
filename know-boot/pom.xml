@@ -27,14 +27,9 @@
         <module>know-boot-base</module>
         <module>know-boot-start</module>
         <module>know-boot-system</module>
-        <module>know-boot-plan</module>
         <module>know-boot-api</module>
         <module>know-boot-accumulate</module>
-        <module>know-boot-front</module>
-        <module>know-boot-generator</module>
         <module>know-boot-common</module>
-        <module>know-boot-camera</module>
-        <module>know-boot-customer</module>
     </modules>
 
     <!--配置依赖-->
@@ -201,12 +196,12 @@
                 <artifactId>mybatis-plus-join</artifactId>
                 <version>${mybatis-plus-join.version}</version>
             </dependency>
-            <!-- MyBatis-PageHelper -->
-            <dependency>
-                <groupId>com.github.pagehelper</groupId>
-                <artifactId>pagehelper-spring-boot-starter</artifactId>
-                <version>${pagehelper.version}</version>
-            </dependency>
+            <!-- MyBatis-PageHelper (已移除，使用MyBatis-Plus内置分页插件) -->
+            <!-- <dependency> -->
+            <!--     <groupId>com.github.pagehelper</groupId> -->
+            <!--     <artifactId>pagehelper-spring-boot-starter</artifactId> -->
+            <!--     <version>${pagehelper.version}</version> -->
+            <!-- </dependency> -->
 
             <!-- Pool2 -->
 <!--            <dependency>-->

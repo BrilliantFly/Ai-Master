@@ -62,11 +62,12 @@
             <artifactId>mybatis-plus-join</artifactId>
         </dependency>
 
-        <!-- MyBatis-Page-Helper -->
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper-spring-boot-starter</artifactId>
-        </dependency>
+        <!-- MyBatis-Page-Helper (已移除，使用MyBatis-Plus内置分页) -->
+        <!-- <dependency> -->
+        <!--     <groupId>com.github.pagehelper</groupId> -->
+        <!--     <artifactId>pagehelper-spring-boot-starter</artifactId> -->
+        <!--     <version>1.4.7</version> -->
+        <!-- </dependency> -->
 
         <!-- Pool2 -->
         <dependency>

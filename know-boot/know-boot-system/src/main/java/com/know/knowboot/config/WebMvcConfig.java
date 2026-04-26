@@ -21,6 +21,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Resource
     KnowBootSystemInterceptor likeAdminInterceptor;
 
+    @Resource
+    JwtPermissionFilter jwtPermissionFilter;
+
     /**
      * 配置允许跨域
      */
@@ -34,12 +37,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     * 登录拦截器
+     * 登录拦截器 + 权限拦截器
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 登录拦截器
         registry.addInterceptor(likeAdminInterceptor)
-                .addPathPatterns("/**");
+                .addPathPatterns("/api/**", "/adminapi/**")
+                .excludePathPatterns("/api/login/**", "/adminapi/login/**");
+
+        // 权限拦截器 - 在登录拦截器之后
+        registry.addInterceptor(jwtPermissionFilter)
+                .addPathPatterns("/api/**", "/adminapi/**")
+                .excludePathPatterns("/api/login/**", "/adminapi/login/**");
     }
 
     /**
