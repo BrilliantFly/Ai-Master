@@ -64,14 +64,42 @@ export const useUserStore = defineStore('app-user', {
       }
     ): Promise<UserInfo | null> {
       try {
+        console.log('开始登录，参数:', params)
         const { goHome = true, ...loginParams } = params
         const data = await loginApi(loginParams)
-        const { token } = data
-
+        console.log('登录返回原始数据:', data)
+        
+        // axios 返回整个响应对象 {code, msg, data, show}，实际数据在 data.data
+        const result = data.data
+        if (!result || !result.token) {
+          throw new Error('登录返回数据异常: ' + JSON.stringify(data))
+        }
+        
         // Save token
-        this.setToken(token)
-        return this.afterLoginAction(goHome)
+        this.setToken(result.token)
+        console.log('Token 已保存')
+        
+        // 保存用户信息
+        this.setUserInfo({
+          userId: result.userId,
+          username: result.username,
+          realName: result.realname,
+          homePath: '/home'
+        })
+        console.log('用户信息已保存')
+        
+        // 登录成功后直接跳转到首页
+        console.log('准备跳转到首页')
+        try {
+          await router.replace('/home')
+          console.log('跳转完成')
+        } catch (e) {
+          console.error('路由跳转失败:', e)
+        }
+        
+        return this.userInfo
       } catch (error) {
+        console.error('登录失败:', error)
         return Promise.reject(error)
       }
     },
@@ -90,8 +118,6 @@ export const useUserStore = defineStore('app-user', {
       return userInfo
     },
     async getUserInfoAction(): Promise<UserInfo | null> {
-      if (!this.getToken) return null
-
       const userInfo = await getUserInfo()
 
       this.setUserInfo(userInfo)

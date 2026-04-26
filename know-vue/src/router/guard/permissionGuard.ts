@@ -11,22 +11,17 @@ export function createPermissionGuard(router: Router) {
   const userStore = useUserStoreWithOut()
   const permissionStore = usePermissionStoreWithOut()
 
-  router.beforeEach(async (to, from, next) => {
-    if (
-      from.path === RootRoute.path &&
-      to.path === '/home' &&
-      userStore.getUserInfo.homePath &&
-      userStore.getUserInfo.homePath !== '/home'
-    ) {
-      next(userStore.getUserInfo.homePath)
-      return
-    }
-
+router.beforeEach(async (to, from, next) => {
+    console.log('[PermissionGuard] to:', to.path, 'from:', from.path)
+    
+    // 使用 getter 获取 token，确保从 localStorage 读取
     const token = userStore.getToken
+    console.log('[PermissionGuard] token:', token)
+    
     // Whitelist can be directly entered
     if (whiteList.includes(to.path)) {
       if (to.path === '/login' && token) {
-        const isSessionTimeout = userStore.getSessionTimeout
+        const isSessionTimeout = userStore.sessionTimeout
         try {
           await userStore.afterLoginAction()
           if (!isSessionTimeout) {
@@ -41,6 +36,7 @@ export function createPermissionGuard(router: Router) {
 
     // Token does not exist
     if (!token) {
+      console.log('[PermissionGuard] No token, redirect to login')
       // You can access without permission. You need to set the routing meta.ignoreAuth to true
       if (to.meta.ignoreAuth) {
         next()
@@ -67,22 +63,25 @@ export function createPermissionGuard(router: Router) {
     if (
       from.path === '/login' &&
       to.name === PageNotFoundRoute.name &&
-      to.fullPath !== (userStore.getUserInfo.homePath || '/home')
+      to.fullPath !== ((userStore.userInfo as any)?.homePath || '/home')
     ) {
-      next(userStore.getUserInfo.homePath || '/home')
+      next((userStore.userInfo as any)?.homePath || '/home')
       return
     }
 
     // Get userinfo while last fetch time is empty
-    if (userStore.getLastUpdateTime === 0) {
+    if (userStore.lastUpdateTime === 0) {
+      console.log('[PermissionGuard] Fetching user info...')
       try {
         await userStore.getUserInfoAction()
       } catch (err) {
+        console.log('[PermissionGuard] Get user info error:', err)
         next()
         return
       }
     }
 
+    console.log('[PermissionGuard] Building routes...')
     const routes = await permissionStore.buildRoutesAction()
 
     routes.forEach(route => {
@@ -90,14 +89,11 @@ export function createPermissionGuard(router: Router) {
     })
 
     router.addRoute(PageNotFoundRoute as unknown as RouteRecordRaw)
+    console.log('[PermissionGuard] Routes built, allowing navigation')
 
-    if (to.name === PageNotFoundRoute.name) {
+if (to.name === PageNotFoundRoute.name) {
       next({ path: to.fullPath, replace: true, query: to.query })
     } else {
-      // const redirectPath = (from.query.redirect || to.path) as string
-      // const redirect = decodeURIComponent(redirectPath)
-      // const nextData = to.path === redirect ? { ...to, replace: true } : { path: redirect }
-      // next(nextData)
       next()
     }
   })

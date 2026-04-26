@@ -17,7 +17,7 @@ const VideoRoute: AppRoute = {
     {
       path: 'video-player',
       name: 'VideoPlayer',
-      component: () => import('@/views/video/video-player'),
+      component: () => import('@/views/video/video-player.vue'),
       meta: {
         title: t('routes.video.player')
       }
@@ -25,7 +25,7 @@ const VideoRoute: AppRoute = {
     {
       path: 'video-watermark',
       name: 'VideoWatermark',
-      component: () => import('@/views/video/video-watermark'),
+      component: () => import('@/views/video/video-watermark.vue'),
       meta: {
         title: t('routes.video.watermark')
       }

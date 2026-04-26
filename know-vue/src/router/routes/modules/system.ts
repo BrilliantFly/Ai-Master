@@ -85,6 +85,14 @@ const ExcelRoute: AppRoute = {
       meta: {
         title: 'Wi-Fi管理'
       }
+    },
+    {
+      path: 'tenant',
+      name: 'Tenant',
+      component: () => import('@/views/system/tenant/index.vue'),
+      meta: {
+        title: '租户管理'
+      }
     }
   ]
 }
