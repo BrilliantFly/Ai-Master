@@ -1,9 +1,9 @@
 package com.know.knowboot.core;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.pagehelper.PageInfo;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,45 +26,27 @@ public class PageResult<T> {
     private List<T> lists;
 
     /**
-     * PageHelper分页
+     * 创建简单的分页结果 (适用于已知分页信息的情况)
      *
-     * @author fzr
-     * @param list (分页数据集)
-     * @param <T>  (泛型)
-     * @return PageList
+     * @param list     数据列表
+     * @param total    总记录数
+     * @param pageNo   当前页码
+     * @param pageSize 每页条数
+     * @param <T>      泛型
+     * @return PageResult
      */
-    public static <T> PageResult<T> pageHelper(List<T> list) {
+    public static <T> PageResult<T> of(List<T> list, long total, int pageNo, int pageSize) {
         PageResult<T> pageResult = new PageResult<>();
-        PageInfo<T> pageInfo = new PageInfo<>(list);
-        pageResult.setCount(pageInfo.getTotal());
-        pageResult.setPage_no(pageInfo.getPageNum());
-        pageResult.setPage_size(pageInfo.getPageSize());
-        pageResult.setLists(pageInfo.getList());
-        return pageResult;
-    }
-
-    /**
-     * PageHelper分页(数据额外处理)
-     *
-     * @author fzr
-     * @param list (分页数据集)
-     * @param <T>  (泛型)
-     * @return PageList
-     */
-    public static <T> PageResult<T> pageHelper(List<T> list, List<T> data) {
-        PageResult<T> pageResult = new PageResult<>();
-        PageInfo<T> pageInfo = new PageInfo<>(list);
-        pageResult.setCount(pageInfo.getTotal());
-        pageResult.setPage_no(pageInfo.getPageSize());
-        pageResult.setPage_size(pageInfo.getPageNum());
-        pageResult.setLists(data);
+        pageResult.setCount(total);
+        pageResult.setPage_no(pageNo);
+        pageResult.setPage_size(pageSize);
+        pageResult.setLists(list);
         return pageResult;
     }
 
     /**
      * MyBatisPlus分页
      *
-     * @author fzr
      * @param iPage (分页)
      * @param <T>   (泛型)
      * @return PageList
@@ -81,12 +63,11 @@ public class PageResult<T> {
     /**
      * MyBatisPlus分页(数据额外处理)
      *
-     * @author fzr
      * @param total   (总条数)
      * @param pageNo  (当前页码)
      * @param size    (每页条数)
-     * @param list    (列表数据)
-     * @param <T>     (泛型)
+     * @param list   (列表数据)
+     * @param <T>    (泛型)
      * @return PageList
      */
     public static <T> PageResult<T> iPageHandle(Long total, Long pageNo, Long size, List<T> list) {
@@ -117,6 +98,16 @@ public class PageResult<T> {
         pageResult.setLists(list);
         pageResult.setExtend(extend);
         return pageResult;
+    }
+
+    /**
+     * 空分页结果
+     *
+     * @param <T> 泛型
+     * @return 空分页结果
+     */
+    public static <T> PageResult<T> empty() {
+        return of(new ArrayList<>(), 0L, 1, 10);
     }
 
 }
