@@ -1,4 +1,6 @@
 /target/
+/know-boot-*/target/
+/know-boot-*/target/
 /.idea/workspace.xml
 *.iml
 rebel.xml
@@ -7,3 +9,8 @@ rebel.xml
 /.idea/
 /nul
 /know-boot/know-boot-customer/nul
+/backend.log
+/logging.path_*/
+/settings.xml
+/sql/
+/start-*.bat
