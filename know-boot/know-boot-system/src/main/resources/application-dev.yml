@@ -1,11 +1,11 @@
 # 项目配置
 like:
-  upload-directory: /opt/project/knowboot/data/ # 上传目录
+  upload-directory: /opt/project/knowboot/data/  # 上传目录
   unique-identification: know_boot_salt_v1  # 密码加密盐
   # 验证码配置
   captcha:
     # 是否开启验证码
-    status: true
+    status: false
     # 验证码有效时长
     expire: 120
     # 验证码缓存键名
@@ -55,8 +55,8 @@ spring:
       enabled: true
   # Redis配置
   redis:
-    host: 123.207.61.17   # Redis服务地址
-    port: 3309        # Redis端口
+    host: 127.0.0.1   # Redis服务地址
+    port: 6379        # Redis端口
     password:         # Redis密码
     database: 6       # 数据库索引
     timeout: 5000     # 连接超时
@@ -73,22 +73,18 @@ spring:
     exclude:
       - com.alibaba.cloud.seata.feign.SeataFeignAutoConfiguration
       - com.alibaba.cloud.seata.feign.SeataFeignClientAutoConfiguration
-# Mybatis-plus配置
+# Mybatis-plus配置 (已包含内置分页插件)
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml
-  typeAliasesPackage: com.mdd.**.mapper
+  typeAliasesPackage: com.know.**.mapper
   global-config:
     banner: false
-    db-config:
-      # table-# prefix: la_  (已删除)  (已删除)
-  configuration-properties:
-    # prefix: la_  (已删除)
 
 logging:
   config:
     classpath: logback-spring.xml
   logback-spring:
-    path: D:\var\logs\system
+    path: E:\Ai-Master\logs\system
     filename: system
     max-history: 100
   # mybatis的sql语句是debug下打印（mybatisplus日志、logging日志可以选择一个）
@@ -143,6 +139,9 @@ know:
   redisson:
     enabled: false  # 禁用Redisson，需要Redis时改为true并启动Redis
     address: redis://${spring.redis.host}:${spring.redis.port}
+  # 初始化配置
+  init:
+    tenant-data-initializer-enabled: true  # 启用租户数据初始化（PageHelper已移除）
 
 seata:
   enabled: false  # 禁用Seata分布式事务（单机模式）
