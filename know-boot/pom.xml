@@ -30,6 +30,7 @@
         <module>know-boot-api</module>
         <module>know-boot-accumulate</module>
         <module>know-boot-common</module>
+        <module>know-boot-camera</module>
     </modules>
 
     <!--配置依赖-->

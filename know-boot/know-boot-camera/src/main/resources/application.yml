@@ -1,0 +1,43 @@
+server:
+  port: 8085
+  
+spring:
+  application:
+    name: know-boot-camera
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ai_master?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:123456}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: 6379
+    
+# MyBatis Plus
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.know.knowboot.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# Camera ONVIF 配置
+camera:
+  onvif:
+    discovery:
+      port: 3702
+      timeout: 5000
+  rtsp:
+    default-port: 554
+    timeout: 10000
+    
+# 录像存储配置
+record:
+  storage:
+    path: ./records/
+    max-size: 1073741824
+    
+# 日志配置
+logging:
+  level:
+    com.know.knowboot: debug
