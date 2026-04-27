@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "摄像头列表",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
+  "enablePullDownRefresh": true,
+  "navigationBarLoading": true,
+  "usingComponents": {
+    "page-status": "/components/page-status/page-status"
+  }
+}

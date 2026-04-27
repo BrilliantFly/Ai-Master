@@ -1,45 +1,320 @@
 import request from "@/utils/request";
 
+/**
+ * 摄像头设备相关接口
+ */
+
+// 设备状态枚举
+export enum CameraStatus {
+    Offline = 0,
+    Online = 1
+}
+
+// 录像类型枚举
+export enum RecordType {
+    Manual = 1,      // 手动录制
+    Timed = 2,        // 定时录制
+    Motion = 3        // 移动侦测
+}
+
+// 录像状态枚举
+export enum RecordStatus {
+    Recording = 0,   // 录制中
+    Completed = 1,   // 已完成
+    Uploaded = 2      // 已上传
+}
+
+// 设备接口
 export interface CameraDevice {
-    id: number;
-    name: string;
-    ip: string;
-    port: number;
-    status: number;
-    brand?: string;
+    id?: number;
+    deviceName: string;
+    deviceCode: string;
+    deviceModel?: string;
+    manufacturer?: string;
+    ipAddress?: string;
+    macAddress?: string;
+    port?: number;
     username?: string;
     password?: string;
-    channel?: number;
-    streamType?: string;
-    rtspUrl?: string;
-    httpPort?: number;
-    thumbnail?: string;
     streamUrl?: string;
-    lastOnlineTime?: string;
-    playCount?: number;
-    sort?: number;
+    snapshotUrl?: string;
+    status?: CameraStatus;
+    position?: string;
     remark?: string;
-    manufacturer?: string;
-    model?: string;
+    userId?: number;
+    createBy?: number;
+    createTime?: number;
+    updateBy?: number;
+    updateTime?: number;
 }
+
+// 录像记录接口
+export interface CameraRecord {
+    id?: number;
+    deviceId: number;
+    recordType?: RecordType;
+    startTime?: number;
+    endTime?: number;
+    duration?: number;
+    filePath?: string;
+    fileSize?: number;
+    cloudUrl?: string;
+    status?: RecordStatus;
+    createBy?: number;
+    createTime?: number;
+}
+
+// 截图记录接口
+export interface CameraSnapshot {
+    id?: number;
+    deviceId: number;
+    captureTime?: number;
+    filePath?: string;
+    cloudUrl?: string;
+    thumbnail?: string;
+    createBy?: number;
+    createTime?: number;
+}
+
+// 分页参数
+export interface PageParams {
+    pageNum?: number;
+    pageSize?: number;
+    [key: string]: any;
+}
+
+// 分页结果
+export interface PageResult<T> {
+    records: T[];
+    total: number;
+    size: number;
+    current: number;
+    pages: number;
+}
+
+// ==================== 设备管理接口 ====================
+
+/**
+ * 分页查询设备列表
+ */
+export function getCameraPage(params: PageParams): Promise<PageResult<CameraDevice>> {
+    return request.get({
+        url: "/camera/device/page",
+        data: params
+    });
+}
+
+/**
+ * 获取设备列表
+ */
+export function getCameraList(): Promise<CameraDevice[]> {
+    return request.get({
+        url: "/camera/device/list"
+    });
+}
+
+/**
+ * 获取收藏设备
+ */
+export function getCameraFavorites(): Promise<CameraDevice[]> {
+    return request.get({
+        url: "/camera/device/favorites"
+    });
+}
+
+/**
+ * 获取设备详情
+ */
+export function getCameraDetail(id: number): Promise<CameraDevice> {
+    return request.get({
+        url: `/camera/device/${id}`
+    });
+}
+
+/**
+ * 新增设备
+ */
+export function addCamera(data: Partial<CameraDevice>): Promise<boolean> {
+    return request.post({
+        url: "/camera/device",
+        data
+    });
+}
+
+/**
+ * 修改设备
+ */
+export function updateCamera(data: Partial<CameraDevice>): Promise<boolean> {
+    return request.put({
+        url: "/camera/device",
+        data
+    });
+}
+
+/**
+ * 删除设备
+ */
+export function deleteCamera(id: number): Promise<boolean> {
+    return request.delete({
+        url: `/camera/device/${id}`
+    });
+}
+
+/**
+ * 检查设备编号是否存在
+ */
+export function checkDeviceCode(deviceCode: string, excludeId?: number): Promise<boolean> {
+    return request.get({
+        url: "/camera/device/check",
+        data: { deviceCode, excludeId }
+    });
+}
+
+/**
+ * 更新设备状态
+ */
+export function updateCameraStatus(id: number, status: CameraStatus): Promise<boolean> {
+    return request.put({
+        url: `/camera/device/status/${id}`,
+        data: { status }
+    });
+}
+
+// ==================== 录像管理接口 ====================
+
+/**
+ * 分页查询录像列表
+ */
+export function getRecordPage(params: { deviceId?: number } & PageParams): Promise<PageResult<CameraRecord>> {
+    return request.get({
+        url: "/camera/record/page",
+        data: params
+    });
+}
+
+/**
+ * 获取录像详情
+ */
+export function getRecordDetail(id: number): Promise<CameraRecord> {
+    return request.get({
+        url: `/camera/record/${id}`
+    });
+}
+
+/**
+ * 开始录制
+ */
+export function startRecord(deviceId: number, recordType?: RecordType): Promise<CameraRecord> {
+    return request.post({
+        url: "/camera/record/start",
+        data: { deviceId, recordType: recordType || RecordType.Manual }
+    });
+}
+
+/**
+ * 停止录制
+ */
+export function stopRecord(id: number): Promise<boolean> {
+    return request.post({
+        url: `/camera/record/stop/${id}`
+    });
+}
+
+/**
+ * 删除录像
+ */
+export function deleteRecord(id: number): Promise<boolean> {
+    return request.delete({
+        url: `/camera/record/${id}`
+    });
+}
+
+/**
+ * 批量删除录像
+ */
+export function deleteRecordBatch(ids: number[]): Promise<boolean> {
+    return request.delete({
+        url: "/camera/record/batch",
+        data: ids
+    });
+}
+
+/**
+ * 获取正在录制的录像
+ */
+export function getRecordingByDevice(deviceId: number): Promise<CameraRecord | null> {
+    return request.get({
+        url: "/camera/record/recording",
+        data: { deviceId }
+    });
+}
+
+// ==================== 截图管理接口 ====================
+
+/**
+ * 分页查询截图列表
+ */
+export function getSnapshotPage(params: { deviceId?: number } & PageParams): Promise<PageResult<CameraSnapshot>> {
+    return request.get({
+        url: "/camera/snapshot/page",
+        data: params
+    });
+}
+
+/**
+ * 获取截图详情
+ */
+export function getSnapshotDetail(id: number): Promise<CameraSnapshot> {
+    return request.get({
+        url: `/camera/snapshot/${id}`
+    });
+}
+
+/**
+ * 获取最新截图
+ */
+export function getLatestSnapshot(deviceId: number): Promise<CameraSnapshot | null> {
+    return request.get({
+        url: "/camera/snapshot/latest",
+        data: { deviceId }
+    });
+}
+
+/**
+ * 保存截图
+ */
+export function saveSnapshot(deviceId: number, filePath: string, thumbnail?: string): Promise<CameraSnapshot> {
+    return request.post({
+        url: "/camera/snapshot",
+        data: { deviceId, filePath, thumbnail }
+    });
+}
+
+/**
+ * 删除截图
+ */
+export function deleteSnapshot(id: number): Promise<boolean> {
+    return request.delete({
+        url: `/camera/snapshot/${id}`
+    });
+}
+
+/**
+ * 批量删除截图
+ */
+export function deleteSnapshotBatch(ids: number[]): Promise<boolean> {
+    return request.delete({
+        url: "/camera/snapshot/batch",
+        data: ids
+    });
+}
+
+// ==================== 遗留接口（兼容旧代码） ====================
 
 export interface CameraStream {
     id: number;
     streamUrl: string;
     rtspUrl: string;
-}
-
-export interface CameraRecord {
-    id: number;
-    deviceId: number;
-    fileName: string;
-    filePath: string;
-    fileSize: number;
-    duration: number;
-    startTime: number;
-    endTime: number;
-    recordType: string;
-    status: number;
 }
 
 export interface LanDevice {
@@ -59,23 +334,38 @@ export interface WifiInfo {
     signalStrength: number;
 }
 
-export function getCameraList() {
+/**
+ * @deprecated 使用 getCameraList
+ */
+export function getCameraListLegacy() {
     return request.get({ url: "/camera/list" });
 }
 
-export function getCameraDetail(id: number) {
-    return request.get({ url: `/camera/detail`, data: { id } });
+/**
+ * @deprecated 使用 getCameraDetail
+ */
+export function getCameraDetailLegacy(id: number) {
+    return request.get({ url: "/camera/detail", data: { id } });
 }
 
-export function addCamera(data: Partial<CameraDevice>) {
+/**
+ * @deprecated 使用 addCamera
+ */
+export function addCameraLegacy(data: Partial<CameraDevice>) {
     return request.post({ url: "/camera/add", data });
 }
 
-export function updateCamera(id: number, data: Partial<CameraDevice>) {
+/**
+ * @deprecated 使用 updateCamera
+ */
+export function updateCameraLegacy(id: number, data: Partial<CameraDevice>) {
     return request.post({ url: "/camera/edit", params: { id }, data });
 }
 
-export function deleteCamera(id: number) {
+/**
+ * @deprecated 使用 deleteCamera
+ */
+export function deleteCameraLegacy(id: number) {
     return request.post({ url: "/camera/delete", data: { id } });
 }
 
@@ -95,11 +385,11 @@ export function checkCameraOnline(id: number) {
     return request.post({ url: `/camera/check/${id}` });
 }
 
-export function startRecord(id: number) {
+export function startRecordLegacy(id: number) {
     return request.post({ url: `/camera/record/start/${id}` });
 }
 
-export function stopRecord(id: number) {
+export function stopRecordLegacy(id: number) {
     return request.post({ url: `/camera/record/stop/${id}` });
 }
 
@@ -107,7 +397,7 @@ export function getRecordList(deviceId: number) {
     return request.get({ url: "/camera/record/list", data: { deviceId } });
 }
 
-export function deleteRecord(id: number) {
+export function deleteRecordLegacy(id: number) {
     return request.post({ url: "/camera/record/delete", data: { id } });
 }
 
