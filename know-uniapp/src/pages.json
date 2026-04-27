@@ -226,6 +226,20 @@
             }
         },
         {
+            "path": "pages/camera/edit",
+            "style": {
+                "navigationBarTitleText": "编辑设备",
+                "navigationBarBackgroundColor": "#ffffff"
+            }
+        },
+        {
+            "path": "pages/camera/playback",
+            "style": {
+                "navigationBarTitleText": "录像回放",
+                "navigationStyle": "custom"
+            }
+        },
+        {
             "path": "pages/camera/snapshots",
             "style": {
                 "navigationBarTitleText": "我的截图",
