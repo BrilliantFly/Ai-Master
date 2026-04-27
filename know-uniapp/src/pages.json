@@ -198,6 +198,48 @@
             }
         },
         {
+            "path": "pages/camera/wifi-config",
+            "style": {
+                "navigationBarTitleText": "WiFi配网",
+                "navigationBarBackgroundColor": "#ffffff"
+            }
+        },
+        {
+            "path": "pages/camera/discover",
+            "style": {
+                "navigationBarTitleText": "发现设备",
+                "navigationBarBackgroundColor": "#ffffff"
+            }
+        },
+        {
+            "path": "pages/camera/add",
+            "style": {
+                "navigationBarTitleText": "添加设备",
+                "navigationBarBackgroundColor": "#ffffff"
+            }
+        },
+        {
+            "path": "pages/camera/detail",
+            "style": {
+                "navigationBarTitleText": "设备详情",
+                "navigationBarBackgroundColor": "#ffffff"
+            }
+        },
+        {
+            "path": "pages/camera/snapshots",
+            "style": {
+                "navigationBarTitleText": "我的截图",
+                "navigationBarBackgroundColor": "#ffffff"
+            }
+        },
+        {
+            "path": "pages/camera/records",
+            "style": {
+                "navigationBarTitleText": "录像记录",
+                "navigationBarBackgroundColor": "#ffffff"
+            }
+        },
+        {
             "path": "pages/wifi/index",
             "style": {
                 "navigationBarTitleText": "Wi-Fi管理"
