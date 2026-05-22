@@ -2,7 +2,7 @@ import { service } from '@/utils/axios'
 
 export function getHabitList(params) {
   return service({
-    url: '/habit/list',
+    url: '/adminapi/plan/habit/list',
     method: 'get',
     params
   })
@@ -10,7 +10,7 @@ export function getHabitList(params) {
 
 export function getHabitPage(params) {
   return service({
-    url: '/habit/page',
+    url: '/adminapi/plan/habit/page',
     method: 'get',
     params
   })
@@ -18,7 +18,7 @@ export function getHabitPage(params) {
 
 export function getHabitStats(params) {
   return service({
-    url: '/habit/stats',
+    url: '/adminapi/plan/habit/stats',
     method: 'get',
     params
   })
@@ -26,7 +26,7 @@ export function getHabitStats(params) {
 
 export function addHabit(data) {
   return service({
-    url: '/habit',
+    url: '/adminapi/plan/habit',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export function addHabit(data) {
 
 export function updateHabit(data) {
   return service({
-    url: '/habit',
+    url: '/adminapi/plan/habit',
     method: 'put',
     data
   })
@@ -42,21 +42,21 @@ export function updateHabit(data) {
 
 export function deleteHabit(id) {
   return service({
-    url: `/habit/${id}`,
+    url: `/adminapi/plan/habit/${id}`,
     method: 'delete'
   })
 }
 
 export function getHabitDetail(id) {
   return service({
-    url: `/habit/${id}`,
+    url: `/adminapi/plan/habit/${id}`,
     method: 'get'
   })
 }
 
 export function checkinHabit(id, params) {
   return service({
-    url: `/habit/${id}/checkin`,
+    url: `/adminapi/plan/habit/${id}/checkin`,
     method: 'post',
     params
   })
@@ -64,7 +64,7 @@ export function checkinHabit(id, params) {
 
 export function getHabitRecords(id, params) {
   return service({
-    url: `/habit/${id}/records`,
+    url: `/adminapi/plan/habit/${id}/records`,
     method: 'get',
     params
   })

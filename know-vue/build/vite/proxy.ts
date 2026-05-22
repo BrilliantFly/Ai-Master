@@ -38,6 +38,13 @@ export function createProxy(list: ProxyList = []) {
     rewrite: path => path
   }
   
+  // 计划管理 /adminapi/plan/* - 重写为 /api/plan/*
+  ret['/adminapi/plan'] = {
+    target: 'http://localhost:8083',
+    changeOrigin: true,
+    rewrite: path => path.replace(/^\/adminapi\/plan/, '/api/plan')
+  }
+  
   // 然后处理环境变量中的代理配置
   for (const [prefix, target] of list) {
     const isHttps = httpsRE.test(target)
