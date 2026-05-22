@@ -5,7 +5,6 @@ import com.know.knowboot.common.GlobalConfig;
 import com.know.knowboot.common.YmlUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -25,18 +24,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     JwtPermissionFilter jwtPermissionFilter;
 
     /**
-     * 配置允许跨域
-     */
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedHeaders("*")
-                .allowedMethods("GET", "POST", "DELETE", "PUT")
-                .maxAge(3600);
-    }
-
-    /**
      * 登录拦截器 + 权限拦截器
      */
     @Override
@@ -44,12 +31,22 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 登录拦截器
         registry.addInterceptor(likeAdminInterceptor)
                 .addPathPatterns("/api/**", "/adminapi/**")
-                .excludePathPatterns("/api/login/**", "/adminapi/login/**");
+                .excludePathPatterns("/api/login/**", "/adminapi/login/**",
+                        "/api/index/decorate", "/api/index/config", "/api/index/init-plan-menu",
+                        "/api/plan/home/config",
+                        "/api/system/menu/config/tabbar", "/api/system/menu/config/home",
+                        "/api/system/menu/config/type/**", "/api/system/menu/config/list",
+                        "/api/system/menu/config/page");
 
         // 权限拦截器 - 在登录拦截器之后
         registry.addInterceptor(jwtPermissionFilter)
                 .addPathPatterns("/api/**", "/adminapi/**")
-                .excludePathPatterns("/api/login/**", "/adminapi/login/**");
+                .excludePathPatterns("/api/login/**", "/adminapi/login/**",
+                        "/api/index/decorate", "/api/index/config", "/api/index/init-plan-menu",
+                        "/api/plan/home/config",
+                        "/api/system/menu/config/tabbar", "/api/system/menu/config/home",
+                        "/api/system/menu/config/type/**", "/api/system/menu/config/list",
+                        "/api/system/menu/config/page");
     }
 
     /**

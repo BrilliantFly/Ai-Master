@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Api(tags = "菜单配置")
 @RestController
-@RequestMapping("/system/menu/config")
+@RequestMapping("/api/system/menu/config")
 public class SysMenuConfigController {
 
     @Autowired

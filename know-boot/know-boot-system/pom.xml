@@ -55,6 +55,12 @@
             <version>${knowboot.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.know</groupId>
+            <artifactId>know-boot-api</artifactId>
+            <version>${knowboot.version}</version>
+        </dependency>
+
         <!-- 代码生成 -->
         <!--
         <dependency>
