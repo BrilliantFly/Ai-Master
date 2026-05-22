@@ -28,7 +28,7 @@
       <text class="empty-text">暂无截图记录</text>
     </view>
 
-    <loading :loading="loading" />
+    <page-status :status="loading ? 'loading' : 'normal'" />
   </view>
 </template>
 

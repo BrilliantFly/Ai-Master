@@ -26,7 +26,7 @@
       <text class="empty-text">暂无录像记录</text>
     </view>
 
-    <loading :loading="loading" />
+    <page-status :status="loading ? 'loading' : 'normal'" />
   </view>
 </template>
 

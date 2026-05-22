@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onMounted } from from '@dcloudio/uni-app';
+import { onMounted } from 'vue';
 
 interface LanDevice {
   ip: string;

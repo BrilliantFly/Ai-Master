@@ -68,7 +68,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onLoad } from from '@dcloudio/uni-app';
+import { ref } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
 import { getCameraDetail, deleteCamera, type CameraDevice } from '@/api/camera';
 
 const device = ref<CameraDevice>({});

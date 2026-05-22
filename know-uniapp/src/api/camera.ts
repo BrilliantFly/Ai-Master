@@ -1,4 +1,14 @@
-import request from "@/utils/request";
+import request, { createRequest } from "@/utils/request";
+
+/**
+ * 摄像头服务专用请求实例
+ * 摄像头后端运行在 8085 端口，无 /api 前缀
+ */
+const cameraRequest = createRequest({
+    baseUrl: "http://localhost:8085",
+    urlPrefix: "",
+    withToken: false,
+});
 
 /**
  * 摄像头设备相关接口
@@ -98,7 +108,7 @@ export interface PageResult<T> {
  * 分页查询设备列表
  */
 export function getCameraPage(params: PageParams): Promise<PageResult<CameraDevice>> {
-    return request.get({
+    return cameraRequest.get({
         url: "/camera/device/page",
         data: params
     });
@@ -108,7 +118,7 @@ export function getCameraPage(params: PageParams): Promise<PageResult<CameraDevi
  * 获取设备列表
  */
 export function getCameraList(): Promise<CameraDevice[]> {
-    return request.get({
+    return cameraRequest.get({
         url: "/camera/device/list"
     });
 }
@@ -117,7 +127,7 @@ export function getCameraList(): Promise<CameraDevice[]> {
  * 获取收藏设备
  */
 export function getCameraFavorites(): Promise<CameraDevice[]> {
-    return request.get({
+    return cameraRequest.get({
         url: "/camera/device/favorites"
     });
 }
@@ -126,7 +136,7 @@ export function getCameraFavorites(): Promise<CameraDevice[]> {
  * 获取设备详情
  */
 export function getCameraDetail(id: number): Promise<CameraDevice> {
-    return request.get({
+    return cameraRequest.get({
         url: `/camera/device/${id}`
     });
 }
@@ -135,7 +145,7 @@ export function getCameraDetail(id: number): Promise<CameraDevice> {
  * 新增设备
  */
 export function addCamera(data: Partial<CameraDevice>): Promise<boolean> {
-    return request.post({
+    return cameraRequest.post({
         url: "/camera/device",
         data
     });
@@ -145,7 +155,7 @@ export function addCamera(data: Partial<CameraDevice>): Promise<boolean> {
  * 修改设备
  */
 export function updateCamera(data: Partial<CameraDevice>): Promise<boolean> {
-    return request.put({
+    return cameraRequest.put({
         url: "/camera/device",
         data
     });
@@ -155,7 +165,7 @@ export function updateCamera(data: Partial<CameraDevice>): Promise<boolean> {
  * 删除设备
  */
 export function deleteCamera(id: number): Promise<boolean> {
-    return request.delete({
+    return cameraRequest.delete({
         url: `/camera/device/${id}`
     });
 }
@@ -164,7 +174,7 @@ export function deleteCamera(id: number): Promise<boolean> {
  * 检查设备编号是否存在
  */
 export function checkDeviceCode(deviceCode: string, excludeId?: number): Promise<boolean> {
-    return request.get({
+    return cameraRequest.get({
         url: "/camera/device/check",
         data: { deviceCode, excludeId }
     });
@@ -174,7 +184,7 @@ export function checkDeviceCode(deviceCode: string, excludeId?: number): Promise
  * 更新设备状态
  */
 export function updateCameraStatus(id: number, status: CameraStatus): Promise<boolean> {
-    return request.put({
+    return cameraRequest.put({
         url: `/camera/device/status/${id}`,
         data: { status }
     });
@@ -186,7 +196,7 @@ export function updateCameraStatus(id: number, status: CameraStatus): Promise<bo
  * 分页查询录像列表
  */
 export function getRecordPage(params: { deviceId?: number } & PageParams): Promise<PageResult<CameraRecord>> {
-    return request.get({
+    return cameraRequest.get({
         url: "/camera/record/page",
         data: params
     });
@@ -196,7 +206,7 @@ export function getRecordPage(params: { deviceId?: number } & PageParams): Promi
  * 获取录像详情
  */
 export function getRecordDetail(id: number): Promise<CameraRecord> {
-    return request.get({
+    return cameraRequest.get({
         url: `/camera/record/${id}`
     });
 }
@@ -205,7 +215,7 @@ export function getRecordDetail(id: number): Promise<CameraRecord> {
  * 开始录制
  */
 export function startRecord(deviceId: number, recordType?: RecordType): Promise<CameraRecord> {
-    return request.post({
+    return cameraRequest.post({
         url: "/camera/record/start",
         data: { deviceId, recordType: recordType || RecordType.Manual }
     });
@@ -215,7 +225,7 @@ export function startRecord(deviceId: number, recordType?: RecordType): Promise<
  * 停止录制
  */
 export function stopRecord(id: number): Promise<boolean> {
-    return request.post({
+    return cameraRequest.post({
         url: `/camera/record/stop/${id}`
     });
 }
@@ -224,7 +234,7 @@ export function stopRecord(id: number): Promise<boolean> {
  * 删除录像
  */
 export function deleteRecord(id: number): Promise<boolean> {
-    return request.delete({
+    return cameraRequest.delete({
         url: `/camera/record/${id}`
     });
 }
@@ -233,7 +243,7 @@ export function deleteRecord(id: number): Promise<boolean> {
  * 批量删除录像
  */
 export function deleteRecordBatch(ids: number[]): Promise<boolean> {
-    return request.delete({
+    return cameraRequest.delete({
         url: "/camera/record/batch",
         data: ids
     });
@@ -243,7 +253,7 @@ export function deleteRecordBatch(ids: number[]): Promise<boolean> {
  * 获取正在录制的录像
  */
 export function getRecordingByDevice(deviceId: number): Promise<CameraRecord | null> {
-    return request.get({
+    return cameraRequest.get({
         url: "/camera/record/recording",
         data: { deviceId }
     });
@@ -255,7 +265,7 @@ export function getRecordingByDevice(deviceId: number): Promise<CameraRecord | n
  * 分页查询截图列表
  */
 export function getSnapshotPage(params: { deviceId?: number } & PageParams): Promise<PageResult<CameraSnapshot>> {
-    return request.get({
+    return cameraRequest.get({
         url: "/camera/snapshot/page",
         data: params
     });
@@ -265,7 +275,7 @@ export function getSnapshotPage(params: { deviceId?: number } & PageParams): Pro
  * 获取截图详情
  */
 export function getSnapshotDetail(id: number): Promise<CameraSnapshot> {
-    return request.get({
+    return cameraRequest.get({
         url: `/camera/snapshot/${id}`
     });
 }
@@ -274,7 +284,7 @@ export function getSnapshotDetail(id: number): Promise<CameraSnapshot> {
  * 获取最新截图
  */
 export function getLatestSnapshot(deviceId: number): Promise<CameraSnapshot | null> {
-    return request.get({
+    return cameraRequest.get({
         url: "/camera/snapshot/latest",
         data: { deviceId }
     });
@@ -284,7 +294,7 @@ export function getLatestSnapshot(deviceId: number): Promise<CameraSnapshot | nu
  * 保存截图
  */
 export function saveSnapshot(deviceId: number, filePath: string, thumbnail?: string): Promise<CameraSnapshot> {
-    return request.post({
+    return cameraRequest.post({
         url: "/camera/snapshot",
         data: { deviceId, filePath, thumbnail }
     });
@@ -294,7 +304,7 @@ export function saveSnapshot(deviceId: number, filePath: string, thumbnail?: str
  * 删除截图
  */
 export function deleteSnapshot(id: number): Promise<boolean> {
-    return request.delete({
+    return cameraRequest.delete({
         url: `/camera/snapshot/${id}`
     });
 }
@@ -303,7 +313,7 @@ export function deleteSnapshot(id: number): Promise<boolean> {
  * 批量删除截图
  */
 export function deleteSnapshotBatch(ids: number[]): Promise<boolean> {
-    return request.delete({
+    return cameraRequest.delete({
         url: "/camera/snapshot/batch",
         data: ids
     });
@@ -338,67 +348,67 @@ export interface WifiInfo {
  * @deprecated 使用 getCameraList
  */
 export function getCameraListLegacy() {
-    return request.get({ url: "/camera/list" });
+    return cameraRequest.get({ url: "/camera/list" });
 }
 
 /**
  * @deprecated 使用 getCameraDetail
  */
 export function getCameraDetailLegacy(id: number) {
-    return request.get({ url: "/camera/detail", data: { id } });
+    return cameraRequest.get({ url: "/camera/detail", data: { id } });
 }
 
 /**
  * @deprecated 使用 addCamera
  */
 export function addCameraLegacy(data: Partial<CameraDevice>) {
-    return request.post({ url: "/camera/add", data });
+    return cameraRequest.post({ url: "/camera/add", data });
 }
 
 /**
  * @deprecated 使用 updateCamera
  */
 export function updateCameraLegacy(id: number, data: Partial<CameraDevice>) {
-    return request.post({ url: "/camera/edit", params: { id }, data });
+    return cameraRequest.post({ url: "/camera/edit", params: { id }, data });
 }
 
 /**
  * @deprecated 使用 deleteCamera
  */
 export function deleteCameraLegacy(id: number) {
-    return request.post({ url: "/camera/delete", data: { id } });
+    return cameraRequest.post({ url: "/camera/delete", data: { id } });
 }
 
 export function getCameraStream(id: number) {
-    return request.get({ url: `/camera/stream/${id}` });
+    return cameraRequest.get({ url: `/camera/stream/${id}` });
 }
 
 export function getCameraScreenshot(id: number) {
-    return request.get({ url: `/camera/screenshot/${id}` });
+    return cameraRequest.get({ url: `/camera/screenshot/${id}` });
 }
 
 export function scanLanDevices() {
-    return request.get({ url: "/camera/scan" });
+    return cameraRequest.get({ url: "/camera/scan" });
 }
 
 export function checkCameraOnline(id: number) {
-    return request.post({ url: `/camera/check/${id}` });
+    return cameraRequest.post({ url: `/camera/check/${id}` });
 }
 
 export function startRecordLegacy(id: number) {
-    return request.post({ url: `/camera/record/start/${id}` });
+    return cameraRequest.post({ url: `/camera/record/start/${id}` });
 }
 
 export function stopRecordLegacy(id: number) {
-    return request.post({ url: `/camera/record/stop/${id}` });
+    return cameraRequest.post({ url: `/camera/record/stop/${id}` });
 }
 
 export function getRecordList(deviceId: number) {
-    return request.get({ url: "/camera/record/list", data: { deviceId } });
+    return cameraRequest.get({ url: "/camera/record/list", data: { deviceId } });
 }
 
 export function deleteRecordLegacy(id: number) {
-    return request.post({ url: "/camera/record/delete", data: { id } });
+    return cameraRequest.post({ url: "/camera/record/delete", data: { id } });
 }
 
 export function getWifiList(): Promise<WifiInfo[]> {

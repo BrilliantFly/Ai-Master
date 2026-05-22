@@ -83,9 +83,7 @@
 
     <!-- 加载状态 -->
     <page-status 
-      :loading="loading" 
-      :empty="deviceList.length === 0 && !loading" 
-      emptyText="暂无设备"
+      :status="loading ? 'loading' : 'normal'"
     />
 
     <!-- 底部操作栏 -->
