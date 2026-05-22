@@ -31,7 +31,7 @@ export const useThemeStore = defineStore({
                 buttonColor,
                 navigationBarColor,
                 topTextColor
-            } = JSON.parse(data.data)
+            } = data
             this.primaryColor = themeColor1
             this.minorColor = themeColor2
             this.btnColor = buttonColor

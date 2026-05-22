@@ -22,6 +22,8 @@
 	import { onShow, onLoad } from '@dcloudio/uni-app'
 	import { storeToRefs } from 'pinia'
 	import { computed, reactive } from 'vue'
+	import cache from '@/utils/cache'
+	import { BACK_URL } from '@/enums/constantEnums'
 	const state = reactive<{
 		meta : any[]
 		pages : any[]
@@ -61,6 +63,11 @@
 		}
 	})
 	onShow(() => {
+		if (!isLogin.value) {
+			cache.set(BACK_URL, '/pages/user/user')
+			uni.navigateTo({ url: '/pages/login/login' })
+			return
+		}
 		userStore.getUser()
 	})
 	getData()

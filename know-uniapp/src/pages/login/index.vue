@@ -78,6 +78,9 @@ const handleLogin = async () => {
         // Get user info
         await userStore.getUser()
         
+        // 登录后重新加载菜单配置（tabBar/首页菜单）
+        await appStore.loadUserMenuConfig()
+        
         uni.hideLoading()
         uni.showToast({ title: '登录成功', icon: 'success' })
         

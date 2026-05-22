@@ -58,8 +58,11 @@ onLaunch(async () => {
     //#ifdef H5
     setH5WebIcon()
     //#endif
-    
-    // 如果已登录则加载数据
+
+    // 始终加载公共菜单配置（免登录 TabBar + 首页）
+    await appStore.loadPublicMenuConfig()
+
+    // 如果已登录则加载带权限的用户数据
     if (userStore.isLogin) {
         await initData()
     }

@@ -73,11 +73,12 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, reactive, onMounted } from 'vue'
+	import { ref, reactive } from 'vue'
 	import { onShow } from '@dcloudio/uni-app'
 	import { useAppStore } from '@/stores/app'
 	import { useUserStore } from '@/stores/user'
 	import { getHomeConfig } from '@/api/plan/home'
+	import { getHomeMenu } from '@/api/system/menu'
 
 	const appStore = useAppStore()
 	const userStore = useUserStore()
@@ -88,7 +89,24 @@
 
 	const loadConfig = async () => {
 		// 优先使用新版API获取菜单配置
-		const homeMenu = appStore.getHomeMenu
+		let homeMenu = appStore.getHomeMenu
+		if (!homeMenu?.length) {
+			// store 为空时直接调用公共菜单 API 作为 fallback
+			try {
+				const menus = await getHomeMenu()
+				if (Array.isArray(menus) && menus.length) {
+					homeMenu = menus.map((m: any) => ({
+						name: m.menuName,
+						path: m.path,
+						icon: m.icon,
+						color: m.bigIcon,
+						renderType: m.renderType
+					}))
+				}
+			} catch (e) {
+				console.error('加载公共菜单失败', e)
+			}
+		}
 		if (homeMenu?.length) {
 			// 过滤首页菜单
 			const menus = homeMenu.filter((m: any) => m.renderType === 1)
@@ -147,10 +165,6 @@
 	}
 
 	onShow(() => {
-		loadConfig()
-	})
-
-	onMounted(() => {
 		loadConfig()
 	})
 </script>

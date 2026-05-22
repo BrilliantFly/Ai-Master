@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getTabbarMenuByUser, getHomeMenuByUser } from '@/api/system/menu'
+import { getTabbarMenu, getHomeMenu, getTabbarMenuByUser, getHomeMenuByUser } from '@/api/system/menu'
 
 interface AppState {
     config: Record<string, any>
@@ -32,7 +32,8 @@ export const useAppStore = defineStore({
                     name: item.menuName,
                     path: item.path,
                     icon: item.icon,
-                    color: item.bigIcon
+                    color: item.bigIcon,
+                    renderType: item.renderType
                 }))
             }
             return []
@@ -59,15 +60,35 @@ export const useAppStore = defineStore({
                     getHomeMenuByUser()
                 ])
                 
-                this.menuConfig.tabbar = tabbarRes?.result || []
-                this.menuConfig.home = homeRes?.result || []
+                if (Array.isArray(tabbarRes)) {
+                    this.menuConfig.tabbar = tabbarRes
+                }
+                if (Array.isArray(homeRes)) {
+                    this.menuConfig.home = homeRes
+                }
             } catch (e) {
-                console.error('加载菜单配置失败', e)
-                // 降级处理：使用空数组
+                console.error('加载用户菜单配置失败，使用公共配置', e)
+                // 失败时不覆盖已有数据，保留公共菜单配置
+            }
+        },
+        /**
+         * 加载公共菜单配置（免登录，用于未登录状态下的 TabBar 和首页）
+         */
+        async loadPublicMenuConfig() {
+            try {
+                const [tabbarRes, homeRes] = await Promise.all([
+                    getTabbarMenu(),
+                    getHomeMenu()
+                ])
+                this.menuConfig.tabbar = Array.isArray(tabbarRes) ? tabbarRes : []
+                this.menuConfig.home = Array.isArray(homeRes) ? homeRes : []
+            } catch (e) {
+                console.error('加载公共菜单配置失败', e)
                 this.menuConfig.tabbar = []
                 this.menuConfig.home = []
             }
         },
+
         /**
          * 刷新菜单配置
          */

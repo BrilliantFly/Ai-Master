@@ -343,6 +343,8 @@ const loginHandle = async (data: any) => {
     }
     userStore.login(data.token)
     await userStore.getUser()
+    // 登录后重新加载菜单配置（tabBar/首页菜单）
+    await appStore.loadUserMenuConfig()
     uni.$u.toast('登录成功')
     uni.hideLoading()
     const pages = getCurrentPages()
