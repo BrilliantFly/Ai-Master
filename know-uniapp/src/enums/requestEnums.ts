@@ -7,7 +7,9 @@ export enum ContentTypeEnum {
 
 export enum RequestMethodsEnum {
     GET = 'GET',
-    POST = 'POST'
+    POST = 'POST',
+    PUT = 'PUT',
+    DELETE = 'DELETE'
 }
 
 export enum RequestCodeEnum {

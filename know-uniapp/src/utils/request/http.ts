@@ -43,6 +43,20 @@ export default class HttpRequest {
     }
 
     /**
+     * @description put请求
+     */
+    put<T = any>(options: RequestOptions, config?: Partial<RequestConfig>): Promise<T> {
+        return this.request({ ...options, method: RequestMethodsEnum.PUT }, config)
+    }
+
+    /**
+     * @description delete请求
+     */
+    delete<T = any>(options: RequestOptions, config?: Partial<RequestConfig>): Promise<T> {
+        return this.request({ ...options, method: RequestMethodsEnum.DELETE }, config)
+    }
+
+    /**
      * @description 上传图片
      */
     uploadFile(options: UploadFileOption, config?: Partial<RequestConfig>) {
@@ -111,6 +125,10 @@ export default class HttpRequest {
                     resolve(response)
                 },
                 fail: async (err) => {
+                    // 静默忽略由防重复请求机制触发的取消
+                    if (err.errMsg == RequestErrMsgEnum.ABORT) {
+                        return
+                    }
                     if (err.errMsg == RequestErrMsgEnum.TIMEOUT) {
                         this.retryRequest(mergeOptions, mergeConfig)
                             .then((res) => resolve(res))

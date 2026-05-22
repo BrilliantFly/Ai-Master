@@ -97,7 +97,7 @@ const defaultOptions: HttpRequestOptions = {
     requestHooks: requestHooks,
 };
 
-function createRequest(opt?: HttpRequestOptions) {
+export function createRequest(opt?: HttpRequestOptions) {
     return new HttpRequest(
         // 深度合并
         merge(defaultOptions, opt || {})
