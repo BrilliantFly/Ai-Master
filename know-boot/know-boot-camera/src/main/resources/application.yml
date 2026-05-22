@@ -2,16 +2,26 @@ server:
   port: 8085
   
 spring:
+  main:
+    allow-circular-references: true
   application:
     name: know-boot-camera
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL:jdbc:mysql://localhost:3306/ai_master?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai}
-    username: ${DB_USER:root}
-    password: ${DB_PASSWORD:123456}
+    url: jdbc:mysql://127.0.0.1:3306/know_boot_v1?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456aA@
   redis:
-    host: ${REDIS_HOST:localhost}
+    host: localhost
     port: 6379
+    database: 6
+    timeout: 5000
+    lettuce:
+      pool:
+        max-active: 100
+        max-idle: 20
+        min-idle: 0
+        max-wait: 30000
     
 # MyBatis Plus
 mybatis-plus:
@@ -41,3 +51,19 @@ record:
 logging:
   level:
     com.know.knowboot: debug
+
+# 限流配置
+know:
+  rateLimiter:
+    all:
+      permitsPerSecond: 100
+      warmupPeriod: 0
+      maxConcurrent: 1000
+    resource:
+      permitsPerSecond: 100
+      warmupPeriod: 0
+      maxConcurrent: 500
+    interface:
+      permitsPerSecond: 50
+      warmupPeriod: 0
+      maxConcurrent: 200

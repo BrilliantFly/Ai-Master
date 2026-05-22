@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.know.knowboot.entity.CameraRecord;
 import com.know.knowboot.mapper.CameraRecordMapper;
 import com.know.knowboot.service.ICameraRecordService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
