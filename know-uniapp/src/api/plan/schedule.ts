@@ -5,7 +5,7 @@ export function getScheduleList(params) {
 }
 
 export function getScheduleByDate(params) {
-  return request.get({ url: '/plan/event/date', params })
+  return request.get({ url: '/plan/event/date', data: params })
 }
 
 export function getScheduleByQuadrant(quadrant, params) {
@@ -38,4 +38,12 @@ export function getScheduleDetail(id) {
 
 export function getCategoryList(params) {
   return request.get({ url: '/plan/category/list', params })
+}
+
+export function getCalendarMonthly(params) {
+  return request.get({ url: '/plan/calendar/monthly', data: params })
+}
+
+export function getScheduleByDateRange(params) {
+  return request.get({ url: '/plan/event/week', params })
 }

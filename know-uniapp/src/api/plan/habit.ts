@@ -31,3 +31,7 @@ export function checkinHabit(id, params) {
 export function getHabitRecords(id, params) {
   return request.get({ url: `/plan/habit/${id}/records`, params })
 }
+
+export function getCalendarMonthly(params) {
+  return request.get({ url: '/plan/calendar/monthly', data: params })
+}

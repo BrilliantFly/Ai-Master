@@ -233,6 +233,24 @@
             }
         },
         {
+            "path": "pages/plan/schedule/index",
+            "style": {
+                "navigationBarTitleText": "日程管理"
+            }
+        },
+        {
+            "path": "pages/plan/habit/index",
+            "style": {
+                "navigationBarTitleText": "习惯打卡"
+            }
+        },
+        {
+            "path": "pages/plan/schedule/detail",
+            "style": {
+                "navigationBarTitleText": "日程详情"
+            }
+        },
+        {
             "path": "pages/camera/playback",
             "style": {
                 "navigationBarTitleText": "录像回放",
