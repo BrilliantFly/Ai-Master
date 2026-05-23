@@ -43,10 +43,6 @@
         </view>
       </scroll-view>
 
-      <view style="padding:10rpx 20rpx;background:#fff;font-size:22rpx;color:#999;display:flex;gap:20rpx">
-        <text>renderKey={{ renderKey }}</text>
-        <text>completed={{ Object.keys(completedMap).length }}</text>
-      </view>
       <view v-if="filteredDayEvents.length === 0 && selectedDateLabel" class="empty-state">
         <text class="empty-icon">📅</text>
         <text class="empty-text">{{ currentQuadrant === 0 ? '该日暂无日程' : '该象限暂无日程' }}</text>
@@ -285,9 +281,14 @@ const fetchDayEvents = async (dateStr) => {
     const ts = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime()
     const res = await getScheduleByDate({ date: ts })
     dayEvents.value = res || []
+    // 更新统计：基于当前选中日期的数据
+    const events = res || []
+    const totalCount = events.length
+    const completedCount = events.filter(e => e.status === 1).length
+    todayStats.value = { totalCount, todoCount: totalCount - completedCount, completedCount }
     // 从服务端数据同步 completedMap
     const map = {}
-    for (const e of (res || [])) {
+    for (const e of events) {
       if (e.status === 1) map[e.id] = true
     }
     completedMap.value = map
