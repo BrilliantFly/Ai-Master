@@ -184,19 +184,17 @@ const fetchCalendarMonthly = async () => {
       }
     })
 
-    // 为有打卡记录的日期生成标记
+    // 有习惯即有打卡内容 → 标记整个月所有日期
     const marks = []
-    const checkedDateMap = {}
-    Object.values(habitsMap || {}).forEach(h => {
-      (h.checkinDays || []).forEach(day => {
-        const dateStr = `${currentYear.value}-${String(currentMonth.value).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-        if (!checkedDateMap[dateStr]) {
-          checkedDateMap[dateStr] = true
-          marks.push({ date: dateStr })
-        }
-      })
-    })
+    const hasActive = Object.keys(habitsMap).length > 0
+    if (hasActive) {
+      const daysInMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
+      for (let day = 1; day <= daysInMonth; day++) {
+        marks.push({ date: `${currentYear.value}-${String(currentMonth.value).padStart(2, '0')}-${String(day).padStart(2, '0')}` })
+      }
+    }
     calendarSelected.value = marks
+    calRenderKey.value++ // 强制日历重新渲染标记
   } catch (e) {
     console.error('获取日历数据失败', e)
   }
