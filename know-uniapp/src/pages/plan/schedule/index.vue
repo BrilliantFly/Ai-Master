@@ -187,11 +187,15 @@ const handleCheck = (item) => {
   // 用独立 completedMap 驱动视觉更新，完全绕过 dayEvents 响应式链
   completedMap.value = { ...completedMap.value, [item.id]: true }
   renderKey.value++
-  // 异步调用 API，成功后不重新拉取列表（避免覆盖 completedMap）
+  // 异步调用 API，成功后刷新当前日期的数据
   completeSchedule(item.id, {}).then(() => {
     uni.showToast({ title: '已完成', icon: 'success' })
     fetchCalendarMonthly()
-    fetchStats()
+    if (selectedDateLabel.value) {
+      fetchDayEvents(selectedDateLabel.value)
+    } else {
+      fetchStats()
+    }
   }).catch(e => {
     console.error(e)
   })
