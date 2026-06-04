@@ -288,12 +288,12 @@ const fetchDayEvents = async (dateStr) => {
     const totalCount = events.length
     const completedCount = events.filter(e => e.status === 1).length
     todayStats.value = { totalCount, todoCount: totalCount - completedCount, completedCount }
-    // 从服务端数据同步 completedMap
+    // 从服务端数据同步 completedMap（合并而非覆盖，保留已有完成状态）
     const map = {}
     for (const e of events) {
       if (e.status === 1) map[e.id] = true
     }
-    completedMap.value = map
+    completedMap.value = { ...completedMap.value, ...map }
   } catch (e) {
     console.error('获取当日日程失败', e)
   }
