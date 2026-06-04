@@ -48,9 +48,14 @@ public interface IPlanHabitService {
     boolean delete(Long id);
 
     /**
-     * 打卡
+     * 打卡（默认当天）
      */
     boolean checkin(Long habitId, Long userId);
+
+    /**
+     * 打卡（指定日期，时间戳）
+     */
+    boolean checkin(Long habitId, Long userId, Long recordDate);
 
     /**
      * 查询打卡记录

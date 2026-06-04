@@ -107,26 +107,32 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean checkin(Long habitId, Long userId) {
+        return checkin(habitId, userId, null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean checkin(Long habitId, Long userId, Long recordDate) {
         PlanHabit habit = planHabitMapper.selectById(habitId);
         if (habit == null) {
             return false;
         }
 
-        long today = System.currentTimeMillis();
-        // 归一化到当天0点
+        long now = System.currentTimeMillis();
+        // 归一化到当天0点（如果没传日期则使用当前时间）
         java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.setTimeInMillis(today);
+        cal.setTimeInMillis(recordDate != null ? recordDate : now);
         cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
         cal.set(java.util.Calendar.MINUTE, 0);
         cal.set(java.util.Calendar.SECOND, 0);
         cal.set(java.util.Calendar.MILLISECOND, 0);
-        long todayStart = cal.getTimeInMillis();
+        long dayStart = cal.getTimeInMillis();
 
         // 检查是否已打卡
         Long exists = planHabitRecordMapper.selectCount(
                 new LambdaQueryWrapper<PlanHabitRecord>()
                         .eq(PlanHabitRecord::getHabitId, habitId)
-                        .eq(PlanHabitRecord::getRecordDate, todayStart));
+                        .eq(PlanHabitRecord::getRecordDate, dayStart));
         if (exists != null && exists > 0) {
             return false; // 已打卡，防止重复
         }
@@ -134,16 +140,16 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
         // 创建打卡记录
         PlanHabitRecord record = new PlanHabitRecord();
         record.setHabitId(habitId);
-        record.setRecordDate(todayStart);
+        record.setRecordDate(dayStart);
         record.setUserId(userId);
         record.setCreateBy(userId);
-        record.setCreateTime(today);
+        record.setCreateTime(now);
         planHabitRecordMapper.insert(record);
 
         // 更新习惯统计
         habit.setTotalDays(habit.getTotalDays() + 1);
-        habit.setCurrentDays(calculateStreak(habitId, todayStart));
-        habit.setUpdateTime(today);
+        habit.setCurrentDays(calculateStreak(habitId, dayStart));
+        habit.setUpdateTime(now);
 
         // 检查是否达成目标
         if (habit.getTotalDays() >= habit.getTargetDays()) {
@@ -153,6 +159,8 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
         planHabitMapper.updateById(habit);
         return true;
     }
+
+
 
     @Override
     public List<PlanHabitRecord> getRecords(Long habitId) {

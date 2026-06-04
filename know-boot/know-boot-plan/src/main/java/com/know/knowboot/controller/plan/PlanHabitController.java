@@ -79,9 +79,11 @@ public class PlanHabitController {
 
     @ApiOperation("打卡")
     @PostMapping("/{id}/checkin")
-    public AjaxResult<Boolean> checkin(@PathVariable Long id) {
+    public AjaxResult<Boolean> checkin(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long recordDate) {
         Long userId = 1L;
-        return AjaxResult.success(planHabitService.checkin(id, userId));
+        return AjaxResult.success(planHabitService.checkin(id, userId, recordDate));
     }
 
     @ApiOperation("查询打卡记录")
