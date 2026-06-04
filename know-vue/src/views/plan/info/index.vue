@@ -1,17 +1,62 @@
 <template>
-  <div class="p-4">
-    <a-card title="计划管理">
-      <a-row class="mb-4">
-        <a-col :span="24">
-          <a-button type="primary" @click="showAddModal">新增计划</a-button>
-        </a-col>
-      </a-row>
+  <div class="plan-info-container">
+    <!-- 搜索区域 -->
+    <a-card :bordered="false" class="search-form">
+      <a-form :model="queryParams" layout="inline">
+        <a-form-item label="计划名称">
+          <a-input v-model:value="queryParams.planName" placeholder="请输入计划名称" allow-clear />
+        </a-form-item>
+        <a-form-item label="计划类型">
+          <a-select v-model:value="queryParams.planType" placeholder="请选择类型" allow-clear style="width: 140px">
+            <a-select-option value="life">生活习惯</a-select-option>
+            <a-select-option value="cognition">认知提升</a-select-option>
+            <a-select-option value="skill">工作技能</a-select-option>
+            <a-select-option value="project">项目</a-select-option>
+            <a-select-option value="hobby">兴趣爱好</a-select-option>
+            <a-select-option value="study">学习</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="状态">
+          <a-select v-model:value="queryParams.status" placeholder="请选择状态" allow-clear style="width: 120px">
+            <a-select-option :value="0">待开始</a-select-option>
+            <a-select-option :value="1">进行中</a-select-option>
+            <a-select-option :value="2">已完成</a-select-option>
+            <a-select-option :value="3">已取消</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item>
+          <a-space>
+            <a-button type="primary" @click="fetchData">
+              <template #icon><SearchOutlined /></template>
+              查询
+            </a-button>
+            <a-button @click="handleReset">
+              <template #icon><ReloadOutlined /></template>
+              重置
+            </a-button>
+          </a-space>
+        </a-form-item>
+      </a-form>
+    </a-card>
+
+    <!-- 表格区域 -->
+    <a-card :bordered="false" class="table-wrapper">
+      <a-space class="table-toolbar">
+        <a-button type="primary" @click="showAddModal">
+          <template #icon><PlusOutlined /></template>
+          新增计划
+        </a-button>
+        <a-button @click="goToGantt">
+          <template #icon><BarChartOutlined /></template>
+          甘特图
+        </a-button>
+      </a-space>
 
       <a-table
         :columns="columns"
         :data-source="plans"
         :loading="loading"
-        :pagination="{ pageSize: 10 }"
+        :pagination="{ pageSize: 10, showTotal: (total: number) => `共 ${total} 条` }"
         row-key="id"
       >
         <template #bodyCell="{ column, record }">
@@ -81,7 +126,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { SearchOutlined, ReloadOutlined, PlusOutlined, BarChartOutlined } from '@ant-design/icons-vue'
+
+const router = useRouter()
 
 const loading = ref(false)
 const saving = ref(false)
@@ -89,6 +138,8 @@ const modalVisible = ref(false)
 const isEdit = ref(false)
 const plans = ref<any[]>([])
 const editId = ref<number | null>(null)
+
+const queryParams = reactive({ planName: '', planType: undefined, status: undefined })
 
 const columns = [
   { title: '计划名称', dataIndex: 'planName', key: 'planName' },
@@ -124,20 +175,40 @@ const resetForm = () => {
   editId.value = null
 }
 
+const buildParams = () => {
+  const params: any = {}
+  if (queryParams.planName) params.title = queryParams.planName
+  if (queryParams.planType) params.planType = queryParams.planType
+  if (queryParams.status !== undefined && queryParams.status !== null && queryParams.status !== '') params.status = queryParams.status
+  return params
+}
+
 const fetchData = async () => {
   loading.value = true
   try {
-    // 计划管理API在后端plan模块，通过代理转发
     const { getScheduleList } = await import('@/api/plan/schedule')
-    // 暂时使用schedule API的数据格式，等待独立plan API接入
-    const res = await getScheduleList({})
-    plans.value = []
+    const res = await getScheduleList(buildParams())
+    plans.value = (res?.data || []).map((item: any) => ({
+      ...item,
+      planName: item.planName || item.title || ''
+    }))
   } catch (e) {
     console.error('获取计划数据失败:', e)
     plans.value = []
   } finally {
     loading.value = false
   }
+}
+
+const handleReset = () => {
+  queryParams.planName = ''
+  queryParams.planType = undefined
+  queryParams.status = undefined
+  fetchData()
+}
+
+const goToGantt = () => {
+  router.push('/plan/gantt')
 }
 
 const showAddModal = () => {
@@ -197,5 +268,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.mb-4 { margin-bottom: 16px; }
+.plan-info-container { padding: 16px; }
+.search-form { margin-bottom: 16px; }
+.table-wrapper { }
+.table-toolbar { margin-bottom: 16px; }
 </style>
