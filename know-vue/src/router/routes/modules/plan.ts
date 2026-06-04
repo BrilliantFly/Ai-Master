@@ -35,6 +35,15 @@ const planRoute: AppRoute = {
       meta: {
         title: '计划管理'
       }
+    },
+    {
+      path: 'gantt',
+      name: 'PlanGantt',
+      component: () => import('@/views/plan/gantt/index.vue'),
+      meta: {
+        title: '甘特图',
+        hideMenu: true
+      }
     }
   ]
 }
