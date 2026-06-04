@@ -1,6 +1,10 @@
 <template>
   <div class="p-4">
     <a-card title="日程管理">
+      <!-- 调试信息 - 如果看到这里说明组件已加载 -->
+      <div style="background:#f0f0f0;padding:8px;margin-bottom:8px;font-size:12px;color:#333;">
+        组件已加载 | 事件数: {{ events?.length || 0 }} | 加载中: {{ loading ? '是' : '否' }}
+      </div>
       <a-row :gutter="16" class="mb-4">
         <a-col :span="6">
           <a-statistic title="今日待办" :value="todayStats.todoCount" value-style="color: #FF4D4F" />
@@ -13,6 +17,33 @@
         </a-col>
         <a-col :span="6" class="text-right">
           <a-button type="primary" @click="showAddModal">新增日程</a-button>
+        </a-col>
+      </a-row>
+
+      <!-- 查询栏 -->
+      <a-row :gutter="16" class="mb-4" style="margin-top: 16px;">
+        <a-col :span="6">
+          <a-input v-model:value="query.title" placeholder="标题搜索" allow-clear />
+        </a-col>
+        <a-col :span="5">
+          <a-select v-model:value="query.quadrant" placeholder="象限筛选" allow-clear style="width: 100%">
+            <a-select-option :value="1">重要紧急</a-select-option>
+            <a-select-option :value="2">重要不紧急</a-select-option>
+            <a-select-option :value="3">紧急不重要</a-select-option>
+            <a-select-option :value="4">不紧急不重要</a-select-option>
+          </a-select>
+        </a-col>
+        <a-col :span="5">
+          <a-select v-model:value="query.status" placeholder="状态筛选" allow-clear style="width: 100%">
+            <a-select-option :value="0">待完成</a-select-option>
+            <a-select-option :value="1">已完成</a-select-option>
+          </a-select>
+        </a-col>
+        <a-col :span="8">
+          <a-space>
+            <a-button type="primary" @click="handleSearch">搜索</a-button>
+            <a-button @click="handleReset">重置</a-button>
+          </a-space>
         </a-col>
       </a-row>
 
@@ -107,6 +138,13 @@ const categories = ref<any[]>([])
 const todayStats = ref({ todoCount: 0, completedCount: 0, totalCount: 0 })
 const editId = ref<number | null>(null)
 
+// 查询参数
+const query = reactive({
+  title: undefined,
+  quadrant: undefined,
+  status: undefined
+})
+
 const columns = [
   { title: '标题', dataIndex: 'title', key: 'title' },
   { title: '象限', key: 'quadrant' },
@@ -143,22 +181,48 @@ const resetForm = () => {
   editId.value = null
 }
 
+// 构建查询参数（去除空值）
+const buildParams = () => {
+  const params: Record<string, any> = {}
+  if (query.title) params.title = query.title
+  if (query.quadrant) params.quadrant = query.quadrant
+  if (query.status !== undefined && query.status !== null && query.status !== '') params.status = query.status
+  return params
+}
+
 const fetchData = async () => {
   loading.value = true
   try {
+    const params = buildParams()
     const [eventRes, statsRes, catRes] = await Promise.all([
-      getScheduleList({}),
+      getScheduleList(params),
       getTodayStats({}),
       getScheduleCategoryList({})
     ])
+    console.log('eventRes:', eventRes)
+    console.log('statsRes:', statsRes)
+    console.log('catRes:', catRes)
     events.value = eventRes?.data || eventRes || []
     todayStats.value = statsRes?.data || statsRes || { todoCount: 0, completedCount: 0, totalCount: 0 }
     categories.value = catRes?.data || catRes || []
-  } catch (e) {
-    console.error('获取日程数据失败:', e)
-  } finally {
-    loading.value = false
-  }
+    console.log('events after assign:', events.value)
+    } catch (e) {
+      console.error('获取日程数据失败:', e)
+      message.error('获取数据失败: ' + (e?.message || e || '未知错误'))
+    } finally {
+      loading.value = false
+    }
+}
+
+const handleSearch = () => {
+  fetchData()
+}
+
+const handleReset = () => {
+  query.title = undefined
+  query.quadrant = undefined
+  query.status = undefined
+  fetchData()
 }
 
 const showAddModal = () => {
