@@ -319,96 +319,11 @@ export function deleteSnapshotBatch(ids: number[]): Promise<boolean> {
     });
 }
 
-// ==================== 遗留接口（兼容旧代码） ====================
-
-export interface CameraStream {
-    id: number;
-    streamUrl: string;
-    rtspUrl: string;
-}
-
-export interface LanDevice {
-    ip: string;
-    mac?: string;
-    port?: number;
-    brand?: string;
-    deviceType?: string;
-    isAdded: boolean;
-    online?: boolean;
-}
-
 export interface WifiInfo {
     SSID: string;
     BSSID: string;
     secure: boolean;
     signalStrength: number;
-}
-
-/**
- * @deprecated 使用 getCameraList
- */
-export function getCameraListLegacy() {
-    return cameraRequest.get({ url: "/camera/list" });
-}
-
-/**
- * @deprecated 使用 getCameraDetail
- */
-export function getCameraDetailLegacy(id: number) {
-    return cameraRequest.get({ url: "/camera/detail", data: { id } });
-}
-
-/**
- * @deprecated 使用 addCamera
- */
-export function addCameraLegacy(data: Partial<CameraDevice>) {
-    return cameraRequest.post({ url: "/camera/add", data });
-}
-
-/**
- * @deprecated 使用 updateCamera
- */
-export function updateCameraLegacy(id: number, data: Partial<CameraDevice>) {
-    return cameraRequest.post({ url: "/camera/edit", params: { id }, data });
-}
-
-/**
- * @deprecated 使用 deleteCamera
- */
-export function deleteCameraLegacy(id: number) {
-    return cameraRequest.post({ url: "/camera/delete", data: { id } });
-}
-
-export function getCameraStream(id: number) {
-    return cameraRequest.get({ url: `/camera/stream/${id}` });
-}
-
-export function getCameraScreenshot(id: number) {
-    return cameraRequest.get({ url: `/camera/screenshot/${id}` });
-}
-
-export function scanLanDevices() {
-    return cameraRequest.get({ url: "/camera/scan" });
-}
-
-export function checkCameraOnline(id: number) {
-    return cameraRequest.post({ url: `/camera/check/${id}` });
-}
-
-export function startRecordLegacy(id: number) {
-    return cameraRequest.post({ url: `/camera/record/start/${id}` });
-}
-
-export function stopRecordLegacy(id: number) {
-    return cameraRequest.post({ url: `/camera/record/stop/${id}` });
-}
-
-export function getRecordList(deviceId: number) {
-    return cameraRequest.get({ url: "/camera/record/list", data: { deviceId } });
-}
-
-export function deleteRecordLegacy(id: number) {
-    return cameraRequest.post({ url: "/camera/record/delete", data: { id } });
 }
 
 export function getWifiList(): Promise<WifiInfo[]> {

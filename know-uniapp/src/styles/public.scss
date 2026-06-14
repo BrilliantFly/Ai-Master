@@ -1,10 +1,12 @@
 page {
-    background-color: $u-bg-color;
+    background-color: var(--color-bg-app);
+    color: var(--color-text);
     font-size: 28rpx;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-family: theme('fontFamily.sans')
-    //font-family: PingFang SC;
+    font-family: var(--font-sans);
+    line-height: 1.45;
+    letter-spacing: .01em;
 }
 
 uni-modal {
@@ -14,3 +16,25 @@ uni-modal {
 button::after {
     border: initial;
 }
+
+/* H5: hide framework tabbar, keep only the custom premium bar */
+/* #ifdef H5 */
+uni-tabbar,
+.uni-tabbar,
+.uni-tabbar-bottom,
+.uni-tabbar-top,
+.uni-app--showtabbar .uni-tabbar,
+.uni-app--showtabbar .uni-tabbar-bottom,
+.uni-app--showtabbar .uni-tabbar-top,
+.uni-app--showtabbar .uni-placeholder {
+    display: none !important;
+}
+
+.uni-app--showtabbar uni-page-wrapper,
+.uni-app--showtabbar uni-page-wrapper::after,
+.uni-app--showtabbar uni-page-body {
+    height: 100% !important;
+    min-height: 100% !important;
+    margin-bottom: 0 !important;
+}
+/* #endif */

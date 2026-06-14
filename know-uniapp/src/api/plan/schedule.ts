@@ -8,10 +8,6 @@ export function getScheduleByDate(params) {
   return request.get({ url: '/plan/event/date', data: params })
 }
 
-export function getScheduleByQuadrant(quadrant, params) {
-  return request.get({ url: `/plan/event/quadrant/${quadrant}`, params })
-}
-
 export function getTodayStats(params) {
   return request.get({ url: '/plan/event/today', params })
 }

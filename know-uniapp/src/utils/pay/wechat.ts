@@ -42,6 +42,34 @@ export class Wechat {
                         window.open(options, '_self')
                         resolve(PayStatusEnum.PENDING)
                     })
+                },
+                ANDROID: () => {
+                    return new Promise((resolve) => {
+                        uni.requestPayment({
+                            provider: 'wxpay',
+                            ...options,
+                            success() {
+                                resolve(PayStatusEnum.SUCCESS)
+                            },
+                            fail() {
+                                resolve(PayStatusEnum.FAIL)
+                            }
+                        })
+                    })
+                },
+                IOS: () => {
+                    return new Promise((resolve) => {
+                        uni.requestPayment({
+                            provider: 'wxpay',
+                            ...options,
+                            success() {
+                                resolve(PayStatusEnum.SUCCESS)
+                            },
+                            fail() {
+                                resolve(PayStatusEnum.FAIL)
+                            }
+                        })
+                    })
                 }
             })
             return res

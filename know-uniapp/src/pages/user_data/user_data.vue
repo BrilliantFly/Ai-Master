@@ -144,7 +144,7 @@
     <u-picker
         mode="selector"
         v-model="showPicker"
-        confirm-color="#4173FF"
+        confirm-color="var(--color-primary)"
         :default-selector="[0]"
         :range="sexList"
         @confirm="changeSexConfirm"
@@ -351,7 +351,7 @@ onUnload(() => {})
 .item {
     margin-top: 2rpx;
     padding: 30rpx;
-    background-color: #ffffff;
+    background-color: var(--color-bg);
 
     .label {
         width: 150rpx;

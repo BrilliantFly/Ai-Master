@@ -306,8 +306,8 @@ defineExpose({
   bottom: 0;
   z-index: 1000;
   width: 100vw;
-  background-color: #fff;
- 
+  background-color: var(--color-surface);
+  
   .comment-input-wrap {
     padding: 20rpx 30rpx;
     display: flex;
@@ -320,7 +320,7 @@ defineExpose({
         border-radius: 20rpx;
         height: 160rpx;
         width: auto;
-        background-color: #f6f6f6;
+        background-color: var(--color-bg-app);
         font-size: 26rpx;
         padding: 20rpx;
       }
@@ -331,10 +331,10 @@ defineExpose({
         right: 20rpx;
         bottom: 20rpx;
         font-size: 20rpx;
-        color: #767676;
+        color: var(--color-text-tertiary);
       }
     }
- 
+  
     .image-list {
       display: flex;
       flex-wrap: wrap;
@@ -372,8 +372,8 @@ defineExpose({
         display: flex;
         align-items: center;
         font-size: 48rpx;
-        color: #3d3d3d;
- 
+        color: var(--color-text);
+  
         .as-image,
         .emoji {
           margin-right: 20rpx;
@@ -382,12 +382,12 @@ defineExpose({
  
       .limit {
         font-size: 24rpx;
-        color: #767676;
+        color: var(--color-text-tertiary);
       }
- 
+  
       .relase {
         // background-color: $uni-color-primary;
-		background-color: #3d3d3d;
+		background-color: var(--color-text);
         border-radius: 10rpx;
         font-size: 26rpx;
         color: #fff;

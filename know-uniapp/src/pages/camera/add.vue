@@ -170,13 +170,13 @@ async function onSubmit() {
 <style scoped lang="scss">
 .add-device-page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
   padding: 24rpx;
 }
 
 .form-section {
-  background: #fff;
-  border-radius: 16rpx;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
   padding: 30rpx;
   
   .form-item {
@@ -189,17 +189,17 @@ async function onSubmit() {
     .label {
       display: block;
       font-size: 28rpx;
-      color: #333;
+      color: var(--color-text);
       margin-bottom: 16rpx;
       
       .required {
-        color: #ff4d4f;
+        color: var(--color-danger);
       }
     }
     
     .input {
       height: 88rpx;
-      background: #f5f5f5;
+      background: var(--color-surface-soft);
       border-radius: 12rpx;
       padding: 0 24rpx;
       font-size: 28rpx;
@@ -207,7 +207,7 @@ async function onSubmit() {
     
     .textarea {
       height: 160rpx;
-      background: #f5f5f5;
+      background: var(--color-surface-soft);
       border-radius: 12rpx;
       padding: 24rpx;
       font-size: 28rpx;
@@ -215,12 +215,12 @@ async function onSubmit() {
     
     .picker-value {
       height: 88rpx;
-      background: #f5f5f5;
+      background: var(--color-surface-soft);
       border-radius: 12rpx;
       padding: 0 24rpx;
       line-height: 88rpx;
       font-size: 28rpx;
-      color: #333;
+      color: var(--color-text);
     }
   }
 }
@@ -231,7 +231,7 @@ async function onSubmit() {
   .submit-btn {
     width: 100%;
     height: 88rpx;
-    background: linear-gradient(135deg, #1890ff, #096dd9);
+    background: var(--color-primary);
     color: #fff;
     border-radius: 44rpx;
     font-size: 32rpx;
@@ -240,7 +240,7 @@ async function onSubmit() {
     justify-content: center;
     
     &[disabled] {
-      background: #ccc;
+      background: var(--color-text-tertiary);
     }
   }
 }

@@ -2,6 +2,7 @@ import HttpRequest from "./http";
 import { merge } from "lodash-es";
 import { HttpRequestOptions, RequestHooks } from "./type";
 import { getToken } from "../auth";
+import { removeToken } from "@/api/auth";
 import { RequestCodeEnum, RequestMethodsEnum } from "@/enums/requestEnums";
 import { useUserStore } from "@/stores/user";
 import appConfig from "@/config";
@@ -27,9 +28,15 @@ const requestHooks: RequestHooks = {
             options.url = `${baseUrl}${options.url}`;
         }
         const token = getToken();
-        // 添加token (Sa-Token使用satoken请求头)
+        // 添加token (Sa-Token请求头)
+        console.log('[SisDebug] request interceptor', {
+            url: options.url,
+            withToken,
+            hasToken: !!token,
+            tokenPrefix: token ? token.substring(0, 10) + '...' : null
+        });
         if (withToken && token) {
-            options.header['satoken'] = token;
+            options.header['token'] = token;
         }
         options.header.version = appConfig.version;
         return options;
@@ -45,23 +52,40 @@ const requestHooks: RequestHooks = {
         if (!isTransformResponse) {
             return response.data;
         }
-        const { logout } = useUserStore();
         const { code, data, msg, show } = response.data as any;
+
+        // 登录超时处理：清除 token 并重定向到登录页
+        const handleTokenTimeout = () => {
+            removeToken();
+            const store = useUserStore();
+            store.token = null;
+            store.tokenName = null;
+            store.userInfo = {};
+            uni.reLaunch({ url: "/pages/login/login" });
+        };
+
+        console.log('[SisDebug] response interceptor', {
+            url: response.config?.url,
+            code,
+            msg,
+            data
+        });
         switch (code) {
             case RequestCodeEnum.SUCCESS:
                 msg && show && uni.$u.toast(msg);
                 return data;
             case RequestCodeEnum.FAILED:
+                // 后端 TOKEN_EMPTY 返回 code=0, msg="登录超时，请重新登录"
+                // 落在此分支时也要跳转登录页，否则只弹 toast 无跳转
+                if (msg && msg.indexOf('登录超时') !== -1) {
+                    handleTokenTimeout();
+                    return Promise.reject(msg);
+                }
                 uni.$u.toast(msg);
                 return Promise.reject(msg);
 
             case RequestCodeEnum.TOKEN_INVALID:
-                logout();
-                if (isAuth && !getToken()) {
-                    uni.navigateTo({
-                        url: "/pages/login/login",
-                    });
-                }
+                handleTokenTimeout();
                 return Promise.reject(msg);
 
             default:
@@ -99,8 +123,8 @@ const defaultOptions: HttpRequestOptions = {
 
 export function createRequest(opt?: HttpRequestOptions) {
     return new HttpRequest(
-        // 深度合并
-        merge(defaultOptions, opt || {})
+        // 深度合并（使用 {} 防止 lodash.merge 修改 defaultOptions）
+        merge({}, defaultOptions, opt || {})
     );
 }
 const request = createRequest();

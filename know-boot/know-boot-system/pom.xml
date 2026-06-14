@@ -107,7 +107,6 @@
         </dependency>
 
         <!-- Plan 模块 - 单机模式使用 -->
-        <!--
         <dependency>
             <groupId>com.know</groupId>
             <artifactId>know-boot-plan</artifactId>
@@ -131,7 +130,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        -->
 
         <!-- Swagger3 -->
         <dependency>

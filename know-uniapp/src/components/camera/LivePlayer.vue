@@ -362,7 +362,7 @@ defineExpose({
 
   .retry-btn {
     padding: 16rpx 48rpx;
-    background: #1890ff;
+    background: var(--color-primary);
     color: #fff;
     border-radius: 40rpx;
     font-size: 28rpx;
@@ -424,10 +424,10 @@ defineExpose({
 
   .device-status {
     font-size: 22rpx;
-    color: #999;
+    color: var(--color-text-tertiary);
     
     &.online {
-      color: #52c41a;
+      color: var(--color-success);
     }
   }
 }
@@ -454,7 +454,7 @@ defineExpose({
     }
 
     &.active {
-      background: #1890ff;
+      background: var(--color-primary);
     }
   }
 }

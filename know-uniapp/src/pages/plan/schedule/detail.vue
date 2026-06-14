@@ -1,44 +1,91 @@
 <template>
   <view class="schedule-detail-page">
+    <view class="detail-header-bar">
+      <view class="detail-header-copy">
+        <text class="detail-page-title">日程详情</text>
+        <text class="detail-page-sub">查看任务状态与时间线</text>
+      </view>
+    </view>
+
     <view v-if="loading" class="loading-state">
       <text>加载中...</text>
     </view>
+
     <template v-else-if="event">
-      <view class="detail-header" :style="{ borderLeftColor: getQuadrantColor(event.quadrant) }">
-        <text class="detail-title">{{ event.title }}</text>
-        <text class="detail-status" :class="event.status === 1 ? 'done' : 'todo'">
-          {{ event.status === 1 ? '✅ 已完成' : '⏳ 待办' }}
-        </text>
+      <view class="hero-card" :style="{ borderTopColor: getQuadrantColor(event.quadrant) }">
+        <view class="hero-meta">
+          <text class="hero-tag" :style="{ background: getQuadrantColor(event.quadrant) + '22', color: getQuadrantColor(event.quadrant) }">
+            {{ quadrantLabel(event.quadrant) }}
+          </text>
+          <text class="hero-status" :class="event.status === 1 ? 'done' : 'todo'">
+            {{ event.status === 1 ? '已完成' : '待处理' }}
+          </text>
+        </view>
+        <text class="hero-title">{{ event.title }}</text>
+        <text class="hero-desc">{{ event.content || '这条日程没有补充描述。' }}</text>
       </view>
 
-      <view class="detail-section">
+      <view class="info-grid">
+        <view class="info-card premium-card">
+          <text class="info-label">开始时间</text>
+          <text class="info-value">{{ formatDateTime(event.startTime) || '--' }}</text>
+        </view>
+        <view class="info-card premium-card">
+          <text class="info-label">结束时间</text>
+          <text class="info-value">{{ formatDateTime(event.endTime) || '--' }}</text>
+        </view>
+      </view>
+
+      <view class="detail-section premium-card">
+        <view class="section-title">详情信息</view>
         <view class="detail-row">
           <text class="label">象限</text>
           <text class="value">{{ quadrantLabel(event.quadrant) }}</text>
-        </view>
-        <view class="detail-row" v-if="event.content">
-          <text class="label">描述</text>
-          <text class="value">{{ event.content }}</text>
-        </view>
-        <view class="detail-row" v-if="event.startTime">
-          <text class="label">开始时间</text>
-          <text class="value">{{ formatDateTime(event.startTime) }}</text>
-        </view>
-        <view class="detail-row" v-if="event.endTime">
-          <text class="label">结束时间</text>
-          <text class="value">{{ formatDateTime(event.endTime) }}</text>
         </view>
         <view class="detail-row" v-if="event.location">
           <text class="label">地点</text>
           <text class="value">📍 {{ event.location }}</text>
         </view>
+        <view class="detail-row" v-if="event.isRepeat">
+          <text class="label">重复</text>
+          <text class="value">{{ repeatLabel(event.repeatType) }}</text>
+        </view>
+        <view class="detail-row" v-if="event.priority">
+          <text class="label">优先级</text>
+          <text class="value">{{ priorityLabel(event.priority) }}</text>
+        </view>
         <view class="detail-row" v-if="event.categoryId">
           <text class="label">分类</text>
-          <text class="value">{{ event.categoryId }}</text>
+          <text class="value">#{{ event.categoryId }}</text>
         </view>
         <view class="detail-row" v-if="event.completedTime">
           <text class="label">完成时间</text>
           <text class="value">{{ formatDateTime(event.completedTime) }}</text>
+        </view>
+      </view>
+
+      <view class="timeline-card premium-card">
+        <view class="section-title">时间线</view>
+        <view class="timeline-item">
+          <view class="timeline-dot start"></view>
+          <view class="timeline-content">
+            <text class="timeline-name">开始</text>
+            <text class="timeline-time">{{ formatDateTime(event.startTime) || '--' }}</text>
+          </view>
+        </view>
+        <view class="timeline-item" v-if="event.endTime">
+          <view class="timeline-dot end"></view>
+          <view class="timeline-content">
+            <text class="timeline-name">结束</text>
+            <text class="timeline-time">{{ formatDateTime(event.endTime) }}</text>
+          </view>
+        </view>
+        <view class="timeline-item" v-if="event.completedTime">
+          <view class="timeline-dot done"></view>
+          <view class="timeline-content">
+            <text class="timeline-name">完成</text>
+            <text class="timeline-time">{{ formatDateTime(event.completedTime) }}</text>
+          </view>
         </view>
       </view>
 
@@ -48,12 +95,10 @@
           class="action-btn primary"
           @tap="handleComplete"
         >标记完成</button>
-        <button
-          class="action-btn danger"
-          @tap="handleDelete"
-        >删除</button>
+        <button class="action-btn danger" @tap="handleDelete">删除日程</button>
       </view>
     </template>
+
     <view v-else class="loading-state">
       <text>未找到日程</text>
     </view>
@@ -62,33 +107,51 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getScheduleDetail, completeSchedule, deleteSchedule } from '@/api/plan/schedule'
+import { completeSchedule, deleteSchedule, getScheduleDetail } from '@/api/plan/schedule'
 
 const event = ref(null)
 const loading = ref(true)
 
 const quadrantLabel = (q) => {
-  const labels = { 1: '重要紧急', 2: '重要不紧急', 3: '紧急不重要', 4: '不紧急不重要' }
+  const labels = {
+    1: '重要紧急',
+    2: '重要不紧急',
+    3: '紧急不重要',
+    4: '不紧急不重要'
+  }
   return labels[q] || '未分类'
 }
 
 const getQuadrantColor = (q) => {
-  const colors = { 1: '#FF6B6B', 2: '#4ECDC4', 3: '#FFE66D', 4: '#95A5A6' }
-  return colors[q] || '#999'
+  const colors = {
+    1: '#FF6B6B',
+    2: '#4ECDC4',
+    3: '#FFE66D',
+    4: '#95A5A6'
+  }
+  return colors[q] || '#999999'
+}
+
+const repeatLabel = (repeatType) => {
+  return ['不重复', '每天', '每周', '每月', '每年'][repeatType] || '重复'
+}
+
+const priorityLabel = (priority) => {
+  return ['低', '中', '高'][priority - 1] || '中'
 }
 
 const formatDateTime = (ts) => {
   if (!ts) return ''
   const d = new Date(ts)
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
 const fetchDetail = async (id) => {
   try {
     const res = await getScheduleDetail(id)
     event.value = res || null
-  } catch (e) {
-    console.error('获取详情失败', e)
+  } catch (error) {
+    console.error('获取详情失败', error)
   } finally {
     loading.value = false
   }
@@ -101,8 +164,8 @@ const handleComplete = async () => {
     uni.showToast({ title: '已完成', icon: 'success' })
     event.value.status = 1
     event.value.completedTime = Date.now()
-  } catch (e) {
-    console.error(e)
+  } catch (error) {
+    console.error(error)
   }
 }
 
@@ -112,8 +175,8 @@ const handleDelete = async () => {
     await deleteSchedule(event.value.id)
     uni.showToast({ title: '已删除', icon: 'success' })
     setTimeout(() => uni.navigateBack(), 500)
-  } catch (e) {
-    console.error(e)
+  } catch (error) {
+    console.error(error)
   }
 }
 
@@ -129,83 +192,216 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .schedule-detail-page {
   min-height: 100vh;
-  background: #f5f5f5;
-  padding: 20rpx;
+  background: var(--color-bg-app);
+  padding: 24rpx 24rpx 40rpx;
+}
+
+.detail-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20rpx;
+  margin-bottom: 18rpx;
+}
+
+.detail-header-copy {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-page-title {
+  font-size: 42rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.detail-page-sub {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
 }
 
 .loading-state {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 120rpx 0;
+  padding: 160rpx 0;
   font-size: 28rpx;
-  color: #999;
+  color: var(--color-text-tertiary);
 }
 
-.detail-header {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-  border-left: 8rpx solid #1890FF;
-  margin-bottom: 20rpx;
+.hero-card {
+  background: var(--color-surface);
+  border-radius: 24rpx;
+  padding: 32rpx 30rpx;
+  border-top: 8rpx solid var(--color-primary);
+  box-shadow: var(--shadow-sm);
 }
 
-.detail-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
+.hero-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.hero-tag {
+  font-size: 22rpx;
+  padding: 6rpx 18rpx;
+  border-radius: 999rpx;
+}
+
+.hero-status {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.hero-status.todo {
+  color: var(--color-danger);
+}
+
+.hero-status.done {
+  color: var(--color-success);
+}
+
+.hero-title {
   display: block;
-  margin-bottom: 12rpx;
+  margin-top: 18rpx;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.35;
 }
 
-.detail-status {
+.hero-desc {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18rpx;
+  margin-top: 20rpx;
+}
+
+.info-card {
+  padding: 24rpx;
+}
+
+.info-label {
+  display: block;
+  font-size: 22rpx;
+  color: var(--color-text-tertiary);
+}
+
+.info-value {
+  display: block;
+  margin-top: 10rpx;
   font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.5;
 }
-.detail-status.todo { color: #FF6B6B; }
-.detail-status.done { color: #52C41A; }
 
-.detail-section {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
+.detail-section,
+.timeline-card {
+  margin-top: 20rpx;
+  padding: 28rpx 28rpx 16rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 12rpx;
 }
 
 .detail-row {
   display: flex;
-  padding: 16rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--color-border-light);
 }
 
-.detail-row:last-child { border-bottom: none; }
+.detail-row:last-child {
+  border-bottom: none;
+}
 
-.detail-row .label {
-  width: 140rpx;
-  font-size: 28rpx;
-  color: #999;
+.label {
+  width: 150rpx;
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: var(--color-text-tertiary);
+}
+
+.value {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 18rpx;
+  padding: 14rpx 0;
+}
+
+.timeline-dot {
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 50%;
+  margin-top: 8rpx;
   flex-shrink: 0;
 }
 
-.detail-row .value {
-  flex: 1;
-  font-size: 28rpx;
-  color: #333;
+.timeline-dot.start {
+  background: var(--color-primary);
+}
+
+.timeline-dot.end {
+  background: #5AC8A0;
+}
+
+.timeline-dot.done {
+  background: var(--color-success);
+}
+
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-name {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.timeline-time {
+  margin-top: 6rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
 .detail-actions {
   display: flex;
   gap: 20rpx;
-  padding: 20rpx 0;
+  padding: 28rpx 0 0;
 }
 
 .action-btn {
   flex: 1;
-  height: 88rpx;
-  border-radius: 44rpx;
-  font-size: 30rpx;
+  height: 90rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -213,13 +409,13 @@ onMounted(() => {
 }
 
 .action-btn.primary {
-  background: #1890FF;
+  background: linear-gradient(135deg, var(--color-primary), #8980f0);
   color: #fff;
 }
 
 .action-btn.danger {
-  background: #fff;
-  color: #FF4D4F;
-  border: 2rpx solid #FF4D4F;
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border: 2rpx solid rgba(255, 107, 107, 0.35);
 }
 </style>

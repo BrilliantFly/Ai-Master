@@ -117,7 +117,7 @@ async function deleteRecord(item: CameraRecord) {
 <style scoped lang="scss">
 .records-page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
   padding: 24rpx;
 }
 
@@ -125,15 +125,15 @@ async function deleteRecord(item: CameraRecord) {
   .record-item {
     display: flex;
     align-items: center;
-    background: #fff;
-    border-radius: 16rpx;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
     padding: 24rpx;
     margin-bottom: 24rpx;
     
     .record-icon {
       width: 80rpx;
       height: 80rpx;
-      background: #e6f7ff;
+      background: var(--color-primary-mist);
       border-radius: 12rpx;
       display: flex;
       align-items: center;
@@ -148,21 +148,21 @@ async function deleteRecord(item: CameraRecord) {
       .record-name {
         display: block;
         font-size: 28rpx;
-        color: #333;
+        color: var(--color-text);
         margin-bottom: 8rpx;
       }
       
       .record-time {
         display: block;
         font-size: 24rpx;
-        color: #999;
+        color: var(--color-text-tertiary);
         margin-bottom: 6rpx;
       }
       
       .record-duration {
         display: block;
         font-size: 24rpx;
-        color: #1890ff;
+        color: var(--color-primary);
       }
     }
     
@@ -179,9 +179,9 @@ async function deleteRecord(item: CameraRecord) {
         justify-content: center;
         font-size: 24rpx;
         
-        &.play { background: #e6f7ff; }
-        &.download { background: #f6ffed; }
-        &.delete { background: #fff1f0; }
+        &.play { background: var(--color-primary-mist); }
+        &.download { background: var(--color-success-soft); }
+        &.delete { background: var(--color-danger-soft); }
       }
     }
   }

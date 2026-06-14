@@ -1,0 +1,209 @@
+<template>
+    <view class="theme-switcher">
+        <view class="theme-trigger" @tap.stop="togglePanel" title="切换主题">
+            <view class="trigger-icon" v-html="sunIcon"></view>
+        </view>
+
+        <view v-if="isOpen" class="theme-overlay" @tap="closePanel"></view>
+
+        <view class="theme-panel" :class="{ open: isOpen }">
+            <view
+                v-for="theme in themes"
+                :key="theme.key"
+                class="theme-option"
+                :class="{ active: current === theme.key }"
+                :data-theme="theme.key"
+                @tap.stop="selectTheme(theme.key)"
+            >
+                <text class="swatch" :class="'sw-' + theme.key"></text>
+                <text class="theme-name">{{ theme.name }}</text>
+                <text class="check">✓</text>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useThemeStore, VISUAL_THEMES } from '@/stores/theme'
+
+const themeStore = useThemeStore()
+const isOpen = ref(false)
+
+const themes = VISUAL_THEMES
+const current = computed(() => themeStore.currentVisualTheme)
+
+const sunIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="5"></circle>
+  <line x1="12" y1="1" x2="12" y2="3"></line>
+  <line x1="12" y1="21" x2="12" y2="23"></line>
+  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+  <line x1="1" y1="12" x2="3" y2="12"></line>
+  <line x1="21" y1="12" x2="23" y2="12"></line>
+  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+</svg>
+`
+
+const togglePanel = () => {
+    isOpen.value = !isOpen.value
+}
+
+const closePanel = () => {
+    isOpen.value = false
+}
+
+const selectTheme = (key: string) => {
+    themeStore.setVisualTheme(key)
+    closePanel()
+}
+</script>
+
+<style scoped lang="scss">
+.theme-switcher {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 220;
+}
+
+.theme-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: var(--color-text-secondary);
+    opacity: 0.7;
+    transition: all var(--duration) var(--ease);
+}
+
+.theme-trigger:active {
+    opacity: 1;
+    background: var(--color-surface-soft);
+}
+
+.trigger-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:deep(.trigger-icon svg) {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
+.theme-overlay {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 210;
+}
+
+.theme-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: var(--color-bg-app);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    display: none;
+    z-index: 220;
+    min-width: 148px;
+    transform-origin: top right;
+    animation: themeIn 0.2s var(--ease-out-expo);
+}
+
+.theme-panel.open {
+    display: block;
+}
+
+@keyframes themeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.theme-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    transition: all var(--duration) var(--ease);
+}
+
+.theme-option:active {
+    background: var(--color-surface-soft);
+    color: var(--color-text);
+}
+
+.theme-option.active {
+    color: var(--color-primary);
+    background: var(--color-primary-mist);
+}
+
+.swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1.5px solid var(--color-border-light);
+    position: relative;
+}
+
+.swatch::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+}
+
+.sw-white::after { background: #5b5bd6; }
+.sw-dark::after { background: #6b6be0; }
+.sw-warm::after { background: #d4956b; }
+.sw-aurora::after { background: #6366f1; }
+.sw-purple::after { background: #7c3aed; }
+.sw-glass::after { background: linear-gradient(135deg, #667eea, #764ba2); }
+.sw-orangold::after { background: linear-gradient(135deg, #E87A5D, #D4A04A); }
+
+.theme-option.active .swatch {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-mist);
+}
+
+.theme-name {
+    font-size: 13px;
+}
+
+.check {
+    margin-left: auto;
+    font-size: 14px;
+    color: var(--color-primary);
+    display: none;
+}
+
+.theme-option.active .check {
+    display: inline-flex;
+}
+</style>

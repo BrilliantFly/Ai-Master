@@ -11,7 +11,7 @@
 			textAlign: inputAlignCom,
 			backgroundColor: backgroundColor,
 		}"
-		@tap.stop="inputClick"
+		@tap="inputClick"
 	>
 		<textarea
 			v-if="type == 'textarea'"

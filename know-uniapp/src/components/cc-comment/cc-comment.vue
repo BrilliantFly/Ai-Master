@@ -43,7 +43,7 @@
   </template>
   <!-- 空盒子 -->
   <view class="empty_box" v-else>
-    <uni-icons type="chatboxes" size="36" color="#c0c0c0"></uni-icons>
+    <uni-icons type="chatboxes" size="36" color="#a5a7b5"></uni-icons>
     <view>
       <span class="txt"> 这里是一片荒草地, </span>
       <span class="txt click" @click="() => newCommentFun()">说点什么...</span>
@@ -449,7 +449,7 @@ function shrinkReplyFun({ item1, index1 }) {
   }
 }
 .c_popup_box {
-  background-color: #fff;
+  background-color: var(--color-surface);
   .reply_text {
     @extend .center;
     padding: 20rpx 20rpx 0 20rpx;

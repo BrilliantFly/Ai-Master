@@ -42,7 +42,7 @@ const props = withDefaults(
 
 <style lang="scss" scoped>
 .news-card {
-    border-bottom: 1px solid #f8f8f8;
+    border-bottom: 1px solid var(--color-border-light);
     &-content {
         &-title {
             -webkit-line-clamp: 2;

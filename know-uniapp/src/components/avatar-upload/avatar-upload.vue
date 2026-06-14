@@ -99,7 +99,7 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .avatar-upload {
-    background: #fff;
+    background: var(--color-bg);
     overflow: hidden;
     &::after {
         border: none;

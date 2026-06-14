@@ -263,10 +263,10 @@ function formatDuration(seconds: number): string {
     .subtitle {
       display: block;
       font-size: 22rpx;
-      color: #999;
+      color: var(--color-text-tertiary);
 
       &.recording {
-        color: #ff4d4f;
+        color: var(--color-danger);
       }
     }
   }
@@ -313,7 +313,7 @@ function formatDuration(seconds: number): string {
 
       &.active {
         text:first-child {
-          color: #ff4d4f;
+          color: var(--color-danger);
         }
       }
 
@@ -354,7 +354,7 @@ function formatDuration(seconds: number): string {
         }
 
         &:active {
-          background: rgba(24, 144, 255, 0.6);
+          background: rgba(var(--color-primary-rgb), 0.6);
         }
       }
     }
@@ -377,13 +377,13 @@ function formatDuration(seconds: number): string {
         color: #fff;
 
         &:active {
-          background: rgba(24, 144, 255, 0.6);
+          background: rgba(var(--color-primary-rgb), 0.6);
         }
       }
 
       .zoom-label {
         font-size: 20rpx;
-        color: #999;
+        color: var(--color-text-tertiary);
       }
     }
   }
@@ -403,7 +403,7 @@ function formatDuration(seconds: number): string {
       .record-dot {
         width: 12rpx;
         height: 12rpx;
-        background: #ff4d4f;
+        background: var(--color-danger);
         border-radius: 50%;
         margin-right: 12rpx;
         animation: blink 1s infinite;
@@ -435,7 +435,7 @@ function formatDuration(seconds: number): string {
   justify-content: center;
 
   .menu-content {
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 16rpx;
     min-width: 400rpx;
     overflow: hidden;
@@ -444,7 +444,7 @@ function formatDuration(seconds: number): string {
       display: flex;
       align-items: center;
       padding: 30rpx 40rpx;
-      border-bottom: 1rpx solid #f0f0f0;
+      border-bottom: 1rpx solid var(--color-border-light);
 
       &:last-child {
         border-bottom: none;
@@ -457,12 +457,12 @@ function formatDuration(seconds: number): string {
 
       text:last-child {
         font-size: 28rpx;
-        color: #333;
+        color: var(--color-text);
       }
 
       &.danger {
         text:last-child {
-          color: #ff4d4f;
+          color: var(--color-danger);
         }
       }
     }

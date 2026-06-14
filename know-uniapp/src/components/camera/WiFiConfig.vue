@@ -282,7 +282,7 @@ function getSignalText(signal: number): string {
 <style scoped lang="scss">
 .wifi-config-container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg-app);
   padding: 30rpx;
 }
 
@@ -294,30 +294,30 @@ function getSignalText(signal: number): string {
     display: block;
     font-size: 36rpx;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
     margin-bottom: 12rpx;
   }
   
   .subtitle {
     display: block;
     font-size: 26rpx;
-    color: #999;
+    color: var(--color-text-tertiary);
   }
 }
 
 .current-wifi-card {
   display: flex;
   align-items: center;
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
   
   .wifi-icon {
     width: 80rpx;
     height: 80rpx;
-    background: #e8f5e9;
+    background: var(--color-success-soft);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -336,13 +336,13 @@ function getSignalText(signal: number): string {
       display: block;
       font-size: 32rpx;
       font-weight: 500;
-      color: #333;
+      color: var(--color-text);
     }
     
     .wifi-signal {
       display: block;
       font-size: 24rpx;
-      color: #999;
+      color: var(--color-text-tertiary);
       margin-top: 8rpx;
     }
   }
@@ -352,19 +352,19 @@ function getSignalText(signal: number): string {
       padding: 8rpx 20rpx;
       border-radius: 20rpx;
       font-size: 24rpx;
-      background: #f5f5f5;
-      color: #999;
+      background: var(--color-bg-app);
+      color: var(--color-text-tertiary);
       
       &.connected {
-        background: #e8f5e9;
-        color: #4caf50;
+        background: var(--color-success-soft);
+        color: var(--color-success);
       }
     }
   }
 }
 
 .wifi-list-section {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
@@ -378,13 +378,13 @@ function getSignalText(signal: number): string {
     .section-title {
       font-size: 30rpx;
       font-weight: 500;
-      color: #333;
+      color: var(--color-text);
     }
     
     .refresh-btn {
       display: flex;
       align-items: center;
-      color: #1890ff;
+      color: var(--color-primary);
       font-size: 26rpx;
       
       .iconfont {
@@ -402,12 +402,12 @@ function getSignalText(signal: number): string {
     padding: 24rpx;
     border-radius: 12rpx;
     margin-bottom: 16rpx;
-    background: #fafafa;
+    background: var(--color-surface-soft);
     transition: all 0.2s;
     
     &.selected {
-      background: #e6f7ff;
-      border: 2rpx solid #1890ff;
+      background: var(--color-primary-mist);
+      border: 2rpx solid var(--color-primary);
     }
     
     &:active {
@@ -427,14 +427,14 @@ function getSignalText(signal: number): string {
         .wifi-item-name {
           display: block;
           font-size: 28rpx;
-          color: #333;
+          color: var(--color-text);
           margin-bottom: 6rpx;
         }
         
         .wifi-item-detail {
           display: block;
           font-size: 22rpx;
-          color: #999;
+          color: var(--color-text-tertiary);
         }
       }
     }
@@ -452,7 +452,7 @@ function getSignalText(signal: number): string {
         .signal-bar {
           width: 6rpx;
           margin-right: 4rpx;
-          background: #ddd;
+          background: var(--color-border-light);
           border-radius: 2rpx;
           
           &:nth-child(1) { height: 8rpx; }
@@ -461,13 +461,13 @@ function getSignalText(signal: number): string {
           &:nth-child(4) { height: 26rpx; }
           
           &.active {
-            background: #1890ff;
+            background: var(--color-primary);
           }
         }
       }
       
       .select-indicator {
-        color: #1890ff;
+        color: var(--color-primary);
         font-size: 32rpx;
         font-weight: 600;
       }
@@ -479,19 +479,19 @@ function getSignalText(signal: number): string {
 .wifi-list-loading {
   text-align: center;
   padding: 60rpx 0;
-  color: #999;
+  color: var(--color-text-tertiary);
   font-size: 28rpx;
   
   .hint {
     display: block;
     font-size: 24rpx;
-    color: #ccc;
+    color: var(--color-text-tertiary);
     margin-top: 12rpx;
   }
   
   .scan-btn {
     margin-top: 30rpx;
-    background: #1890ff;
+    background: var(--color-primary);
     color: #fff;
     border-radius: 40rpx;
     font-size: 28rpx;
@@ -506,7 +506,7 @@ function getSignalText(signal: number): string {
     .dot {
       width: 12rpx;
       height: 12rpx;
-      background: #1890ff;
+      background: var(--color-primary);
       border-radius: 50%;
       margin: 0 6rpx;
       animation: dot-bounce 1.4s infinite ease-in-out both;
@@ -523,7 +523,7 @@ function getSignalText(signal: number): string {
 }
 
 .password-section {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
@@ -531,14 +531,14 @@ function getSignalText(signal: number): string {
   .section-title {
     font-size: 30rpx;
     font-weight: 500;
-    color: #333;
+    color: var(--color-text);
     margin-bottom: 24rpx;
   }
   
   .password-input-wrapper {
     display: flex;
     align-items: center;
-    background: #f5f5f5;
+    background: var(--color-bg-app);
     border-radius: 12rpx;
     padding: 0 24rpx;
     
@@ -561,7 +561,7 @@ function getSignalText(signal: number): string {
   .config-btn {
     width: 100%;
     height: 88rpx;
-    background: linear-gradient(135deg, #1890ff, #096dd9);
+    background: var(--color-primary);
     color: #fff;
     border-radius: 44rpx;
     font-size: 32rpx;
@@ -572,13 +572,13 @@ function getSignalText(signal: number): string {
     justify-content: center;
     
     &[disabled] {
-      background: #ccc;
+      background: var(--color-text-tertiary);
     }
   }
 }
 
 .config-progress {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
@@ -590,25 +590,25 @@ function getSignalText(signal: number): string {
     
     .progress-title {
       font-size: 28rpx;
-      color: #333;
+      color: var(--color-text);
     }
     
     .progress-percent {
       font-size: 28rpx;
-      color: #1890ff;
+      color: var(--color-primary);
       font-weight: 500;
     }
   }
   
   .progress-bar {
     height: 12rpx;
-    background: #f0f0f0;
+    background: var(--color-border-light);
     border-radius: 6rpx;
     overflow: hidden;
     
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #1890ff, #52c41a);
+      background: var(--color-primary);
       border-radius: 6rpx;
       transition: width 0.3s ease;
     }
@@ -617,7 +617,7 @@ function getSignalText(signal: number): string {
 
 .config-result {
   .result-card {
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 16rpx;
     padding: 60rpx 30rpx;
     text-align: center;
@@ -631,12 +631,12 @@ function getSignalText(signal: number): string {
     .result-message {
       display: block;
       font-size: 30rpx;
-      color: #333;
+      color: var(--color-text);
       margin-bottom: 40rpx;
     }
     
     .result-action {
-      background: #1890ff;
+      background: var(--color-primary);
       color: #fff;
       border-radius: 40rpx;
       font-size: 28rpx;
@@ -644,7 +644,7 @@ function getSignalText(signal: number): string {
       border: none;
       
       &.retry {
-        background: #ff4d4f;
+        background: var(--color-danger);
       }
     }
   }

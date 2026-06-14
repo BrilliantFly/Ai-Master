@@ -86,7 +86,7 @@ const metaData: any = computed(() => {
     width: 60rpx;
     height: 60rpx;
     margin-left: 20rpx;
-    background-color: #ffffff;
+    background-color: var(--color-surface);
     border-radius: 50%;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
 }

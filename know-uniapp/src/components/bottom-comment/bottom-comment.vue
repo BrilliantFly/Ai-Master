@@ -43,8 +43,8 @@ const emit = defineEmits([
   z-index: 80;
   width: 100vw;
   min-height: 8vh;
-  background-color: #fff;
-  box-shadow: 0 0 8rpx 4rpx #f7f7f7;
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -53,11 +53,11 @@ const emit = defineEmits([
   .disableinput {
     width: 54%;
     height: 70rpx;
-    background-color: #f6f6f6;
+    background-color: var(--color-bg);
     border-radius: 35rpx;
     margin-right: 30rpx;
     font-size: 20rpx;
-    color: #767676;
+    color: var(--color-text-tertiary);
     padding-left: 16rpx;
     display: flex;
     align-items: center;
@@ -76,7 +76,7 @@ const emit = defineEmits([
  
     .isUp {
       // color: $uni-color-primary;
-	  color: #767676;
+	  color: var(--color-text-tertiary);
     }
  
     .item-text {

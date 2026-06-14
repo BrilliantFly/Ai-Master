@@ -96,7 +96,7 @@ const handleLogin = async () => {
 <style lang="scss" scoped>
 .login-container {
     min-height: 100vh;
-    background-color: #fff;
+    background-color: var(--color-bg);
     padding: 120rpx 60rpx 0;
     box-sizing: border-box;
 }
@@ -121,7 +121,7 @@ const handleLogin = async () => {
     display: flex;
     align-items: center;
     padding: 20rpx 30rpx;
-    border: 1rpx solid #ddd;
+    border: 1rpx solid var(--color-border);
     border-radius: 10rpx;
     margin-bottom: 30rpx;
 }
@@ -142,7 +142,7 @@ const handleLogin = async () => {
     height: 90rpx;
     line-height: 90rpx;
     text-align: center;
-    background-color: #07c160;
+    background-color: var(--color-primary);
     color: #fff;
     border-radius: 45rpx;
     font-size: 32rpx;

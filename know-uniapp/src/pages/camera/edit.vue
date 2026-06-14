@@ -293,19 +293,19 @@ function onDelete() {
 <style scoped lang="scss">
 .edit-device-page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
   padding: 24rpx;
 }
 
 .loading-state {
   text-align: center;
   padding: 100rpx;
-  color: #999;
+  color: var(--color-text-tertiary);
 }
 
 .form-section {
-  background: #fff;
-  border-radius: 16rpx;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
   padding: 30rpx;
   
   .form-item {
@@ -318,36 +318,36 @@ function onDelete() {
     .label {
       display: block;
       font-size: 28rpx;
-      color: #333;
+      color: var(--color-text);
       margin-bottom: 16rpx;
       
       .required {
-        color: #ff4d4f;
+        color: var(--color-danger);
       }
     }
     
     .input {
       height: 88rpx;
-      background: #f5f5f5;
+      background: var(--color-surface-soft);
       border-radius: 12rpx;
       padding: 0 24rpx;
       font-size: 28rpx;
       
       &[disabled] {
-        color: #999;
+        color: var(--color-text-tertiary);
       }
     }
     
     .hint {
       display: block;
       font-size: 22rpx;
-      color: #999;
+      color: var(--color-text-tertiary);
       margin-top: 8rpx;
     }
     
     .textarea {
       height: 160rpx;
-      background: #f5f5f5;
+      background: var(--color-surface-soft);
       border-radius: 12rpx;
       padding: 24rpx;
       font-size: 28rpx;
@@ -355,12 +355,12 @@ function onDelete() {
     
     .picker-value {
       height: 88rpx;
-      background: #f5f5f5;
+      background: var(--color-surface-soft);
       border-radius: 12rpx;
       padding: 0 24rpx;
       line-height: 88rpx;
       font-size: 28rpx;
-      color: #333;
+      color: var(--color-text);
     }
     
     .password-input {
@@ -386,7 +386,7 @@ function onDelete() {
       
       .action-btn {
         font-size: 24rpx;
-        color: #1890ff;
+        color: var(--color-primary);
       }
     }
   }
@@ -396,8 +396,8 @@ function onDelete() {
   margin-top: 24rpx;
   
   .status-card {
-    background: #fff;
-    border-radius: 16rpx;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
     padding: 30rpx;
     
     .status-header {
@@ -409,19 +409,19 @@ function onDelete() {
       .status-title {
         font-size: 30rpx;
         font-weight: 500;
-        color: #333;
+        color: var(--color-text);
       }
       
       .status-badge {
         padding: 8rpx 24rpx;
         border-radius: 20rpx;
         font-size: 24rpx;
-        background: #f5f5f5;
-        color: #999;
+        background: var(--color-surface-soft);
+        color: var(--color-text-tertiary);
         
         &.online {
-          background: #f6ffed;
-          color: #52c41a;
+          background: var(--color-success-soft);
+          color: var(--color-success);
         }
       }
     }
@@ -436,7 +436,7 @@ function onDelete() {
         align-items: center;
         justify-content: center;
         height: 72rpx;
-        background: #f5f5f5;
+        background: var(--color-surface-soft);
         border-radius: 12rpx;
         font-size: 26rpx;
         
@@ -454,22 +454,22 @@ function onDelete() {
   .submit-btn {
     width: 100%;
     height: 88rpx;
-    background: linear-gradient(135deg, #1890ff, #096dd9);
+    background: var(--color-primary);
     color: #fff;
     border-radius: 44rpx;
     font-size: 32rpx;
     margin-bottom: 24rpx;
     
     &[disabled] {
-      background: #ccc;
+      background: var(--color-text-tertiary);
     }
   }
   
   .delete-btn {
     width: 100%;
     height: 88rpx;
-    background: #fff1f0;
-    color: #ff4d4f;
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
     border-radius: 44rpx;
     font-size: 30rpx;
   }

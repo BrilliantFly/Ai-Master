@@ -105,7 +105,7 @@ function shareSnapshot(item: CameraSnapshot) {
 <style scoped lang="scss">
 .snapshots-page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
   padding: 24rpx;
 }
 
@@ -115,8 +115,8 @@ function shareSnapshot(item: CameraSnapshot) {
   gap: 24rpx;
   
   .snapshot-item {
-    background: #fff;
-    border-radius: 16rpx;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
     overflow: hidden;
     
     .snapshot-image {
@@ -130,14 +130,14 @@ function shareSnapshot(item: CameraSnapshot) {
       .snapshot-time {
         display: block;
         font-size: 24rpx;
-        color: #333;
+        color: var(--color-text);
         margin-bottom: 6rpx;
       }
       
       .snapshot-device {
         display: block;
         font-size: 22rpx;
-        color: #999;
+        color: var(--color-text-tertiary);
       }
     }
     
@@ -150,7 +150,7 @@ function shareSnapshot(item: CameraSnapshot) {
       .action-btn {
         width: 56rpx;
         height: 56rpx;
-        background: #f5f5f5;
+        background: var(--color-surface-soft);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -158,7 +158,7 @@ function shareSnapshot(item: CameraSnapshot) {
         font-size: 24rpx;
         
         &.delete {
-          background: #fff1f0;
+          background: var(--color-danger-soft);
         }
       }
     }

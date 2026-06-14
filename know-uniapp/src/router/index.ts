@@ -4,11 +4,12 @@ import { createRouter } from 'uniapp-router-next'
 import { ClientEnum } from '@/enums/appEnums'
 import { useUserStore } from '@/stores/user'
 import { client } from '@/utils/client'
+import cache from '@/utils/cache'
+import { BACK_URL } from '@/enums/constantEnums'
+
 // #ifdef H5
 import wechatOa from '@/utils/wechat'
 // #endif
-import cache from '@/utils/cache'
-import { BACK_URL } from '@/enums/constantEnums'
 
 const router = createRouter({
     routes: [
@@ -23,15 +24,14 @@ const router = createRouter({
         }
     ],
     debug: import.meta.env.DEV,
-    //@ts-ignore
+    // @ts-ignore
     platform: process.env.UNI_PLATFORM,
     h5: {}
 })
 
-//存储登陆前的页面
 let isFirstEach = true
+
 router.beforeEach(async (to, from) => {
-    //保存第一次进来时的页面路径（需要登陆才能访问的页面）
     if (isFirstEach) {
         const userStore = useUserStore()
         if (!userStore.isLogin && !to.meta.white) {
@@ -40,6 +40,7 @@ router.beforeEach(async (to, from) => {
         isFirstEach = false
     }
 })
+
 router.afterEach((to, from) => {
     const userStore = useUserStore()
     if (!userStore.isLogin && !to.meta.white) {
@@ -47,17 +48,22 @@ router.afterEach((to, from) => {
     }
 })
 
-// 登录拦截
 router.beforeEach(async (to, from) => {
-    const userStore = useUserStore();
+    if (to.path === '/pages/plan/home') {
+        return {
+            path: '/pages/plan/home/index',
+            query: to.query
+        }
+    }
+
+    const userStore = useUserStore()
     if (!userStore.isLogin && to.meta.auth) {
         return '/pages/login/login'
     }
 })
 
 // #ifdef H5
-//用于收集微信公众号的授权的code，并清除路径上微信带的参数
-router.beforeEach(async (to, form) => {
+router.beforeEach(async (to, from) => {
     const { code, state, scene } = to.query
 
     if (code && state && scene) {
@@ -65,7 +71,6 @@ router.beforeEach(async (to, form) => {
             code,
             scene
         })
-        //收集完删除路径上的参数
         delete to.query.code
         delete to.query.state
         return {
@@ -76,16 +81,14 @@ router.beforeEach(async (to, form) => {
         }
     }
 })
-// #endif
 
-// #ifdef H5
 router.afterEach((to, from) => {
     setTimeout(async () => {
-        if (client == ClientEnum.OA_WEIXIN && !to.meta.webview) {
-            // jssdk配置
+        if (client === ClientEnum.OA_WEIXIN && !to.meta.webview) {
             await wechatOa.config()
         }
     })
 })
 // #endif
+
 export default router

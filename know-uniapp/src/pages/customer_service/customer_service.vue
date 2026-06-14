@@ -14,9 +14,9 @@
 </script>
 
 <style scoped>
-.customer-service-page { min-height: 100vh; padding: 30rpx; background: #f5f5f5; }
+.customer-service-page { min-height: 100vh; padding: 30rpx; background: var(--color-bg); }
 .header { padding: 30rpx 0; }
-.title { font-size: 36rpx; font-weight: bold; color: #333; }
-.content { background: #fff; border-radius: 16rpx; padding: 40rpx; }
-.desc, .phone { display: block; font-size: 30rpx; color: #666; margin-bottom: 20rpx; }
+.title { font-size: 36rpx; font-weight: bold; color: var(--color-text); }
+.content { background: var(--color-surface); border-radius: 16rpx; padding: 40rpx; }
+.desc, .phone { display: block; font-size: 30rpx; color: var(--color-text-secondary); margin-bottom: 20rpx; }
 </style>

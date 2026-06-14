@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,11 +58,28 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
                 new LambdaQueryWrapper<PlanHabitRecord>()
                         .eq(PlanHabitRecord::getUserId, userId));
 
+        // 今日打卡数
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long todayStart = cal.getTimeInMillis();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        long todayEnd = cal.getTimeInMillis();
+
+        long todayCheckins = planHabitRecordMapper.selectCount(
+                new LambdaQueryWrapper<PlanHabitRecord>()
+                        .eq(PlanHabitRecord::getUserId, userId)
+                        .ge(PlanHabitRecord::getRecordDate, todayStart)
+                        .lt(PlanHabitRecord::getRecordDate, todayEnd));
+
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalCount", totalCount);
         stats.put("activeCount", activeCount);
         stats.put("completedCount", completedCount);
         stats.put("totalCheckins", totalCheckins);
+        stats.put("todayCheckins", todayCheckins);
         return stats;
     }
 

@@ -49,7 +49,7 @@ const props = defineProps({
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #ffffff;
+    background-color: var(--color-surface);
     &--fixed {
         position: fixed;
         top: 0;

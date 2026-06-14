@@ -21,6 +21,7 @@ import java.util.Map;
  */
 @Api(tags = "认证管理")
 @RestController
+@RequestMapping("/api")
 public class AuthController {
 
     @Autowired
@@ -36,9 +37,10 @@ public class AuthController {
     private HttpServletRequest request;
 
     @ApiOperation("用户登录")
-    @PostMapping("/login")
+    @PostMapping("/login/account")
     public AjaxResult login(@RequestBody Map<String, String> loginForm) {
-        String username = loginForm.get("username");
+        // 兼容前端字段名 account/username
+        String username = loginForm.getOrDefault("username", loginForm.get("account"));
         String password = loginForm.get("password");
 
         // 获取客户端IP
@@ -97,7 +99,7 @@ public class AuthController {
     }
 
     @ApiOperation("刷新Token")
-    @PostMapping("/refreshToken")
+    @PostMapping("/login/refreshToken")
     public AjaxResult refreshToken() {
         try {
             // 检查是否已登录
@@ -119,7 +121,7 @@ public class AuthController {
     }
 
     @ApiOperation("获取用户信息")
-    @GetMapping("/getUserInfo")
+    @GetMapping("/login/getUserInfo")
     public AjaxResult getUserInfo() {
         try {
             // 获取当前登录用户ID
@@ -160,7 +162,7 @@ public class AuthController {
     }
 
     @ApiOperation("用户登出")
-    @GetMapping("/logout")
+    @GetMapping("/login/logout")
     public AjaxResult logout() {
         try {
             Object loginId = StpUtil.getLoginId();

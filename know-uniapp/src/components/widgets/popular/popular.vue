@@ -79,13 +79,13 @@
 	
 	.data-box{
 		margin-top: 12upx;
-		background-color: #ffffff;
+		background-color: var(--color-surface);
 		/* box-shadow: 0px 0px 5px rgba(0,0,0,.1); */
 		padding: 0upx;
 	}
 	
 	.data-box-title{
-		color: #333;
+		color: var(--color-text);
 		font-size: 30upx !important;
 		font-weight: bold;
 		
@@ -142,7 +142,7 @@
 	// 	display: none;
 	// }
 	.cuIcon-titles{
-		color: coral;
+		color: var(--color-primary);
 	}
 	
 	/* ==================
@@ -564,7 +564,7 @@
 	.grid.grid-square>view>text[class*="cuIcon-"] {
 		font-size: 52upx;
 		position: absolute;
-		color: #8799a3;
+		color: var(--color-text-tertiary);
 		margin: auto;
 		top: 0;
 		bottom: 0;

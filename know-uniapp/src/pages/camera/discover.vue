@@ -127,7 +127,7 @@ function getBrandIcon(brand?: string): string {
 <style scoped lang="scss">
 .discover-page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
   padding: 30rpx;
 }
 
@@ -139,14 +139,14 @@ function getBrandIcon(brand?: string): string {
     display: block;
     font-size: 36rpx;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
     margin-bottom: 12rpx;
   }
   
   .subtitle {
     display: block;
     font-size: 26rpx;
-    color: #999;
+    color: var(--color-text-tertiary);
   }
 }
 
@@ -166,7 +166,7 @@ function getBrandIcon(brand?: string): string {
       position: absolute;
       width: 100%;
       height: 100%;
-      border: 2rpx solid #1890ff;
+      border: 2rpx solid var(--color-primary);
       border-radius: 50%;
       animation: radar 2s infinite;
       
@@ -186,13 +186,13 @@ function getBrandIcon(brand?: string): string {
   
   .scan-text {
     font-size: 32rpx;
-    color: #333;
+    color: var(--color-text);
     margin-bottom: 12rpx;
   }
   
   .scan-hint {
     font-size: 24rpx;
-    color: #999;
+    color: var(--color-text-tertiary);
   }
 }
 
@@ -208,8 +208,8 @@ function getBrandIcon(brand?: string): string {
 }
 
 .discover-result {
-  background: #fff;
-  border-radius: 16rpx;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
   padding: 30rpx;
   
   .result-header {
@@ -220,12 +220,12 @@ function getBrandIcon(brand?: string): string {
     
     .result-count {
       font-size: 28rpx;
-      color: #333;
+      color: var(--color-text);
     }
     
     .rescan-btn {
       font-size: 26rpx;
-      color: #1890ff;
+      color: var(--color-primary);
     }
   }
   
@@ -234,7 +234,7 @@ function getBrandIcon(brand?: string): string {
       display: flex;
       align-items: center;
       padding: 24rpx 0;
-      border-bottom: 1rpx solid #f0f0f0;
+      border-bottom: 1rpx solid var(--color-border-light);
       
       &:last-child {
         border-bottom: none;
@@ -243,7 +243,7 @@ function getBrandIcon(brand?: string): string {
       .device-icon {
         width: 80rpx;
         height: 80rpx;
-        background: #f5f5f5;
+        background: var(--color-surface-soft);
         border-radius: 12rpx;
         display: flex;
         align-items: center;
@@ -258,14 +258,14 @@ function getBrandIcon(brand?: string): string {
         .device-ip {
           display: block;
           font-size: 28rpx;
-          color: #333;
+    color: var(--color-text);
           margin-bottom: 6rpx;
         }
         
         .device-brand {
           display: block;
           font-size: 24rpx;
-          color: #999;
+          color: var(--color-text-tertiary);
         }
       }
       
@@ -274,12 +274,12 @@ function getBrandIcon(brand?: string): string {
           padding: 8rpx 20rpx;
           border-radius: 20rpx;
           font-size: 22rpx;
-          background: #e6f7ff;
-          color: #1890ff;
+          background: var(--color-primary-mist);
+          color: var(--color-primary);
           
           &.added {
-            background: #f5f5f5;
-            color: #999;
+            background: var(--color-surface-soft);
+            color: var(--color-text-tertiary);
           }
         }
       }
@@ -300,12 +300,12 @@ function getBrandIcon(brand?: string): string {
   .empty-text {
     display: block;
     font-size: 28rpx;
-    color: #999;
+    color: var(--color-text-tertiary);
     margin-bottom: 40rpx;
   }
   
   .rescan-btn {
-    background: #1890ff;
+    background: var(--color-primary);
     color: #fff;
     border-radius: 40rpx;
     padding: 20rpx 60rpx;
@@ -319,14 +319,14 @@ function getBrandIcon(brand?: string): string {
   .manual-title {
     display: block;
     font-size: 26rpx;
-    color: #999;
+    color: var(--color-text-tertiary);
     margin-bottom: 24rpx;
   }
   
   .manual-btn {
     background: transparent;
-    border: 2rpx solid #1890ff;
-    color: #1890ff;
+    border: 2rpx solid var(--color-primary);
+    color: var(--color-primary);
     border-radius: 40rpx;
     padding: 20rpx 60rpx;
   }

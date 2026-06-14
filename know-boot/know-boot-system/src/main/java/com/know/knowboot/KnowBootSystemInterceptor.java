@@ -1,6 +1,7 @@
 package com.know.knowboot;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.exception.NotLoginException;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.know.knowboot.service.IAdminRoleService;
@@ -64,6 +65,13 @@ public class KnowBootSystemInterceptor implements HandlerInterceptor {
             this.checkLogin(method, reqUri);
         } catch (LoginException e) {
             AjaxResult<Object> result = AjaxResult.failed(e.getCode(), e.getMsg());
+            response.getWriter().print(JSON.toJSONString(result));
+            return false;
+        } catch (NotLoginException e) {
+            // Sa-Token登录校验异常（token无效/过期），统一返回TOKEN_INVALID
+            Integer errCode = ErrorEnum.TOKEN_INVALID.getCode();
+            String errMsg = ErrorEnum.TOKEN_INVALID.getMsg();
+            AjaxResult<Object> result = AjaxResult.failed(errCode, errMsg);
             response.getWriter().print(JSON.toJSONString(result));
             return false;
         }

@@ -1,5 +1,6 @@
 package com.know.knowboot.controller;
 
+import com.know.knowboot.aop.NotLogin;
 import com.know.knowboot.core.AjaxResult;
 import com.know.knowboot.entity.tenant.SysDict;
 import com.know.knowboot.entity.tenant.SysDictType;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Api(tags = "字典管理")
 @RestController
-@RequestMapping("/system/dict")
+@RequestMapping("/api/system/dict")
 @RequiredArgsConstructor
 public class SysDictController {
 
@@ -23,6 +24,7 @@ public class SysDictController {
     // ========== 字典类型 ==========
 
     @ApiOperation("字典类型列表")
+    @NotLogin
     @GetMapping("/type/list")
     public AjaxResult<List<SysDictType>> typeList() {
         return AjaxResult.success(sysDictService.listAll());
@@ -55,6 +57,7 @@ public class SysDictController {
     // ========== 字典数据 ==========
 
     @ApiOperation("获取字典数据列表")
+    @NotLogin
     @GetMapping("/list")
     public AjaxResult<List<SysDict>> list(@ApiParam("字典类型ID") @RequestParam Long dictTypeId) {
         return AjaxResult.success(sysDictService.listByTypeId(dictTypeId));

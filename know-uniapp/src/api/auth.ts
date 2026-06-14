@@ -8,7 +8,7 @@ import { client } from '@/utils/client'
  */
 export function login(username: string, password: string) {
     return request.post({
-        url: '/login',
+        url: '/login/account',
         data: {
             username,
             password
@@ -30,7 +30,7 @@ export function refreshToken() {
  * 登出
  */
 export function logout() {
-    return request.post({ url: '/login/logout' }, { isAuth: true })
+    return request.get({ url: '/login/logout' }, { isAuth: true })
 }
 
 /**

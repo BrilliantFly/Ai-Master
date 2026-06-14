@@ -15,8 +15,13 @@ export const isWeixinClient = () => {
  * @return { Boolean }
  */
 export function isAndroid() {
+    // #ifdef H5
     const u = navigator.userAgent
     return u.indexOf('Android') > -1 || u.indexOf('Adr') > -1
+    // #endif
+    // #ifndef H5
+    return false
+    // #endif
 }
 
 /**

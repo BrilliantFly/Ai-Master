@@ -1,3 +1,4 @@
+<!-- #ifdef MP-WEIXIN -->
 <template>
     <!-- modal:隐私授权弹窗-->
     <view v-if="show" class="modal-box" @tap.stop>
@@ -103,6 +104,7 @@ const agreePrivacy = () => {
     bottom: 0;
     width: 100%;
     padding: 40rpx;
+    padding-bottom: calc(20rpx + constant(safe-area-inset-bottom));
     padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
     background: #ffffff;
     border-radius: 20rpx 20rpx 0 0;
@@ -156,3 +158,4 @@ const agreePrivacy = () => {
     background: #f5f5f5;
 }
 </style>
+<!-- #endif -->

@@ -13,8 +13,8 @@
 </script>
 
 <style scoped>
-.change-password-page { min-height: 100vh; padding: 30rpx; background: #f5f5f5; }
-.form { background: #fff; border-radius: 16rpx; padding: 40rpx; }
-.input { border: 1rpx solid #ddd; padding: 20rpx; border-radius: 8rpx; margin-bottom: 30rpx; font-size: 30rpx; }
-.btn { background: #007aff; color: #fff; border-radius: 8rpx; }
+.change-password-page { min-height: 100vh; padding: 30rpx; background: var(--color-bg); }
+.form { background: var(--color-surface); border-radius: 16rpx; padding: 40rpx; }
+.input { border: 1rpx solid var(--color-border); padding: 20rpx; border-radius: 8rpx; margin-bottom: 30rpx; font-size: 30rpx; }
+.btn { background: var(--color-primary); color: #fff; border-radius: 8rpx; }
 </style>

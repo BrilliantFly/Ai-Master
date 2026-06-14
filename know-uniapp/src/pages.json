@@ -11,17 +11,23 @@
                 // #endif
             }
         },
-		{
-		    "path": "pages/index/index-v1",
-		    "style": {
-		        // #ifndef H5
-		        "navigationStyle": "custom",
+        {
+            "path": "pages/index/index-v1",
+            "style": {
+                // #ifndef H5
+                "navigationStyle": "custom",
 		        // #endif
 		        // #ifdef H5
 		        "navigationBarTitleText": "首页"
 		        // #endif
 		    }
 		},
+        {
+            "path": "pages/index/more",
+            "style": {
+                "navigationBarTitleText": "更多内容"
+            }
+        },
         {
             "path": "pages/news/news",
             "style": {
@@ -91,6 +97,15 @@
             "path": "pages/user_set/user_set",
             "style": {
                 "navigationBarTitleText": "个人设置"
+            },
+            "meta": {
+                "auth": true
+            }
+        },
+        {
+            "path": "pages/theme/index",
+            "style": {
+                "navigationBarTitleText": "主题设置"
             },
             "meta": {
                 "auth": true
@@ -236,6 +251,12 @@
             "path": "pages/plan/schedule/index",
             "style": {
                 "navigationBarTitleText": "日程管理"
+            }
+        },
+        {
+            "path": "pages/plan/home/index",
+            "style": {
+                "navigationBarTitleText": "计划总览"
             }
         },
         {

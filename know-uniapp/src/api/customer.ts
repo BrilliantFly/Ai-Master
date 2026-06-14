@@ -120,3 +120,7 @@ export function addFollowup(data: any) {
 export function getCompanyList() {
     return customerRequest.get({ url: '/customer/company/list' })
 }
+
+export function getCustomerStats() {
+    return customerRequest.get({ url: '/customer/stats' })
+}

@@ -27,9 +27,46 @@ public class DecorateController {
     @ApiOperation("获取装修配置")
     @GetMapping("/decorate")
     public AjaxResult getDecorate(@RequestParam(required = false, defaultValue = "5") Integer id) {
-        String themeJson = "{\"themeColor1\":\"#1890ff\",\"themeColor2\":\"#096dd9\",\"buttonColor\":\"white\",\"navigationBarColor\":\"#1890ff\",\"topTextColor\":\"white\"}";
-        Map<String, Object> themeData = JSON.parseObject(themeJson);
-        return AjaxResult.success(themeData);
+        if (id == 5) {
+            // id=5: 主题配置 — themeStore.getTheme() 期望顶层字段 themeColor1, themeColor2 等
+            Map<String, Object> theme = new HashMap<>();
+            theme.put("themeColor1", "#6366f1");
+            theme.put("themeColor2", "#919ef4");
+            theme.put("buttonColor", "white");
+            theme.put("navigationBarColor", "#6366f1");
+            theme.put("topTextColor", "white");
+            return AjaxResult.success(theme);
+        }
+
+        // id=2 (或其他非5): 页面装修数据
+        // meta=页面设置JSON, data=组件配置JSON
+        // 前端 user.vue 对 data.meta / data.data 做 JSON.parse
+        Map<String, Object> result = new HashMap<>();
+
+        // meta: 导航栏及页面样式设置 (JSON string)
+        String meta = "[{\"content\": {\"title\": \"我的\", \"bg_type\": 1, \"bg_color\": \"#f5f5f5\", \"text_color\": 2, \"title_img\": \"\", \"title_type\": 1}}]";
+        result.put("meta", meta);
+
+        // data: 页面组件列表 (JSON string)
+        // 参考E:\Ai-Master\know-uniapp-page\profile.html 设计,保留uni-app顶部圆角
+        String data = "[{\"name\": \"user-info\", \"content\": {}, \"styles\": {}}," +
+                "{\"name\": \"my-service\", \"content\": {" +
+                "\"title\": \"我的服务\", \"style\": 1, \"data\": [" +
+                "{\"name\": \"我的订单\", \"image\": \"\", \"link\": \"/pages/collection/collection\", \"is_show\": \"1\"}," +
+                "{\"name\": \"我的收藏\", \"image\": \"\", \"link\": \"/pages/collection/collection\", \"is_show\": \"1\"}," +
+                "{\"name\": \"消息通知\", \"image\": \"\", \"link\": \"/pages/news/news\", \"is_show\": \"1\"}," +
+                "{\"name\": \"密码修改\", \"image\": \"\", \"link\": \"/pages/change_password/change_password\", \"is_show\": \"1\"}," +
+                "{\"name\": \"绑定手机\", \"image\": \"\", \"link\": \"/pages/bind_mobile/bind_mobile\", \"is_show\": \"1\"}," +
+                "{\"name\": \"关于我们\", \"image\": \"\", \"link\": \"/pages/as_us/as_us\", \"is_show\": \"1\"}," +
+                "{\"name\": \"我的资料\", \"image\": \"\", \"link\": \"/pages/user_data/user_data\", \"is_show\": \"1\"}," +
+                "{\"name\": \"联系客服\", \"image\": \"\", \"link\": \"\", \"is_show\": \"1\"}" +
+                "]}, \"styles\": {}}," +
+                "{\"name\": \"user-banner\", \"content\": {\"enabled\": true, \"data\": [" +
+                "{\"image\": \"\", \"link\": \"\", \"is_show\": \"1\"}" +
+                "]}, \"styles\": {}}]";
+        result.put("data", data);
+
+        return AjaxResult.success(result);
     }
 
     @ApiOperation("初始化计划管理菜单(免登录)")

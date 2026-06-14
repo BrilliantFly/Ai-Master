@@ -69,5 +69,11 @@ onLaunch(async () => {
 })
 </script>
 <style lang="scss">
-//
+page {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.45;
+    letter-spacing: .01em;
+}
 </style>

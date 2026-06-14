@@ -33,20 +33,26 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**", "/adminapi/**")
                 .excludePathPatterns("/api/login/**", "/adminapi/login/**",
                         "/api/index/decorate", "/api/index/config", "/api/index/init-plan-menu",
-                        "/api/plan/home/config",
+                        "/api/plan/**",
                         "/api/system/menu/config/tabbar", "/api/system/menu/config/home",
+                        "/api/system/menu/config/tabbar/user", "/api/system/menu/config/home/user",
+                        "/api/system/menu/config/user",
                         "/api/system/menu/config/type/**", "/api/system/menu/config/list",
-                        "/api/system/menu/config/page");
+                        "/api/system/menu/config/page",
+                        "/api/system/dict/type/list", "/api/system/dict/list");
 
         // 权限拦截器 - 在登录拦截器之后
         registry.addInterceptor(jwtPermissionFilter)
                 .addPathPatterns("/api/**", "/adminapi/**")
                 .excludePathPatterns("/api/login/**", "/adminapi/login/**",
                         "/api/index/decorate", "/api/index/config", "/api/index/init-plan-menu",
-                        "/api/plan/home/config",
+                        "/api/plan/**",
                         "/api/system/menu/config/tabbar", "/api/system/menu/config/home",
+                        "/api/system/menu/config/tabbar/user", "/api/system/menu/config/home/user",
+                        "/api/system/menu/config/user",
                         "/api/system/menu/config/type/**", "/api/system/menu/config/list",
-                        "/api/system/menu/config/page");
+                        "/api/system/menu/config/page",
+                        "/api/system/dict/type/list", "/api/system/dict/list");
     }
 
     /**

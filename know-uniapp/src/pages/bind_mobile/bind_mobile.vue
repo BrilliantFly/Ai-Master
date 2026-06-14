@@ -11,8 +11,8 @@
 </script>
 
 <style scoped>
-.bind-mobile-page { min-height: 100vh; padding: 60rpx 40rpx; background: #fff; }
+.bind-mobile-page { min-height: 100vh; padding: 60rpx 40rpx; background: var(--color-bg); }
 .title { font-size: 48rpx; font-weight: bold; text-align: center; margin-bottom: 60rpx; }
-.input { border: 1rpx solid #ddd; padding: 24rpx; border-radius: 8rpx; margin-bottom: 30rpx; font-size: 30rpx; }
-.btn { background: #007aff; color: #fff; border-radius: 8rpx; margin-top: 40rpx; }
+.input { border: 1rpx solid var(--color-border); padding: 24rpx; border-radius: 8rpx; margin-bottom: 30rpx; font-size: 30rpx; }
+.btn { background: var(--color-primary); color: #fff; border-radius: 8rpx; margin-top: 40rpx; }
 </style>

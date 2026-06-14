@@ -65,6 +65,8 @@ public class PlanCalendarServiceImpl implements IPlanCalendarService {
             Map<String, Object> habitInfo = new HashMap<>();
             habitInfo.put("habitName", habit.getName());
             habitInfo.put("habitId", habit.getId());
+            habitInfo.put("description", habit.getDescription() != null ? habit.getDescription() : "");
+            habitInfo.put("currentDays", habit.getCurrentDays() != null ? habit.getCurrentDays() : 0);
             List<Integer> days = new ArrayList<>();
             for (PlanHabitRecord record : allRecords) {
                 if (record.getHabitId().equals(habit.getId())) {

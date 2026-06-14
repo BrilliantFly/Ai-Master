@@ -1,0 +1,53 @@
+:root {
+  /* 主色 */
+  --color-primary: #5b5bd6;
+  --color-primary-rgb: 91, 91, 214;
+  --color-primary-soft: #f0efff;
+  --color-primary-mist: #f5f5ff;
+  --color-minor: #1890ff;
+  --color-btn-text: white;
+
+  /* 背景 */
+  --color-bg: #ffffff;
+  --color-bg-app: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-soft: #ffffff;
+
+  /* 文字 */
+  --color-text: #0b0b12;
+  --color-text-secondary: #6f7180;
+  --color-text-tertiary: #a5a7b5;
+
+  /* 边框 */
+  --color-border: #e2e4ea;
+  --color-border-light: #e4e7ed;
+
+  /* 语义色 */
+  --color-success: #22b573;
+  --color-warning: #f0a020;
+  --color-danger: #e85a5a;
+  --color-success-soft: #e8f5ee;
+  --color-warning-soft: #fff8ed;
+  --color-danger-soft: #fef0f0;
+
+  /* 字体 */
+  --font-sans: -apple-system, 'Inter', 'PingFang SC', 'Helvetica Neue', sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', 'Cascadia Code', monospace;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,.06);
+  --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+  --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+  --shadow-glow: 0 8px 32px rgba(var(--color-primary-rgb), 0.2);
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+
+  /* 动效 */
+  --duration: 0.25s;
+  --ease: cubic-bezier(.22,1,.36,1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}

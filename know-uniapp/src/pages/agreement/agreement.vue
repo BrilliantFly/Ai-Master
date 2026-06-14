@@ -9,7 +9,7 @@
 </script>
 
 <style scoped>
-.agreement-page { min-height: 100vh; padding: 30rpx; background: #fff; }
-.title { font-size: 36rpx; font-weight: bold; color: #333; display: block; margin-bottom: 30rpx; }
-.content { font-size: 28rpx; color: #666; line-height: 1.8; }
+.agreement-page { min-height: 100vh; padding: 30rpx; background: var(--color-bg); }
+.title { font-size: 36rpx; font-weight: bold; color: var(--color-text); display: block; margin-bottom: 30rpx; }
+.content { font-size: 28rpx; color: var(--color-text-secondary); line-height: 1.8; }
 </style>

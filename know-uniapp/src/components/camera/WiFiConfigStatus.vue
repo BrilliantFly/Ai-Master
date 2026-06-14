@@ -183,7 +183,7 @@ function onManualAdd() {
 <style scoped lang="scss">
 .wifi-config-status-container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg-app);
   padding: 60rpx 30rpx;
   display: flex;
   flex-direction: column;
@@ -204,36 +204,36 @@ function onManualAdd() {
     transition: all 0.3s ease;
     
     &.init {
-      background: #f5f5f5;
-      border: 4rpx solid #ddd;
+      background: var(--color-bg-app);
+      border: 4rpx solid var(--color-border-light);
       
       .status-icon { font-size: 60rpx; }
     }
     
     &.broadcasting {
-      background: #e6f7ff;
-      border: 4rpx solid #1890ff;
+      background: var(--color-primary-mist);
+      border: 4rpx solid var(--color-primary);
       
       .status-icon { font-size: 60rpx; animation: pulse 1s infinite; }
     }
     
     &.waiting {
-      background: #fff7e6;
-      border: 4rpx solid #faad14;
+      background: var(--color-warning-soft);
+      border: 4rpx solid var(--color-warning);
       
       .status-icon { font-size: 60rpx; }
     }
     
     &.success {
-      background: #f6ffed;
-      border: 4rpx solid #52c41a;
+      background: var(--color-success-soft);
+      border: 4rpx solid var(--color-success);
       
       .status-icon { font-size: 60rpx; }
     }
     
     &.failed {
-      background: #fff1f0;
-      border: 4rpx solid #ff4d4f;
+      background: var(--color-danger-soft);
+      border: 4rpx solid var(--color-danger);
       
       .status-icon { font-size: 60rpx; }
     }
@@ -243,7 +243,7 @@ function onManualAdd() {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 4rpx solid #1890ff;
+      border: 4rpx solid var(--color-primary);
       animation: pulse-ring 1.5s infinite;
     }
   }
@@ -273,34 +273,34 @@ function onManualAdd() {
     display: block;
     font-size: 36rpx;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
     margin-bottom: 16rpx;
   }
   
   .status-message {
     display: block;
     font-size: 28rpx;
-    color: #666;
+    color: var(--color-text-secondary);
   }
 }
 
 .progress-container {
   width: 100%;
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
   
   .progress-track {
     height: 8rpx;
-    background: #f0f0f0;
+    background: var(--color-border-light);
     border-radius: 4rpx;
     overflow: hidden;
     margin-bottom: 40rpx;
     
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #1890ff, #52c41a);
+      background: var(--color-primary);
       border-radius: 4rpx;
       transition: width 0.3s ease;
     }
@@ -324,22 +324,22 @@ function onManualAdd() {
         left: calc(50% + 20rpx);
         width: calc(100% - 40rpx);
         height: 2rpx;
-        background: #ddd;
+        background: var(--color-border-light);
       }
       
       &.active:not(.completed)::after {
-        background: #1890ff;
+        background: var(--color-primary);
       }
       
       &.completed::after {
-        background: #52c41a;
+        background: var(--color-success);
       }
       
       .step-dot {
         width: 32rpx;
         height: 32rpx;
         border-radius: 50%;
-        background: #ddd;
+        background: var(--color-border-light);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -348,30 +348,30 @@ function onManualAdd() {
         
         text {
           font-size: 20rpx;
-          color: #fff;
+          color: var(--color-bg);
         }
       }
       
       &.active .step-dot {
-        background: #1890ff;
+        background: var(--color-primary);
       }
       
       &.completed .step-dot {
-        background: #52c41a;
+        background: var(--color-success);
       }
       
       .step-label {
         font-size: 24rpx;
-        color: #999;
+        color: var(--color-text-tertiary);
       }
       
       &.active .step-label {
-        color: #1890ff;
+        color: var(--color-primary);
         font-weight: 500;
       }
       
       &.completed .step-label {
-        color: #52c41a;
+        color: var(--color-success);
       }
     }
   }
@@ -381,7 +381,7 @@ function onManualAdd() {
   width: 100%;
   
   .device-card {
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 16rpx;
     padding: 30rpx;
     
@@ -394,7 +394,7 @@ function onManualAdd() {
       .device-title {
         font-size: 32rpx;
         font-weight: 500;
-        color: #333;
+        color: var(--color-text);
       }
       
       .device-badge {
@@ -403,8 +403,8 @@ function onManualAdd() {
         font-size: 22rpx;
         
         &.online {
-          background: #f6ffed;
-          color: #52c41a;
+          background: var(--color-success-soft);
+          color: var(--color-success);
         }
       }
     }
@@ -414,7 +414,7 @@ function onManualAdd() {
         display: flex;
         justify-content: space-between;
         padding: 16rpx 0;
-        border-bottom: 1rpx solid #f0f0f0;
+        border-bottom: 1rpx solid var(--color-border-light);
         
         &:last-child {
           border-bottom: none;
@@ -422,12 +422,12 @@ function onManualAdd() {
         
         .info-label {
           font-size: 26rpx;
-          color: #999;
+          color: var(--color-text-tertiary);
         }
         
         .info-value {
           font-size: 26rpx;
-          color: #333;
+          color: var(--color-text);
         }
       }
     }
@@ -436,7 +436,7 @@ function onManualAdd() {
 
 .tips-section {
   width: 100%;
-  background: #fffbe6;
+  background: var(--color-warning-soft);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-top: 30rpx;
@@ -447,7 +447,7 @@ function onManualAdd() {
     .tips-title {
       font-size: 28rpx;
       font-weight: 500;
-      color: #d48806;
+      color: var(--color-warning);
     }
   }
   
@@ -455,7 +455,7 @@ function onManualAdd() {
     .tip-item {
       display: block;
       font-size: 24rpx;
-      color: #8c6d1f;
+      color: var(--color-text-secondary);
       line-height: 1.8;
     }
   }
@@ -478,13 +478,13 @@ function onManualAdd() {
     border: none;
     
     &.btn-secondary {
-      background: #fff;
-      color: #666;
-      border: 2rpx solid #ddd;
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+      border: 2rpx solid var(--color-border-light);
     }
     
     &.btn-primary {
-      background: linear-gradient(135deg, #1890ff, #096dd9);
+      background: var(--color-primary);
       color: #fff;
     }
   }

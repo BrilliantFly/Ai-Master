@@ -132,13 +132,13 @@ function onDelete() {
 <style scoped lang="scss">
 .detail-page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
   padding: 24rpx;
 }
 
 .device-card {
-  background: #fff;
-  border-radius: 16rpx;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
   padding: 30rpx;
   margin-bottom: 30rpx;
   
@@ -150,12 +150,12 @@ function onDelete() {
       padding: 8rpx 24rpx;
       border-radius: 20rpx;
       font-size: 24rpx;
-      background: #f5f5f5;
-      color: #999;
+      background: var(--color-surface-soft);
+      color: var(--color-text-tertiary);
       
       &.online {
-        background: #f6ffed;
-        color: #52c41a;
+        background: var(--color-success-soft);
+        color: var(--color-success);
       }
     }
   }
@@ -165,7 +165,7 @@ function onDelete() {
       display: flex;
       justify-content: space-between;
       padding: 20rpx 0;
-      border-bottom: 1rpx solid #f0f0f0;
+      border-bottom: 1rpx solid var(--color-border-light);
       
       &:last-child {
         border-bottom: none;
@@ -173,12 +173,12 @@ function onDelete() {
       
       .label {
         font-size: 28rpx;
-        color: #999;
+        color: var(--color-text-tertiary);
       }
       
       .value {
         font-size: 28rpx;
-        color: #333;
+        color: var(--color-text);
       }
     }
   }
@@ -194,8 +194,8 @@ function onDelete() {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #fff;
-    border-radius: 16rpx;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
     padding: 30rpx 0;
     
     .icon {
@@ -205,7 +205,7 @@ function onDelete() {
     
     .text {
       font-size: 24rpx;
-      color: #666;
+      color: var(--color-text-secondary);
     }
   }
 }
@@ -216,8 +216,8 @@ function onDelete() {
   .delete-btn {
     width: 100%;
     height: 88rpx;
-    background: #fff1f0;
-    color: #ff4d4f;
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
     border-radius: 44rpx;
     font-size: 30rpx;
   }

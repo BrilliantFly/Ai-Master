@@ -10,8 +10,8 @@
 </script>
 
 <style scoped>
-.followup-page { min-height: 100vh; padding: 40rpx; background: #fff; }
+.followup-page { min-height: 100vh; padding: 40rpx; background: var(--color-bg); }
 .title { font-size: 36rpx; font-weight: bold; margin-bottom: 30rpx; }
-.textarea { width: 100%; height: 300rpx; border: 1rpx solid #ddd; padding: 20rpx; border-radius: 8rpx; font-size: 30rpx; }
-.btn { background: #007aff; color: #fff; border-radius: 8rpx; margin-top: 40rpx; }
+.textarea { width: 100%; height: 300rpx; border: 1rpx solid var(--color-border); padding: 20rpx; border-radius: 8rpx; font-size: 30rpx; }
+.btn { background: var(--color-primary); color: #fff; border-radius: 8rpx; margin-top: 40rpx; }
 </style>

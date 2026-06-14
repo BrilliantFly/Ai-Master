@@ -1,95 +1,117 @@
 <template>
   <view class="plan-schedule-page">
-    <!-- 顶部统计 -->
-    <view class="stats-bar">
-      <view class="stat-item">
-        <text class="num">{{ todayStats.totalCount }}</text>
-        <text class="label">全部</text>
+    <view class="page-header">
+      <view class="header-left">
+        <text class="header-title">日程计划</text>
+        <text class="header-sub">高效管理你的每一项安排</text>
       </view>
-      <view class="stat-item">
-        <text class="num warn">{{ todayStats.todoCount }}</text>
-        <text class="label">待办</text>
-      </view>
-      <view class="stat-item">
-        <text class="num success">{{ todayStats.completedCount }}</text>
-        <text class="label">完成</text>
+      <view class="header-actions">
+        <view class="premium-header-btn" @tap="showAddModal">+</view>
       </view>
     </view>
 
-    <!-- 日历 + 日程列表（日历在前，列表在后） -->
     <scroll-view scroll-y class="calendar-scroll">
-      <uni-calendar
-        :insert="true"
-        :lunar="false"
-        :selected="calendarSelected"
-        @change="onDateTap"
-        @monthSwitch="onMonthSwitch"
+      <CalendarGrid
+        :year="currentYear"
+        :month="currentMonth"
+        :weeks="weeks"
+        :current-week-days="currentWeekDays"
+        :monthly-stats="monthlyStats"
+        :collapsed="collapsed"
+        :selected-date="selectedDateLabel"
+        :summary-date="selectedDateLabel"
+        :event-count="filteredDayEvents.length"
+        :quadrant-color="quadrantColor"
+        @date-tap="onDateTap"
+        @month-switch="onMonthSwitch"
+        @toggle-collapse="toggleCollapse"
       />
-      <view class="calendar-day-title">
-        <text>{{ selectedDateLabel ? selectedDateLabel + ' 的日程' : '点击日期查看日程' }}</text>
+
+      <view class="stats-row premium-anim-fade-up premium-anim-delay-1">
+        <view class="stat-card accent">
+          <text class="stat-num">{{ todayStats.completedCount }}</text>
+          <text class="stat-label">已完成</text>
+        </view>
+        <view class="stat-card">
+          <text class="stat-num">{{ todayStats.todoCount }}</text>
+          <text class="stat-label">待处理</text>
+        </view>
+        <view class="stat-card">
+          <text class="stat-num">{{ todayStats.totalCount }}</text>
+          <text class="stat-label">总任务</text>
+        </view>
       </view>
 
-      <!-- 四象限筛选 -->
-      <scroll-view scroll-x class="quadrant-bar" v-if="selectedDateLabel">
-        <view
-          v-for="q in quadrants"
-          :key="q.value"
-          class="quadrant-pill"
-          :class="{ active: currentQuadrant === q.value }"
-          @tap="filterByQuadrant(q.value)"
-        >
-          <view class="pill-dot" :style="{ background: q.color }"></view>
-          <text>{{ q.label }}</text>
+      <view class="module-summary premium-card">
+        <view class="summary-item">
+          <text class="summary-label">月完成率</text>
+          <text class="summary-value">{{ monthlyStats.rate }}%</text>
         </view>
-      </scroll-view>
-
-      <view v-if="filteredDayEvents.length === 0 && selectedDateLabel" class="empty-state">
-        <text class="empty-icon">📅</text>
-        <text class="empty-text">{{ currentQuadrant === 0 ? '该日暂无日程' : '该象限暂无日程' }}</text>
+        <view class="summary-item">
+          <text class="summary-label">月任务数</text>
+          <text class="summary-value">{{ monthlyStats.total }}</text>
+        </view>
+        <view class="summary-item">
+          <text class="summary-label">已完成</text>
+          <text class="summary-value">{{ monthlyStats.completed }}</text>
+        </view>
       </view>
-      <view
-        v-for="item in filteredDayEvents"
-        :key="'sched-' + item.id + '-' + renderKey"
-        class="schedule-card"
-        :class="{ completed: item.status === 1 }"
-        @tap="goToDetail(item)"
-      >
-        <view class="card-left">
-          <view class="quadrant-indicator" :style="{ background: getQuadrantColor(item.quadrant) }"></view>
+
+      <view v-if="selectedDateLabel" class="day-overview premium-card">
+        <view class="overview-top">
+          <text class="overview-date">{{ selectedDateLabel }}</text>
+          <text class="overview-count">{{ filteredDayEvents.length }} 项安排</text>
         </view>
-        <view class="card-body">
-          <text class="card-title">{{ item.title }}</text>
-          <text class="card-time">{{ formatTime(item.startTime) }} - {{ formatTime(item.endTime) }}</text>
-          <text v-if="item.location" class="card-location">📍 {{ item.location }}</text>
+        <view class="overview-chips">
+          <text class="overview-chip">完成 {{ todayStats.completedCount }}</text>
+          <text class="overview-chip">待办 {{ todayStats.todoCount }}</text>
+          <text class="overview-chip">象限 {{ currentQuadrant === 0 ? '全部' : getCurrentQuadrantLabel() }}</text>
         </view>
-        <view class="card-right">
-          <view
-            class="check-btn"
-            :style="completedMap[item.id] ? { background: '#52C41A', borderColor: '#52C41A', color: '#fff' } : {}"
-            @tap.stop="handleCheck(item)"
-          >
-            <text>✓</text>
+        <view class="overview-progress" v-if="todayStats.totalCount > 0">
+          <view class="overview-bar">
+            <view class="overview-fill" :style="{ width: dayProgress + '%' }"></view>
           </view>
+          <text class="overview-rate">{{ dayProgress }}%</text>
         </view>
       </view>
-      <view style="height:120rpx"></view>
+
+      <EventList
+        :selected-date-label="selectedDateLabel"
+        :filtered-events="filteredDayEvents"
+        :completed-map="completedMap"
+        :current-quadrant="currentQuadrant"
+        :render-key="renderKey"
+        :quadrants="quadrants"
+        @check="handleCheckAndRefresh"
+        @quadrant-change="filterByQuadrant"
+        @go-detail="goToDetail"
+        @delete="handleDelete"
+      />
+
+      <view style="height: 180rpx"></view>
     </scroll-view>
 
-    <!-- 底部新增按钮 -->
-    <view class="add-btn-fixed" @tap="showAddModal">
-      <text>+</text>
-    </view>
+    <view class="floating-add" @tap="showAddModal">+</view>
 
-    <!-- 新增弹窗 -->
-    <view class="modal-mask" v-if="showModal">
-      <view class="modal-content">
+    <view v-if="showModal" class="modal-mask">
+      <view class="modal-panel">
         <view class="modal-header">
-          <text>新增日程</text>
-          <text class="close" @tap="hideModal">×</text>
+          <text class="modal-title">新增日程</text>
+          <text class="modal-close" @tap="hideModal">×</text>
         </view>
-        <view class="modal-form">
-          <u-input v-model="form.title" placeholder="日程标题" :border="true" :customStyle="{padding:'20rpx',fontSize:'28rpx',marginBottom:'20rpx'}" />
-          <textarea :value="form.content" @input="onContentInput" placeholder="描述（可选）" class="form-textarea" />
+        <view class="modal-body">
+          <u-input
+            v-model="form.title"
+            placeholder="日程标题"
+            :border="true"
+            :customStyle="{ padding: '20rpx', fontSize: '28rpx', marginBottom: '20rpx' }"
+          />
+          <textarea
+            :value="form.content"
+            class="form-textarea"
+            placeholder="描述（可选）"
+            @input="onContentInput"
+          />
           <view class="form-row">
             <text class="form-label">象限</text>
             <picker :value="form.quadrant - 1" :range="quadrantOptions" @change="onQuadrantChange">
@@ -97,55 +119,42 @@
             </picker>
           </view>
           <view class="form-row">
-            <text class="form-label">开始</text>
+            <text class="form-label">开始日期</text>
             <picker mode="date" @change="onStartDateChange">
-              <text>{{ form.startDate || '选择日期' }}</text>
+              <text class="picker-value">{{ form.startDate || selectedDateLabel || '选择日期' }}</text>
             </picker>
           </view>
-          <view class="form-btns">
-            <button class="btn-cancel" @tap="hideModal">取消</button>
-            <button class="btn-submit" @tap="handleAdd">保存</button>
+          <view class="form-actions">
+            <button class="form-cancel" @tap="hideModal">取消</button>
+            <button class="form-submit" @tap="handleAdd">保存</button>
           </view>
         </view>
       </view>
     </view>
+
+    <PremiumBottomNav active="plan" />
   </view>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { getTodayStats, addSchedule, completeSchedule, getScheduleByDate, getCalendarMonthly } from '@/api/plan/schedule'
+import { computed, onMounted, ref } from 'vue'
+import PremiumBottomNav from '@/components/PremiumBottomNav.vue'
+import CalendarGrid from '@/components/calendar-grid/CalendarGrid.vue'
+import EventList from './components/EventList.vue'
+import { useSchedule } from './composables/useSchedule'
+import { addSchedule, deleteSchedule, getTodayStats } from '@/api/plan/schedule'
 
-const todayStats = ref({ totalCount: 0, todoCount: 0, completedCount: 0 })
-const showModal = ref(false)
-
-// 日历 + 列表
-const calendarSelected = ref([])
-const selectedDateLabel = ref('')
-const dayEvents = ref([])
-const currentYear = ref(new Date().getFullYear())
-const currentMonth = ref(new Date().getMonth() + 1)
-const renderKey = ref(0) // 强制刷新用
-const completedMap = ref({}) // 独立完成状态，直接用 ref 驱动渲染
-
-// 四象限筛选
-const currentQuadrant = ref(0)
 const quadrants = [
-  { value: 0, label: '全部', color: '#999' },
+  { value: 0, label: '全部', color: '#999999' },
   { value: 1, label: '重要紧急', color: '#FF6B6B' },
   { value: 2, label: '重要不紧急', color: '#4ECDC4' },
   { value: 3, label: '紧急不重要', color: '#FFE66D' },
   { value: 4, label: '不紧急不重要', color: '#95A5A6' }
 ]
-const filteredDayEvents = computed(() => {
-  if (currentQuadrant.value === 0) return dayEvents.value
-  return dayEvents.value.filter(item => item.quadrant === currentQuadrant.value)
-})
-
-const filterByQuadrant = (q) => { currentQuadrant.value = q }
-
 const quadrantOptions = ['重要紧急', '重要不紧急', '紧急不重要', '不紧急不重要']
 
+const todayStats = ref({ totalCount: 0, todoCount: 0, completedCount: 0 })
+const showModal = ref(false)
 const form = ref({
   title: '',
   content: '',
@@ -154,56 +163,80 @@ const form = ref({
   eventType: 1
 })
 
-const onTitleInput = (e) => {
-  const val = e.detail ? e.detail.value : e.target.value
-  form.value.title = val || ''
-}
-const onContentInput = (e) => {
-  const val = e.detail ? e.detail.value : e.target.value
-  form.value.content = val || ''
-}
-
-const getQuadrantColor = (q) => {
-  const colors = { 1: '#FF6B6B', 2: '#4ECDC4', 3: '#FFE66D', 4: '#95A5A6' }
-  return colors[q] || '#999'
-}
+const {
+  currentYear,
+  currentMonth,
+  collapsed,
+  selectedDateLabel,
+  currentQuadrant,
+  filteredDayEvents,
+  completedMap,
+  renderKey,
+  weeks,
+  currentWeekDays,
+  monthlyStats,
+  quadrantColor,
+  init,
+  fetchCalendarMonthly,
+  onMonthSwitch,
+  onDateTap,
+  fetchDayEvents,
+  handleCheck,
+  toggleCollapse,
+  filterByQuadrant
+} = useSchedule()
 
 const fetchStats = async () => {
   try {
     const res = await getTodayStats({})
     todayStats.value = res || { totalCount: 0, todoCount: 0, completedCount: 0 }
-  } catch (e) {
-    console.error('获取统计失败', e)
+  } catch (error) {
+    console.error('获取统计失败', error)
   }
 }
 
-const formatTime = (ts) => {
-  if (!ts) return ''
-  const d = new Date(ts)
-  return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`
+const refreshSelectedDayStats = () => {
+  const events = filteredDayEvents.value || []
+  const totalCount = events.length
+  const completedCount = events.filter((item) => item.status === 1 || completedMap.value[item.id]).length
+  todayStats.value = {
+    totalCount,
+    todoCount: totalCount - completedCount,
+    completedCount
+  }
 }
 
-const handleCheck = (item) => {
-  // 用独立 completedMap 驱动视觉更新，完全绕过 dayEvents 响应式链
-  completedMap.value = { ...completedMap.value, [item.id]: true }
-  renderKey.value++
-  // 本地更新统计（不重新拉取列表，避免覆盖 completedMap）
-  todayStats.value.todoCount = Math.max(0, todayStats.value.todoCount - 1)
-  todayStats.value.completedCount += 1
-  // 异步调用 API
-  completeSchedule(item.id, {}).then(() => {
-    uni.showToast({ title: '已完成', icon: 'success' })
-    fetchCalendarMonthly()
-  }).catch(e => {
-    console.error(e)
-  })
+const resetForm = () => {
+  form.value = {
+    title: '',
+    content: '',
+    quadrant: 2,
+    startDate: selectedDateLabel.value || '',
+    eventType: 1
+  }
 }
 
-const showAddModal = () => { showModal.value = true }
-const hideModal = () => { showModal.value = false }
+const showAddModal = () => {
+  resetForm()
+  showModal.value = true
+}
 
-const onQuadrantChange = (e) => { form.value.quadrant = e.detail.value + 1 }
-const onStartDateChange = (e) => { form.value.startDate = e.detail.value }
+const hideModal = () => {
+  showModal.value = false
+}
+
+const onContentInput = (e) => {
+  const val = e.detail ? e.detail.value : e.target.value
+  form.value.content = val || ''
+}
+
+const onQuadrantChange = (e) => {
+  form.value.quadrant = Number(e.detail.value) + 1
+}
+
+const onStartDateChange = (e) => {
+  form.value.startDate = e.detail.value
+}
 
 const handleAdd = async () => {
   if (!form.value.title) {
@@ -214,16 +247,41 @@ const handleAdd = async () => {
     await addSchedule(form.value, {})
     uni.showToast({ title: '添加成功', icon: 'success' })
     hideModal()
-    form.value.title = ''
-    form.value.content = ''
-    form.value.startDate = ''
-    fetchStats()
-    fetchCalendarMonthly()
+    await fetchStats()
+    await fetchCalendarMonthly()
     if (selectedDateLabel.value) {
-      fetchDayEvents(selectedDateLabel.value)
+      await fetchDayEvents(selectedDateLabel.value)
+      refreshSelectedDayStats()
     }
-  } catch (e) {
-    console.error(e)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const handleCheckAndRefresh = async (item) => {
+  await handleCheck(item)
+  if (selectedDateLabel.value) {
+    await fetchDayEvents(selectedDateLabel.value)
+    refreshSelectedDayStats()
+    return
+  }
+  await fetchStats()
+}
+
+const handleDelete = async (item) => {
+  if (!item?.id) return
+  try {
+    await deleteSchedule(item.id)
+    uni.showToast({ title: '已删除', icon: 'success' })
+    await fetchCalendarMonthly()
+    if (selectedDateLabel.value) {
+      await fetchDayEvents(selectedDateLabel.value)
+      refreshSelectedDayStats()
+      return
+    }
+    await fetchStats()
+  } catch (error) {
+    console.error(error)
   }
 }
 
@@ -231,303 +289,300 @@ const goToDetail = (item) => {
   uni.navigateTo({ url: `/pages/plan/schedule/detail?id=${item.id}` })
 }
 
-// ===== 日历 + 列表 =====
-const formatDateStr = (ts) => {
-  const d = new Date(ts)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+const getCurrentQuadrantLabel = () => {
+  return quadrants.find((item) => item.value === currentQuadrant.value)?.label || '全部'
 }
 
-const fetchCalendarMonthly = async () => {
-  try {
-    const res = await getCalendarMonthly({ year: currentYear.value, month: currentMonth.value })
-    if (!res) return
-    // 为有日程的日期生成标记
-    const marks = (res.events || []).reduce((acc, e) => {
-      if (e.startTime) {
-        const dateStr = formatDateStr(e.startTime)
-        if (!acc.find(m => m.date === dateStr)) {
-          acc.push({ date: dateStr })
-        }
-      }
-      return acc
-    }, [])
-    calendarSelected.value = marks
-  } catch (e) {
-    console.error('获取日历数据失败', e)
+const dayProgress = computed(() => {
+  if (!todayStats.value.totalCount) return 0
+  return Math.round((todayStats.value.completedCount / todayStats.value.totalCount) * 100)
+})
+
+onMounted(async () => {
+  await init()
+  if (selectedDateLabel.value) {
+    refreshSelectedDayStats()
+  } else {
+    await fetchStats()
   }
-}
-
-const onMonthSwitch = (e) => {
-  currentYear.value = e.year || e.currentYear || new Date().getFullYear()
-  currentMonth.value = e.month || e.currentMonth || new Date().getMonth() + 1
-  fetchCalendarMonthly()
-}
-
-const onDateTap = (e) => {
-  // uni-calendar change event returns date string '2026-05-20' or object
-  let dateStr = ''
-  if (typeof e === 'string') {
-    dateStr = e
-  } else if (e && typeof e === 'object') {
-    dateStr = e.fulldate || `${e.year}-${String(e.month).padStart(2, '0')}-${String(e.date).padStart(2, '0')}`
-  }
-  if (!dateStr) return
-  selectedDateLabel.value = dateStr
-  currentQuadrant.value = 0  // 切换日期时重置象限筛选
-  fetchDayEvents(dateStr)
-}
-
-const fetchDayEvents = async (dateStr) => {
-  try {
-    const parts = dateStr.split('-')
-    const ts = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime()
-    const res = await getScheduleByDate({ date: ts })
-    dayEvents.value = res || []
-    // 更新统计：基于当前选中日期的数据
-    const events = res || []
-    const totalCount = events.length
-    const completedCount = events.filter(e => e.status === 1).length
-    todayStats.value = { totalCount, todoCount: totalCount - completedCount, completedCount }
-    // 从服务端数据同步 completedMap（合并而非覆盖，保留已有完成状态）
-    const map = {}
-    for (const e of events) {
-      if (e.status === 1) map[e.id] = true
-    }
-    completedMap.value = { ...completedMap.value, ...map }
-  } catch (e) {
-    console.error('获取当日日程失败', e)
-  }
-}
-
-onMounted(() => {
-  fetchStats()
-  fetchCalendarMonthly()
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .plan-schedule-page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg-app);
+  padding-bottom: 150rpx;
 }
 
-.stats-bar {
+.page-header {
   display: flex;
-  background: #fff;
-  padding: 20rpx 0;
-  margin-bottom: 16rpx;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 40rpx 16rpx;
 }
 
-.stat-item {
-  flex: 1;
+.header-left {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  border-right: 1rpx solid #eee;
 }
 
-.stat-item:last-child { border-right: none; }
+.header-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
 
-.stat-item .num { font-size: 40rpx; font-weight: bold; color: #333; }
-.stat-item .warn { color: #FF6B6B; }
-.stat-item .success { color: #52C41A; }
-.stat-item .label { font-size: 24rpx; color: #999; margin-top: 4rpx; }
+.header-sub {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
 
 .calendar-scroll {
-  padding: 0 0 120rpx;
+  padding-bottom: 20rpx;
 }
 
-.calendar-day-title {
-  padding: 20rpx;
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #333;
-  background: #fff;
-  margin-top: 8rpx;
-  border-bottom: 1rpx solid #f5f5f5;
-}
-
-.quadrant-bar {
-  white-space: nowrap;
-  background: #fff;
-  padding: 16rpx 20rpx;
-  border-bottom: 1rpx solid #f5f5f5;
-}
-
-.quadrant-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 8rpx 24rpx;
-  margin-right: 16rpx;
-  border-radius: 30rpx;
-  background: #f5f5f5;
-  font-size: 26rpx;
-  line-height: 1.4;
-  transition: all 0.2s;
-}
-
-.quadrant-pill.active {
-  background: #E6F7FF;
-  color: #1890FF;
-  font-weight: 500;
-}
-
-.pill-dot {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
-  margin-right: 8rpx;
-  flex-shrink: 0;
-}
-
-.schedule-card {
+.stats-row {
   display: flex;
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 24rpx;
-  margin: 0 20rpx 16rpx;
-  align-items: center;
+  gap: 18rpx;
+  padding: 0 32rpx 20rpx;
 }
 
-.schedule-card.completed { opacity: 0.6; }
-
-.card-left {
-  margin-right: 16rpx;
+.module-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 18rpx;
+  margin: 0 16px 14px;
+  padding: 20rpx 24rpx;
 }
 
-.quadrant-indicator {
-  width: 8rpx;
-  height: 48rpx;
-  border-radius: 4rpx;
-}
-
-.card-body {
+.summary-item {
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.card-title { font-size: 30rpx; font-weight: 500; color: #333; }
-.card-time { font-size: 24rpx; color: #999; margin-top: 8rpx; }
-.card-location { font-size: 24rpx; color: #666; margin-top: 4rpx; }
-
-.card-right {
-  margin-left: 16rpx;
-}
-
-.check-btn {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 50%;
-  border: 2rpx solid #ddd;
-  display: flex;
   align-items: center;
   justify-content: center;
-  color: #ddd;
+}
+
+.summary-label {
+  font-size: 22rpx;
+  color: var(--color-text-tertiary);
+}
+
+.summary-value {
+  margin-top: 8rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.day-overview {
+  margin: 0 16px 14px;
+  padding: 22rpx 24rpx;
+}
+
+.overview-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.overview-date {
   font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
-.check-btn.done {
-  background: #52C41A;
-  border-color: #52C41A;
-  color: #fff;
+.overview-count {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
 }
 
-.empty-state {
+.overview-chips {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  margin-top: 14rpx;
+}
+
+.overview-chip {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-soft);
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+}
+
+.overview-progress {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.overview-bar {
+  flex: 1;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: var(--color-surface-soft);
+  overflow: hidden;
+}
+
+.overview-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, var(--color-primary), #8980f0);
+}
+
+.overview-rate {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.stat-card {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 120rpx 0;
+  padding: 30rpx 10rpx 26rpx;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-soft);
+  border: 2rpx solid transparent;
 }
-.empty-icon { font-size: 80rpx; }
-.empty-text { font-size: 28rpx; color: #999; margin-top: 16rpx; }
 
-.add-btn-fixed {
+.stat-card.accent {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary-mist);
+}
+
+.stat-num {
+  font-size: 46rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.stat-label {
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  color: var(--color-text-secondary);
+}
+
+.floating-add {
   position: fixed;
-  bottom: 40rpx;
   right: 40rpx;
-  width: 100rpx;
-  height: 100rpx;
+  bottom: 122rpx;
+  z-index: 50;
+  width: 104rpx;
+  height: 104rpx;
   border-radius: 50%;
-  background: #1890FF;
+  background: linear-gradient(135deg, var(--color-primary), #8980f0);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 60rpx;
-  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.4);
+  font-size: 64rpx;
+  box-shadow: var(--shadow-glow);
 }
 
 .modal-mask {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 120;
 }
 
-.modal-content {
-  background: #fff;
-  border-radius: 16rpx;
-  width: 600rpx;
+.modal-panel {
+  width: 640rpx;
   max-height: 80vh;
-  overflow-y: auto;
+  overflow: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
 }
 
 .modal-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 30rpx;
-  border-bottom: 1rpx solid #eee;
-  font-size: 32rpx;
-  font-weight: 500;
+  padding: 28rpx 32rpx;
+  border-bottom: 2rpx solid var(--color-border-light);
 }
 
-.close { color: #999; font-size: 36rpx; }
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
 
-.modal-form { padding: 30rpx; }
+.modal-close {
+  font-size: 40rpx;
+  color: var(--color-text-tertiary);
+}
+
+.modal-body {
+  padding: 30rpx;
+}
 
 .form-textarea {
-  border: 1rpx solid #ddd;
-  border-radius: 8rpx;
-  padding: 20rpx;
-  font-size: 28rpx;
-  margin-bottom: 20rpx;
   width: 100%;
-  height: 120rpx;
+  height: 140rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  border: 2rpx solid var(--color-border);
+  border-radius: 16rpx;
   box-sizing: border-box;
+  font-size: 28rpx;
+  color: var(--color-text);
 }
 
 .form-row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 16rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
-  margin-bottom: 20rpx;
+  align-items: center;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid var(--color-border-light);
 }
 
-.form-label { font-size: 28rpx; color: #666; }
-.picker-value { font-size: 28rpx; color: #333; }
+.form-label,
+.picker-value {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
 
-.form-btns {
+.form-actions {
   display: flex;
   gap: 20rpx;
   margin-top: 30rpx;
 }
 
-.btn-cancel, .btn-submit {
+.form-cancel,
+.form-submit {
   flex: 1;
-  height: 80rpx;
-  border-radius: 40rpx;
+  height: 86rpx;
+  border-radius: 999rpx;
   font-size: 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.btn-cancel { background: #f5f5f5; color: #666; }
-.btn-submit { background: #1890FF; color: #fff; }
+.form-cancel {
+  background: var(--color-surface-soft);
+  color: var(--color-text-secondary);
+}
+
+.form-submit {
+  background: linear-gradient(135deg, var(--color-primary), #8980f0);
+  color: #fff;
+}
 </style>

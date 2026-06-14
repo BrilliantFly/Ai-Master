@@ -56,9 +56,9 @@ export default defineConfig({
     server: {
         port: 8991,
         proxy: {
-            // 计划服务 → know-boot-plan (8083)
+            // 计划模块 (由 know-boot-system/8082 提供服务)
             '/api/plan': {
-                target: 'http://localhost:8083',
+                target: 'http://localhost:8082',
                 changeOrigin: true
             },
             // Python AI服务 (如有)

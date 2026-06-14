@@ -491,21 +491,21 @@ function getStatusName(status?: number): string {
     .subtitle {
       display: block;
       font-size: 22rpx;
-      color: #ccc;
+      color: rgba(255,255,255,0.6);
     }
   }
 }
 
 .bottom-bar {
   flex: 1;
-  background: #fff;
+  background: var(--color-surface);
   display: flex;
   flex-direction: column;
 }
 
 .timeline-section {
   padding: 24rpx 30rpx;
-  border-bottom: 1rpx solid #eee;
+  border-bottom: 1rpx solid var(--color-border-light);
 
   .timeline-header {
     display: flex;
@@ -515,7 +515,7 @@ function getStatusName(status?: number): string {
 
     .timeline-date {
       font-size: 28rpx;
-      color: #333;
+      color: var(--color-text);
       font-weight: 500;
     }
 
@@ -530,14 +530,14 @@ function getStatusName(status?: number): string {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f5f5f5;
+        background: var(--color-surface-soft);
         border-radius: 8rpx;
         font-size: 24rpx;
       }
 
       .today-btn {
         padding: 8rpx 20rpx;
-        background: #1890ff;
+        background: var(--color-primary);
         color: #fff;
         border-radius: 20rpx;
         font-size: 24rpx;
@@ -563,14 +563,14 @@ function getStatusName(status?: number): string {
 
     .hour-label {
       font-size: 20rpx;
-      color: #999;
+      color: var(--color-text-tertiary);
       margin-bottom: 8rpx;
     }
 
     .hour-bar {
       width: 60rpx;
       height: 40rpx;
-      background: #f0f0f0;
+      background: var(--color-border-light);
       border-radius: 4rpx;
       position: relative;
     }
@@ -578,12 +578,12 @@ function getStatusName(status?: number): string {
     .record-segment {
       position: absolute;
       height: 100%;
-      background: #52c41a;
+      background: var(--color-success);
       border-radius: 4rpx;
     }
 
     &.active .hour-label {
-      color: #1890ff;
+      color: var(--color-primary);
       font-weight: 500;
     }
   }
@@ -602,14 +602,14 @@ function getStatusName(status?: number): string {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f5f5f5;
+    background: var(--color-surface-soft);
     border-radius: 50%;
     font-size: 36rpx;
 
     &.play {
       width: 100rpx;
       height: 100rpx;
-      background: #1890ff;
+      background: var(--color-primary);
       color: #fff;
       font-size: 44rpx;
     }
@@ -625,16 +625,16 @@ function getStatusName(status?: number): string {
     justify-content: space-between;
     align-items: center;
     padding: 20rpx 0;
-    border-bottom: 1rpx solid #eee;
+    border-bottom: 1rpx solid var(--color-border-light);
 
     .section-title {
       font-size: 28rpx;
-      color: #333;
+      color: var(--color-text);
     }
 
     .record-count {
       font-size: 24rpx;
-      color: #999;
+      color: var(--color-text-tertiary);
     }
   }
 
@@ -646,10 +646,10 @@ function getStatusName(status?: number): string {
     display: flex;
     align-items: center;
     padding: 24rpx 0;
-    border-bottom: 1rpx solid #f0f0f0;
+    border-bottom: 1rpx solid var(--color-border-light);
 
     &.active {
-      background: #e6f7ff;
+      background: var(--color-primary-mist);
       margin: 0 -30rpx;
       padding: 24rpx 30rpx;
     }
@@ -660,13 +660,13 @@ function getStatusName(status?: number): string {
       .time-text {
         display: block;
         font-size: 28rpx;
-        color: #333;
+        color: var(--color-text);
       }
 
       .duration-text {
         display: block;
         font-size: 22rpx;
-        color: #999;
+        color: var(--color-text-tertiary);
       }
     }
 
@@ -676,21 +676,21 @@ function getStatusName(status?: number): string {
       .record-type {
         display: block;
         font-size: 26rpx;
-        color: #333;
+        color: var(--color-text);
         margin-bottom: 6rpx;
       }
 
       .record-status {
         display: inline-block;
         padding: 4rpx 12rpx;
-        background: #f5f5f5;
+        background: var(--color-surface-soft);
         border-radius: 12rpx;
         font-size: 20rpx;
-        color: #999;
+        color: var(--color-text-tertiary);
 
         &.completed {
-          background: #f6ffed;
-          color: #52c41a;
+        background: var(--color-success-soft);
+        color: var(--color-success);
         }
       }
     }
@@ -705,12 +705,12 @@ function getStatusName(status?: number): string {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f5f5f5;
+        background: var(--color-surface-soft);
         border-radius: 50%;
         font-size: 24rpx;
 
         &.delete {
-          background: #fff1f0;
+          background: var(--color-danger-soft);
         }
       }
     }
@@ -719,7 +719,7 @@ function getStatusName(status?: number): string {
   .empty-list {
     text-align: center;
     padding: 60rpx;
-    color: #999;
+    color: var(--color-text-tertiary);
   }
 }
 
@@ -736,7 +736,7 @@ function getStatusName(status?: number): string {
 
   .picker-content {
     width: 100%;
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 24rpx 24rpx 0 0;
     padding: 30rpx;
 
@@ -763,12 +763,12 @@ function getStatusName(status?: number): string {
         font-size: 30rpx;
 
         &.cancel {
-          background: #f5f5f5;
-          color: #666;
+          background: var(--color-surface-soft);
+          color: var(--color-text-secondary);
         }
 
         &.confirm {
-          background: #1890ff;
+          background: var(--color-primary);
           color: #fff;
         }
       }

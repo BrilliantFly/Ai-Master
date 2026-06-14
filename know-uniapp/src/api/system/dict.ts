@@ -43,7 +43,7 @@ export function deleteDictType(id: number) {
  * 获取字典数据列表
  */
 export function getDictList(dictTypeId: number) {
-    return request.get({ url: '/system/dict/list', params: { dictTypeId } }, { isAuth: true })
+    return request.get({ url: '/system/dict/list', data: { dictTypeId } }, { isAuth: true })
 }
 
 /**
