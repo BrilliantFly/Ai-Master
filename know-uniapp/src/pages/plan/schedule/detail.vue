@@ -89,13 +89,35 @@
         </view>
       </view>
 
-      <view class="detail-actions">
-        <button
-          v-if="event.status === 0"
-          class="action-btn primary"
-          @tap="handleComplete"
-        >标记完成</button>
-        <button class="action-btn danger" @tap="handleDelete">删除日程</button>
+      <view class="detail-action-swipe">
+        <view class="detail-swipe-actions">
+          <view
+            v-if="event.status === 0"
+            class="detail-swipe-btn detail-swipe-btn-complete"
+            @tap.stop="onDetailSwipeAction('complete')"
+          >
+            <text class="detail-swipe-label">完成</text>
+          </view>
+          <view
+            class="detail-swipe-btn detail-swipe-btn-delete"
+            @tap.stop="onDetailSwipeAction('delete')"
+          >
+            <text class="detail-swipe-label">删除</text>
+          </view>
+        </view>
+        <view
+          class="detail-swipe-content premium-card"
+          :style="detailSwipeStyle"
+          @touchstart="onDetailTouchStart"
+          @touchmove="onDetailTouchMove"
+          @touchend="onDetailTouchEnd"
+        >
+          <view class="detail-action-copy">
+            <text class="detail-action-title">{{ event.status === 1 ? '日程已完成' : '左滑处理日程' }}</text>
+            <text class="detail-action-sub">{{ event.status === 1 ? '左滑可删除该日程' : '完成或删除操作会在右侧显示' }}</text>
+          </view>
+          <text class="detail-action-cue">左滑</text>
+        </view>
       </view>
     </template>
 
@@ -106,11 +128,50 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { completeSchedule, deleteSchedule, getScheduleDetail } from '@/api/plan/schedule'
 
 const event = ref(null)
 const loading = ref(true)
+const DETAIL_ACTION_WIDTH = 92
+const DETAIL_SWIPE_THRESHOLD = 42
+const detailSwipe = ref({
+  startX: 0,
+  currentX: 0,
+  translateX: 0
+})
+
+const detailActionMax = computed(() => event.value?.status === 0 ? DETAIL_ACTION_WIDTH * 2 : DETAIL_ACTION_WIDTH)
+
+const closeDetailSwipe = () => {
+  detailSwipe.value.translateX = 0
+}
+
+const onDetailTouchStart = (e) => {
+  const touch = e.touches[0]
+  detailSwipe.value.startX = touch.clientX
+  detailSwipe.value.currentX = touch.clientX
+}
+
+const onDetailTouchMove = (e) => {
+  const touch = e.touches[0]
+  let targetX = detailSwipe.value.translateX + (touch.clientX - detailSwipe.value.currentX)
+  targetX = Math.max(-detailActionMax.value, Math.min(0, targetX))
+  detailSwipe.value.translateX = targetX
+  detailSwipe.value.currentX = touch.clientX
+}
+
+const onDetailTouchEnd = () => {
+  if (Math.abs(detailSwipe.value.translateX) > DETAIL_SWIPE_THRESHOLD) {
+    detailSwipe.value.translateX = -detailActionMax.value
+  } else {
+    closeDetailSwipe()
+  }
+}
+
+const detailSwipeStyle = computed(() => {
+  return `transform: translateX(${detailSwipe.value.translateX}px); transition: transform 0.25s cubic-bezier(.22,1,.36,1);`
+})
 
 const quadrantLabel = (q) => {
   const labels = {
@@ -164,6 +225,7 @@ const handleComplete = async () => {
     uni.showToast({ title: '已完成', icon: 'success' })
     event.value.status = 1
     event.value.completedTime = Date.now()
+    closeDetailSwipe()
   } catch (error) {
     console.error(error)
   }
@@ -177,6 +239,16 @@ const handleDelete = async () => {
     setTimeout(() => uni.navigateBack(), 500)
   } catch (error) {
     console.error(error)
+  }
+}
+
+const onDetailSwipeAction = (action) => {
+  if (action === 'complete') {
+    handleComplete()
+    return
+  }
+  if (action === 'delete') {
+    handleDelete()
   }
 }
 
@@ -391,31 +463,80 @@ onMounted(() => {
   color: var(--color-text);
 }
 
-.detail-actions {
-  display: flex;
-  gap: 20rpx;
-  padding: 28rpx 0 0;
+.detail-action-swipe {
+  position: relative;
+  margin-top: 20rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
 }
 
-.action-btn {
-  flex: 1;
-  height: 90rpx;
-  border-radius: 999rpx;
-  font-size: 28rpx;
+.detail-swipe-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+}
+
+.detail-swipe-btn {
+  width: 92px;
+  min-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-}
-
-.action-btn.primary {
-  background: linear-gradient(135deg, var(--color-primary), #8980f0);
   color: #fff;
 }
 
-.action-btn.danger {
-  background: var(--color-surface);
-  color: var(--color-danger);
-  border: 2rpx solid rgba(255, 107, 107, 0.35);
+.detail-swipe-btn-complete {
+  background: linear-gradient(135deg, var(--color-primary), #8980f0);
 }
+
+.detail-swipe-btn-delete {
+  background: linear-gradient(135deg, var(--color-danger), #ff8f8f);
+}
+
+.detail-swipe-label {
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.detail-swipe-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 26rpx 28rpx;
+  background: var(--color-surface);
+  will-change: transform;
+}
+
+.detail-action-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.detail-action-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.detail-action-sub {
+  font-size: 23rpx;
+  color: var(--color-text-tertiary);
+}
+
+.detail-action-cue {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+}
+
 </style>

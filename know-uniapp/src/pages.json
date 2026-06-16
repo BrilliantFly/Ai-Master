@@ -254,6 +254,13 @@
             }
         },
         {
+            "path": "pages/plan/schedule/form",
+            "style": {
+                "navigationBarTitleText": "新增日程",
+                "navigationBarBackgroundColor": "#ffffff"
+            }
+        },
+        {
             "path": "pages/plan/home/index",
             "style": {
                 "navigationBarTitleText": "计划总览"
@@ -263,6 +270,13 @@
             "path": "pages/plan/habit/index",
             "style": {
                 "navigationBarTitleText": "习惯打卡"
+            }
+        },
+        {
+            "path": "pages/plan/habit/form",
+            "style": {
+                "navigationBarTitleText": "新增习惯",
+                "navigationBarBackgroundColor": "#ffffff"
             }
         },
         {

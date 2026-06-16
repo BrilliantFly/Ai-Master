@@ -6,7 +6,7 @@
         <text class="page-subtitle">用连续打卡培养稳定节奏</text>
       </view>
       <view class="header-actions">
-        <view class="premium-header-btn" @tap="showAddModal">+</view>
+        <view class="premium-header-btn" @tap="goAddHabit">+</view>
       </view>
     </view>
 
@@ -86,80 +86,69 @@
       <view
         v-for="item in dayHabitRecords"
         :key="item.habitId"
-        class="habit-card premium-card"
+        class="habit-swipe-wrap"
       >
-        <view class="habit-header">
-          <view class="habit-info">
-            <view class="habit-title-row">
-              <text class="habit-name">{{ item.habitName }}</text>
-              <text class="habit-chip">习惯</text>
-            </view>
-            <text class="habit-desc">{{ item.description || '坚持每天打卡' }}</text>
-          </view>
-          <view class="habit-status">
-            <text v-if="item.checked" class="premium-tag premium-tag-success">已打卡</text>
-            <text v-else class="premium-tag premium-tag-warning">未打卡</text>
+        <view class="habit-swipe-actions">
+          <view
+            class="habit-swipe-btn"
+            :class="item.checked ? 'habit-swipe-btn-done' : 'habit-swipe-btn-checkin'"
+            @tap.stop="onHabitSwipeAction(item)"
+          >
+            <text class="habit-swipe-icon">{{ item.checked ? '✓' : '打' }}</text>
+            <text class="habit-swipe-label">{{ item.checked ? '已完成' : '打卡' }}</text>
           </view>
         </view>
-        <view class="habit-footer">
-          <text class="streak-text">连续 {{ item.currentDays || 0 }} 天</text>
-          <button v-if="!item.checked" class="checkin-btn" @tap="handleQuickCheckin(item)">打卡</button>
-          <text v-else class="checked-text">今天已完成</text>
+        <view
+          class="habit-swipe-content"
+          :style="habitSwipeStyle(item.habitId)"
+          @touchstart="onHabitTouchStart($event, item.habitId)"
+          @touchmove="onHabitTouchMove($event, item.habitId)"
+          @touchend="onHabitTouchEnd($event, item.habitId)"
+        >
+          <view class="habit-card premium-card">
+            <view class="habit-header">
+              <view class="habit-info">
+                <view class="habit-title-row">
+                  <text class="habit-name">{{ item.habitName }}</text>
+                  <text class="habit-chip">习惯</text>
+                </view>
+                <text class="habit-desc">{{ item.description || '坚持每天打卡' }}</text>
+              </view>
+              <view class="habit-status">
+                <text v-if="item.checked" class="premium-tag premium-tag-success">已打卡</text>
+                <text v-else class="premium-tag premium-tag-warning">未打卡</text>
+              </view>
+            </view>
+            <view class="habit-footer">
+              <text class="streak-text">连续 {{ item.currentDays || 0 }} 天</text>
+              <text :class="item.checked ? 'checked-text' : 'swipe-hint-text'">
+                {{ item.checked ? '今天已完成' : '左滑打卡' }}
+              </text>
+            </view>
+          </view>
         </view>
       </view>
 
       <view style="height: 180rpx"></view>
     </scroll-view>
 
-    <view class="floating-add" @tap="showAddModal">+</view>
-
-    <view class="modal-mask" v-if="showModal" @tap="hideModal">
-      <view class="modal-content" @tap.stop>
-        <view class="modal-header">
-          <text>{{ isEdit ? '编辑习惯' : '新增习惯' }}</text>
-          <text class="close" @tap="hideModal">×</text>
-        </view>
-        <view class="modal-form">
-          <u-input
-            v-model="form.name"
-            placeholder="习惯名称"
-            border="true"
-            :customStyle="{ marginBottom: '20rpx', padding: '20rpx' }"
-          />
-          <textarea v-model="form.description" placeholder="描述" class="form-textarea" />
-          <view class="form-row">
-            <text class="form-label">目标天数</text>
-            <u-input
-              v-model="form.targetDays"
-              type="number"
-              border="true"
-              :customStyle="{ width: '160rpx', padding: '12rpx 16rpx', textAlign: 'center' }"
-            />
-          </view>
-          <view class="form-btns">
-            <button class="btn-cancel" @tap="hideModal">取消</button>
-            <button class="btn-submit" @tap="handleSave">保存</button>
-          </view>
-        </view>
-      </view>
-    </view>
+    <view class="floating-add" @tap="goAddHabit">+</view>
 
     <PremiumBottomNav active="plan" />
   </view>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PremiumBottomNav from '@/components/PremiumBottomNav.vue'
 import CalendarGrid from '@/components/calendar-grid/CalendarGrid.vue'
-import { addHabit, checkinHabit, getCalendarMonthly, getHabitStats, updateHabit } from '@/api/plan/habit'
+import { checkinHabit, getCalendarMonthly, getHabitStats } from '@/api/plan/habit'
 import { getHolidays } from '@/api/holiday'
 import { formatYYYYMMDD, generateWeeks, quadrantColor } from '@/components/calendar-grid/calendar-utils.js'
 
 const stats = ref({ activeCount: 0, completedCount: 0, totalCheckins: 0 })
-const showModal = ref(false)
-const isEdit = ref(false)
-const editId = ref(null)
+const hasLoaded = ref(false)
 
 const currentYear = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth() + 1)
@@ -170,12 +159,6 @@ const dayHabitRecords = ref([])
 const allHabits = ref([])
 const holidays = ref(null)
 const holidaysYear = ref(0)
-
-const form = reactive({
-  name: '',
-  description: '',
-  targetDays: 30
-})
 
 const currentWeekDays = computed(() => {
   if (!weeks.value.length) return []
@@ -212,6 +195,59 @@ const dayCheckRate = computed(() => {
   if (!dayHabitRecords.value.length) return 0
   return Math.round((checkedCount.value / dayHabitRecords.value.length) * 100)
 })
+
+const HABIT_SWIPE_THRESHOLD = 42
+const HABIT_SWIPE_MAX = 92
+const habitSwipeOffsets = ref({})
+const openHabitId = ref(null)
+
+const closeHabitSwipe = (id) => {
+  if (habitSwipeOffsets.value[id]) {
+    habitSwipeOffsets.value[id].translateX = 0
+  }
+  if (openHabitId.value === id) {
+    openHabitId.value = null
+  }
+}
+
+const onHabitTouchStart = (e, id) => {
+  const touch = e.touches[0]
+  if (openHabitId.value !== null && openHabitId.value !== id) {
+    closeHabitSwipe(openHabitId.value)
+  }
+  habitSwipeOffsets.value[id] = {
+    startX: touch.clientX,
+    currentX: touch.clientX,
+    translateX: openHabitId.value === id ? -HABIT_SWIPE_MAX : 0
+  }
+}
+
+const onHabitTouchMove = (e, id) => {
+  const data = habitSwipeOffsets.value[id]
+  if (!data) return
+  const touch = e.touches[0]
+  let targetX = data.translateX + (touch.clientX - data.currentX)
+  targetX = Math.max(-HABIT_SWIPE_MAX, Math.min(0, targetX))
+  data.translateX = targetX
+  data.currentX = touch.clientX
+}
+
+const onHabitTouchEnd = (e, id) => {
+  const data = habitSwipeOffsets.value[id]
+  if (!data) return
+  if (Math.abs(data.translateX) > HABIT_SWIPE_THRESHOLD) {
+    openHabitId.value = id
+    data.translateX = -HABIT_SWIPE_MAX
+  } else {
+    closeHabitSwipe(id)
+  }
+}
+
+const habitSwipeStyle = (id) => {
+  const data = habitSwipeOffsets.value[id]
+  const x = data ? data.translateX : (openHabitId.value === id ? -HABIT_SWIPE_MAX : 0)
+  return `transform: translateX(${x}px); transition: transform 0.25s cubic-bezier(.22,1,.36,1);`
+}
 
 const fetchStats = async () => {
   try {
@@ -299,43 +335,6 @@ const toggleCollapse = () => {
   collapsed.value = !collapsed.value
 }
 
-const resetForm = () => {
-  isEdit.value = false
-  editId.value = null
-  form.name = ''
-  form.description = ''
-  form.targetDays = 30
-}
-
-const showAddModal = () => {
-  resetForm()
-  showModal.value = true
-}
-
-const hideModal = () => {
-  showModal.value = false
-}
-
-const handleSave = async () => {
-  if (!form.name) {
-    uni.showToast({ title: '请输入习惯名称', icon: 'none' })
-    return
-  }
-  try {
-    if (isEdit.value && editId.value) {
-      await updateHabit({ id: editId.value, ...form })
-    } else {
-      await addHabit(form)
-    }
-    uni.showToast({ title: '保存成功', icon: 'success' })
-    hideModal()
-    await fetchStats()
-    await fetchCalendarData()
-  } catch (error) {
-    console.error(error)
-  }
-}
-
 const handleQuickCheckin = async (item) => {
   try {
     await checkinHabit(item.habitId, {})
@@ -350,6 +349,24 @@ const handleQuickCheckin = async (item) => {
   }
 }
 
+const onHabitSwipeAction = (item) => {
+  closeHabitSwipe(item.habitId)
+  if (item.checked) return
+  handleQuickCheckin(item)
+}
+
+const refreshHabitPage = async () => {
+  await fetchStats()
+  await fetchCalendarData()
+  if (selectedDateLabel.value) {
+    dayHabitRecords.value = mapHabitRecordsForDay(selectedDateLabel.value)
+  }
+}
+
+const goAddHabit = () => {
+  uni.navigateTo({ url: '/pages/plan/habit/form' })
+}
+
 onMounted(async () => {
   await fetchStats()
   await fetchHolidays()
@@ -357,6 +374,12 @@ onMounted(async () => {
   const now = new Date()
   const today = formatYYYYMMDD(now.getFullYear(), now.getMonth() + 1, now.getDate())
   onDateTap(today)
+  hasLoaded.value = true
+})
+
+onShow(async () => {
+  if (!hasLoaded.value) return
+  await refreshHabitPage()
 })
 </script>
 
@@ -534,8 +557,60 @@ onMounted(async () => {
   color: var(--color-text);
 }
 
-.habit-card {
+.habit-swipe-wrap {
+  position: relative;
   margin: 0 16px 10px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.habit-swipe-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+}
+
+.habit-swipe-btn {
+  width: 92px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  color: #fff;
+}
+
+.habit-swipe-btn-checkin {
+  background: linear-gradient(135deg, var(--color-primary), #8980f0);
+}
+
+.habit-swipe-btn-done {
+  background: linear-gradient(135deg, var(--color-success), #5ac8a0);
+}
+
+.habit-swipe-icon {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.habit-swipe-label {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.habit-swipe-content {
+  position: relative;
+  z-index: 2;
+  background: var(--color-surface);
+  will-change: transform;
+}
+
+.habit-card {
+  margin: 0;
   padding: 24rpx 28rpx;
 }
 
@@ -608,6 +683,11 @@ onMounted(async () => {
   color: var(--color-success);
 }
 
+.swipe-hint-text {
+  font-size: 24rpx;
+  color: var(--color-text-tertiary);
+}
+
 .floating-add {
   position: fixed;
   right: 40rpx;
@@ -640,93 +720,5 @@ onMounted(async () => {
   font-size: 28rpx;
   color: var(--color-text-tertiary);
   margin-top: 16rpx;
-}
-
-.modal-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal-content {
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  width: 600rpx;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 30rpx;
-  border-bottom: 1px solid var(--color-border-light);
-  font-size: 32rpx;
-  font-weight: 500;
-}
-
-.close {
-  color: var(--color-text-tertiary);
-  font-size: 36rpx;
-}
-
-.modal-form {
-  padding: 30rpx;
-}
-
-.form-textarea {
-  border: 1px solid var(--color-border);
-  border-radius: 8rpx;
-  padding: 20rpx;
-  font-size: 28rpx;
-  margin-bottom: 20rpx;
-  width: 100%;
-  height: 120rpx;
-  box-sizing: border-box;
-}
-
-.form-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 0;
-  margin-bottom: 20rpx;
-}
-
-.form-label {
-  font-size: 28rpx;
-  color: var(--color-text-secondary);
-}
-
-.form-btns {
-  display: flex;
-  gap: 20rpx;
-  margin-top: 30rpx;
-}
-
-.btn-cancel,
-.btn-submit {
-  flex: 1;
-  height: 80rpx;
-  border-radius: 40rpx;
-  font-size: 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-cancel {
-  background: var(--color-bg-app);
-  color: var(--color-text-secondary);
-}
-
-.btn-submit {
-  background: var(--color-primary);
-  color: var(--color-btn-text);
 }
 </style>

@@ -6,7 +6,7 @@
         <text class="header-sub">高效管理你的每一项安排</text>
       </view>
       <view class="header-actions">
-        <view class="premium-header-btn" @tap="showAddModal">+</view>
+        <view class="premium-header-btn" @tap="goAddSchedule">+</view>
       </view>
     </view>
 
@@ -91,46 +91,7 @@
       <view style="height: 180rpx"></view>
     </scroll-view>
 
-    <view class="floating-add" @tap="showAddModal">+</view>
-
-    <view v-if="showModal" class="modal-mask">
-      <view class="modal-panel">
-        <view class="modal-header">
-          <text class="modal-title">新增日程</text>
-          <text class="modal-close" @tap="hideModal">×</text>
-        </view>
-        <view class="modal-body">
-          <u-input
-            v-model="form.title"
-            placeholder="日程标题"
-            :border="true"
-            :customStyle="{ padding: '20rpx', fontSize: '28rpx', marginBottom: '20rpx' }"
-          />
-          <textarea
-            :value="form.content"
-            class="form-textarea"
-            placeholder="描述（可选）"
-            @input="onContentInput"
-          />
-          <view class="form-row">
-            <text class="form-label">象限</text>
-            <picker :value="form.quadrant - 1" :range="quadrantOptions" @change="onQuadrantChange">
-              <text class="picker-value">{{ quadrantOptions[form.quadrant - 1] }}</text>
-            </picker>
-          </view>
-          <view class="form-row">
-            <text class="form-label">开始日期</text>
-            <picker mode="date" @change="onStartDateChange">
-              <text class="picker-value">{{ form.startDate || selectedDateLabel || '选择日期' }}</text>
-            </picker>
-          </view>
-          <view class="form-actions">
-            <button class="form-cancel" @tap="hideModal">取消</button>
-            <button class="form-submit" @tap="handleAdd">保存</button>
-          </view>
-        </view>
-      </view>
-    </view>
+    <view class="floating-add" @tap="goAddSchedule">+</view>
 
     <PremiumBottomNav active="plan" />
   </view>
@@ -138,11 +99,12 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PremiumBottomNav from '@/components/PremiumBottomNav.vue'
 import CalendarGrid from '@/components/calendar-grid/CalendarGrid.vue'
 import EventList from './components/EventList.vue'
 import { useSchedule } from './composables/useSchedule'
-import { addSchedule, deleteSchedule, getTodayStats } from '@/api/plan/schedule'
+import { deleteSchedule, getTodayStats } from '@/api/plan/schedule'
 
 const quadrants = [
   { value: 0, label: '全部', color: '#999999' },
@@ -154,14 +116,7 @@ const quadrants = [
 const quadrantOptions = ['重要紧急', '重要不紧急', '紧急不重要', '不紧急不重要']
 
 const todayStats = ref({ totalCount: 0, todoCount: 0, completedCount: 0 })
-const showModal = ref(false)
-const form = ref({
-  title: '',
-  content: '',
-  quadrant: 2,
-  startDate: '',
-  eventType: 1
-})
+const hasLoaded = ref(false)
 
 const {
   currentYear,
@@ -206,56 +161,19 @@ const refreshSelectedDayStats = () => {
   }
 }
 
-const resetForm = () => {
-  form.value = {
-    title: '',
-    content: '',
-    quadrant: 2,
-    startDate: selectedDateLabel.value || '',
-    eventType: 1
-  }
-}
-
-const showAddModal = () => {
-  resetForm()
-  showModal.value = true
-}
-
-const hideModal = () => {
-  showModal.value = false
-}
-
-const onContentInput = (e) => {
-  const val = e.detail ? e.detail.value : e.target.value
-  form.value.content = val || ''
-}
-
-const onQuadrantChange = (e) => {
-  form.value.quadrant = Number(e.detail.value) + 1
-}
-
-const onStartDateChange = (e) => {
-  form.value.startDate = e.detail.value
-}
-
-const handleAdd = async () => {
-  if (!form.value.title) {
-    uni.showToast({ title: '请输入标题', icon: 'none' })
+const refreshCurrentSchedule = async () => {
+  await fetchCalendarMonthly()
+  if (selectedDateLabel.value) {
+    await fetchDayEvents(selectedDateLabel.value)
+    refreshSelectedDayStats()
     return
   }
-  try {
-    await addSchedule(form.value, {})
-    uni.showToast({ title: '添加成功', icon: 'success' })
-    hideModal()
-    await fetchStats()
-    await fetchCalendarMonthly()
-    if (selectedDateLabel.value) {
-      await fetchDayEvents(selectedDateLabel.value)
-      refreshSelectedDayStats()
-    }
-  } catch (error) {
-    console.error(error)
-  }
+  await fetchStats()
+}
+
+const goAddSchedule = () => {
+  const query = selectedDateLabel.value ? `?date=${selectedDateLabel.value}` : ''
+  uni.navigateTo({ url: `/pages/plan/schedule/form${query}` })
 }
 
 const handleCheckAndRefresh = async (item) => {
@@ -305,6 +223,12 @@ onMounted(async () => {
   } else {
     await fetchStats()
   }
+  hasLoaded.value = true
+})
+
+onShow(async () => {
+  if (!hasLoaded.value) return
+  await refreshCurrentSchedule()
 })
 </script>
 
@@ -493,96 +417,5 @@ onMounted(async () => {
   justify-content: center;
   font-size: 64rpx;
   box-shadow: var(--shadow-glow);
-}
-
-.modal-mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 120;
-}
-
-.modal-panel {
-  width: 640rpx;
-  max-height: 80vh;
-  overflow: auto;
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 28rpx 32rpx;
-  border-bottom: 2rpx solid var(--color-border-light);
-}
-
-.modal-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.modal-close {
-  font-size: 40rpx;
-  color: var(--color-text-tertiary);
-}
-
-.modal-body {
-  padding: 30rpx;
-}
-
-.form-textarea {
-  width: 100%;
-  height: 140rpx;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
-  border: 2rpx solid var(--color-border);
-  border-radius: 16rpx;
-  box-sizing: border-box;
-  font-size: 28rpx;
-  color: var(--color-text);
-}
-
-.form-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 22rpx 0;
-  border-bottom: 2rpx solid var(--color-border-light);
-}
-
-.form-label,
-.picker-value {
-  font-size: 26rpx;
-  color: var(--color-text-secondary);
-}
-
-.form-actions {
-  display: flex;
-  gap: 20rpx;
-  margin-top: 30rpx;
-}
-
-.form-cancel,
-.form-submit {
-  flex: 1;
-  height: 86rpx;
-  border-radius: 999rpx;
-  font-size: 28rpx;
-}
-
-.form-cancel {
-  background: var(--color-surface-soft);
-  color: var(--color-text-secondary);
-}
-
-.form-submit {
-  background: linear-gradient(135deg, var(--color-primary), #8980f0);
-  color: #fff;
 }
 </style>
