@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="white">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>登录 - Premium Design</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+body{
+  display:flex;justify-content:center;align-items:center;overflow:hidden;
+  background:var(--bg-app);
+}
+
+/* 动态光晕背景 */
+.bg-orbs{position:fixed;inset:0;overflow:hidden;z-index:0}
+.bg-orbs::before,.bg-orbs::after{content:'';position:absolute;border-radius:50%;filter:blur(100px);animation:drifting 10s ease-in-out infinite alternate}
+.bg-orbs::before{width:550px;height:550px;background:radial-gradient(circle,rgba(91,91,214,.35),var(--bg-app) 70%);top:-15%;left:-12%}
+.bg-orbs::after{width:450px;height:450px;background:radial-gradient(circle,rgba(137,128,240,.25),var(--bg-app) 70%);bottom:-12%;right:-12%;animation-delay:-5s}
+@keyframes drifting{0%{transform:translate(0,0) scale(1)}100%{transform:translate(50px,40px) scale(1.12)}}
+
+/* 主容器 */
+.container{position:relative;z-index:1;width:400px;max-width:92vw;padding:24px 0}
+
+/* Logo 区域 */
+.logo-wrap{text-align:center;margin-bottom:44px}
+.logo-icon{width:72px;height:72px;border-radius:24px;background:linear-gradient(135deg,var(--primary),#e8499d);display:inline-flex;align-items:center;justify-content:center;font-size:34px;color:#fff;font-weight:700;margin-bottom:18px;box-shadow:0 10px 36px rgba(var(--primary-rgb),.25)}
+.logo-wrap h1{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.02em}
+.logo-wrap p{font-size:14px;color:var(--text-secondary);margin-top:6px;font-weight:400}
+
+/* 玻璃卡片 */
+.card{background:var(--surface);border-radius:var(--radius-xl);border:1px solid var(--border);padding:36px 28px 32px;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+
+/* Tab 切换 */
+.tabs{display:flex;gap:28px;margin-bottom:34px;border-bottom:1px solid var(--border)}
+.tab{font-size:15px;font-weight:500;color:var(--text-tertiary);padding-bottom:14px;cursor:pointer;position:relative;transition:color var(--duration) var(--ease);border:none;background:none;font-family:inherit}
+.tab.active{color:var(--text)}
+.tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--primary),#e8499d);border-radius:2px}
+.tab:hover{color:var(--text-secondary)}
+
+/* 表单 */
+.form-group{margin-bottom:22px}
+.form-group label{display:block;font-size:12px;color:var(--text-tertiary);margin-bottom:8px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.input-wrap{position:relative}
+.input-wrap .prefix{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text-tertiary);pointer-events:none}
+.input-wrap input{width:100%;padding:17px 18px 17px 50px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);font-size:15px;color:var(--text);outline:none;transition:all var(--duration) var(--ease);font-family:inherit;font-weight:400}
+.input-wrap input::placeholder{color:var(--text-tertiary)}
+.input-wrap input:focus{border-color:var(--primary);background:var(--primary-mist);box-shadow:0 0 0 4px rgba(var(--primary-rgb),.08)}
+.input-code{display:flex;gap:12px}
+.input-code input{flex:1;padding:17px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);font-size:15px;color:var(--text);outline:none;font-family:inherit;transition:all var(--duration) var(--ease);font-weight:400}
+.input-code input:focus{border-color:var(--primary);background:var(--primary-mist)}
+.btn-code{flex-shrink:0;padding:17px 20px;background:var(--surface-soft);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-secondary);font-size:14px;cursor:pointer;transition:all var(--duration) var(--ease);font-family:inherit;white-space:nowrap;font-weight:500}
+.btn-code:hover{background:var(--primary-mist);color:var(--text)}
+
+/* 额外功能 */
+.extras{display:flex;justify-content:space-between;align-items:center;margin:26px 0}
+.remember{display:flex;align-items:center;gap:8px;cursor:pointer}
+.remember input[type=checkbox]{width:17px;height:17px;accent-color:var(--primary);border-radius:4px;cursor:pointer}
+.remember span{font-size:13px;color:var(--text-tertiary)}
+.forgot{font-size:13px;color:rgba(var(--primary-rgb),.6);text-decoration:none;cursor:pointer;transition:color var(--duration) var(--ease);font-weight:500}
+.forgot:hover{color:var(--primary)}
+
+/* 按钮 */
+.btn-primary{width:100%;padding:17px;border:none;border-radius:var(--radius-md);font-size:16px;font-weight:600;color:#fff;cursor:pointer;background:var(--accent-gradient);position:relative;overflow:hidden;transition:all var(--duration) var(--ease);font-family:inherit;letter-spacing:.04em}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(var(--primary-rgb),.3)}
+.btn-primary:active{transform:translateY(0)}
+
+/* 社交登录 */
+.social-divider{display:flex;align-items:center;gap:16px;margin:30px 0 22px}
+.social-divider::before,.social-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.social-divider span{font-size:12px;color:var(--text-tertiary);white-space:nowrap;font-weight:400;letter-spacing:.04em}
+.social-icons{display:flex;justify-content:center;gap:14px}
+.social-btn{width:54px;height:54px;border-radius:var(--radius-md);background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;transition:all var(--duration) var(--ease);text-decoration:none}
+.social-btn:hover{background:var(--primary-mist);transform:translateY(-2px);border-color:var(--primary)}
+.social-btn.wechat{color:#07c160}
+.social-btn.qq{color:#12b7f5}
+.social-btn.phone{color:var(--primary)}
+
+/* 注册链接 */
+.signup-link{text-align:center;margin-top:26px;font-size:14px;color:var(--text-tertiary)}
+.signup-link a{color:rgba(var(--primary-rgb),.7);text-decoration:none;font-weight:500;cursor:pointer;transition:color var(--duration) var(--ease)}
+.signup-link a:hover{color:var(--primary)}
+
+/* 密码可见切换 */
+.toggle-pass{position:absolute;right:18px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-tertiary);font-size:18px;cursor:pointer;padding:4px;transition:color var(--duration) var(--ease)}
+.toggle-pass:hover{color:var(--text-secondary)}
+.input-wrap input[data-has-toggle]{padding-right:52px}
+
+/* 消息提示 */
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 28px;color:var(--text);font-size:14px;z-index:100;opacity:0;transition:all .5s var(--ease);pointer-events:none;font-weight:500}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="bg-orbs"></div>
+<div class="toast" id="toast">欢迎回来</div>
+
+<div class="container" style="position:relative">
+  <div style="display:flex;align-items:center;justify-content:flex-end;padding:0 0 8px;gap:8px">
+    <span class="theme-trigger" onclick="toggleThemePanel(event)" title="切换主题" style="opacity:.6;width:28px;height:28px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
+  </div>
+  <!-- 主题切换 -->
+  <div class="theme-panel" id="themePanel" style="top:38px;right:0">
+    <div class="theme-option" data-theme="white" onclick="setTheme('white')"><span class="swatch sw-white"></span><span>纯白</span><span class="check">✓</span></div>
+    <div class="theme-option" data-theme="dark" onclick="setTheme('dark')"><span class="swatch sw-dark"></span><span>深空</span><span class="check">✓</span></div>
+    <div class="theme-option" data-theme="warm" onclick="setTheme('warm')"><span class="swatch sw-warm"></span><span>暖阳</span><span class="check">✓</span></div>
+    <div class="theme-option" data-theme="aurora" onclick="setTheme('aurora')"><span class="swatch sw-aurora"></span><span>极光</span><span class="check">✓</span></div>
+    <div class="theme-option" data-theme="purple" onclick="setTheme('purple')"><span class="swatch sw-purple"></span><span>暗紫</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="glass" onclick="setTheme('glass')"><span class="swatch sw-glass"></span><span>玻璃</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="orangold" onclick="setTheme('orangold')"><span class="swatch sw-orangold"></span><span>橘金</span><span class="check">✓</span></div>
+  </div>
+  <div class="logo-wrap">
+    <div class="logo-icon">K</div>
+    <h1>AI Master</h1>
+    <p>智能管理，触手可及</p>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="account">密码登录</button>
+      <button type="button" class="tab" data-tab="sms">短信登录</button>
+    </div>
+
+    <!-- 密码登录 -->
+    <div id="tab-account">
+      <div class="form-group">
+        <label>账号</label>
+        <div class="input-wrap">
+          <span class="prefix">📱</span>
+          <input type="text" placeholder="手机号、用户名或邮箱" autocomplete="username">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <div class="input-wrap">
+          <span class="prefix">🔒</span>
+          <input type="password" placeholder="输入密码" data-has-toggle autocomplete="current-password" id="login-pwd">
+          <button type="button" class="toggle-pass" onclick="togglePwd()">👁</button>
+        </div>
+      </div>
+      <div class="extras">
+        <label class="remember">
+          <input type="checkbox" checked> <span>记住登录</span>
+        </label>
+        <a class="forgot">忘记密码?</a>
+      </div>
+      <button type="button" class="btn-primary" onclick="location.href='home.html'">登录</button>
+    </div>
+
+    <!-- 短信登录 -->
+    <div id="tab-sms" style="display:none">
+      <div class="form-group">
+        <label>手机号</label>
+        <div class="input-wrap">
+          <span class="prefix">📱</span>
+          <input type="tel" placeholder="手机号" autocomplete="tel">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>验证码</label>
+        <div class="input-code">
+          <input type="text" placeholder="6位验证码" maxlength="6">
+          <button type="button" class="btn-code" onclick="startCountdown(this)">获取验证码</button>
+        </div>
+      </div>
+      <button type="button" class="btn-primary" style="margin-top:8px" onclick="location.href='home.html'">登录</button>
+    </div>
+
+    <div class="social-divider"><span>其他登录方式</span></div>
+    <div class="social-icons">
+      <a class="social-btn wechat" href="home.html" title="微信登录">💬</a>
+      <a class="social-btn qq" href="home.html" title="QQ登录">🐧</a>
+      <a class="social-btn phone" href="home.html" title="本机号码登录">📲</a>
+    </div>
+
+    <div class="signup-link">
+      还没账号？<a onclick="showToast('跳转注册')">立即注册</a>
+    </div>
+  </div>
+</div>
+
+<script src="theme.js"></script>
+<script>
+/* Login */
+function togglePwd(){
+  const el=document.getElementById('login-pwd');
+  el.type=el.type==='password'?'text':'password';
+}
+function startCountdown(btn){
+  let sec=60;
+  btn.disabled=true;btn.style.opacity='.5';
+  const t=setInterval(()=>{
+    btn.textContent=`${sec}s`;sec--;
+    if(sec<0){clearInterval(t);btn.disabled=false;btn.style.opacity='1';btn.textContent='重新发送';}}
+  },1000);
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-account').style.display=tab.dataset.tab==='account'?'':'none';
+    document.getElementById('tab-sms').style.display=tab.dataset.tab==='sms'?'':'none';
+  });
+});
+</script>
+</body>
+</html>
