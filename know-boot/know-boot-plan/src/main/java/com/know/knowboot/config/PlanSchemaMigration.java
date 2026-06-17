@@ -34,6 +34,7 @@ public class PlanSchemaMigration {
             createPlanScheduleEvent();
             createPlanHabit();
             createPlanHabitRecord();
+            createPlanFocusSession();
             createPlanHomeConfig();
 
             // 修复已有表可能缺失的列（兼容初始版本建表）
@@ -292,6 +293,28 @@ public class PlanSchemaMigration {
     // ============================
     // 8. 首页配置表
     // ============================
+    private void createPlanFocusSession() {
+        if (!tableExists("plan_focus_session")) {
+            jdbcTemplate.execute(
+                "CREATE TABLE `plan_focus_session` (" +
+                "  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键'," +
+                "  `user_id` bigint DEFAULT NULL COMMENT '用户ID'," +
+                "  `phase` tinyint DEFAULT 0 COMMENT '阶段类型(0:专注 1:短休息 2:长休息)'," +
+                "  `duration` int DEFAULT 0 COMMENT '时长(秒)'," +
+                "  `start_time` bigint DEFAULT NULL COMMENT '开始时间'," +
+                "  `end_time` bigint DEFAULT NULL COMMENT '结束时间'," +
+                "  `remark` varchar(200) DEFAULT NULL COMMENT '备注'," +
+                "  `create_by` bigint DEFAULT NULL COMMENT '创建人'," +
+                "  `create_time` bigint DEFAULT NULL COMMENT '创建时间'," +
+                "  PRIMARY KEY (`id`)," +
+                "  KEY `idx_user_id` (`user_id`)," +
+                "  KEY `idx_start_time` (`start_time`)" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='番茄专注记录表'"
+            );
+            System.out.println("[PlanSchemaMigrate] 已创建 plan_focus_session 表");
+        }
+    }
+
     private void createPlanHomeConfig() {
         if (!tableExists("plan_home_config")) {
             jdbcTemplate.execute(

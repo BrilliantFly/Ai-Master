@@ -16,12 +16,12 @@
             "style": {
                 // #ifndef H5
                 "navigationStyle": "custom",
-		        // #endif
-		        // #ifdef H5
-		        "navigationBarTitleText": "首页"
-		        // #endif
-		    }
-		},
+                // #endif
+                // #ifdef H5
+                "navigationBarTitleText": "首页"
+                // #endif
+            }
+        },
         {
             "path": "pages/index/more",
             "style": {
@@ -267,6 +267,18 @@
             }
         },
         {
+            "path": "pages/plan/stats/index",
+            "style": {
+                "navigationBarTitleText": "统计洞察"
+            }
+        },
+        {
+            "path": "pages/plan/focus/index",
+            "style": {
+                "navigationBarTitleText": "番茄专注"
+            }
+        },
+        {
             "path": "pages/plan/habit/index",
             "style": {
                 "navigationBarTitleText": "习惯打卡"
@@ -323,48 +335,50 @@
             }
         }
     ],
-	"subPackages": [{
-		"root": "packages",
-		"pages": [
-            {
-                "path": "pages/404/404",
-                "style": {
-                    "navigationBarTitleText": "404"
+    "subPackages": [
+        {
+            "root": "packages",
+            "pages": [
+                {
+                    "path": "pages/404/404",
+                    "style": {
+                        "navigationBarTitleText": "404"
+                    },
+                    "name": "404",
+                    "meta": {
+                        "white": true
+                    }
                 },
-                "name": "404",
-                "meta": {
-                    "white": true
+                {
+                    "path": "pages/user_wallet/user_wallet",
+                    "style": {
+                        "navigationBarTitleText": "我的"
+                    },
+                    "meta": {
+                        "auth": true
+                    }
+                },
+                {
+                    "path": "pages/recharge/recharge",
+                    "style": {
+                        "navigationBarTitleText": "记录"
+                    },
+                    "meta": {
+                        "auth": true
+                    }
+                },
+                {
+                    "path": "pages/recharge_record/recharge_record",
+                    "style": {
+                        "navigationBarTitleText": "记录"
+                    },
+                    "meta": {
+                        "auth": true
+                    }
                 }
-            },
-			{
-				"path": "pages/user_wallet/user_wallet",
-				"style": {
-				    "navigationBarTitleText": "我的"
-				},
-				"meta": {
-                    "auth": true
-                }
-			},
-            {
-				"path": "pages/recharge/recharge",
-				"style": {
-				    "navigationBarTitleText": "记录"
-				},
-				"meta": {
-                    "auth": true
-                }
-			},
-            {
-				"path": "pages/recharge_record/recharge_record",
-				"style": {
-				    "navigationBarTitleText": "记录"
-				},
-				"meta": {
-                    "auth": true
-                }
-			}
-		]
-	}],
+            ]
+        }
+    ],
     "globalStyle": {
         "navigationBarTextStyle": "black",
         "navigationBarTitleText": "商城",

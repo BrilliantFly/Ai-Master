@@ -65,50 +65,268 @@ const buildPreset = (
 })
 
 const MENU_PRESETS: Record<string, PresetConfig> = {
-    camera: buildPreset('📹', 'premium-icon-g1', '智能摄像头接入指引', '快速了解如何配置和接入你的设备', '设备', 'linear-gradient(135deg,#e0e7ff,#c7d2fe)', ['quick', 'recommend']),
-    device: buildPreset('📹', 'premium-icon-g1', '智能设备管理', '快速查看和管理你的智能设备', '设备', 'linear-gradient(135deg,#e0e7ff,#c7d2fe)', ['quick', 'recommend']),
-    monitor: buildPreset('📹', 'premium-icon-g1', '监控中心', '实时分析，异常告警，7x24h 守护', '设备', 'linear-gradient(135deg,#e0e7ff,#c7d2fe)', ['quick', 'recommend']),
-    schedule: buildPreset('📅', 'premium-icon-g2', '四象限工作法', '高效管理你的每日任务', '效率', 'linear-gradient(135deg,#d1fae5,#a7f3d0)', ['quick', 'recommend', 'tool']),
-    plan: buildPreset('📅', 'premium-icon-g2', '计划管理升级', '甘特图、日程、习惯打卡全新体验', '计划', 'linear-gradient(135deg,#d1fae5,#a7f3d0)', ['quick', 'recommend', 'tool']),
-    calendar: buildPreset('📅', 'premium-icon-g2', '日历计划', '统一查看近期日程与安排', '计划', 'linear-gradient(135deg,#d1fae5,#a7f3d0)', ['quick', 'recommend', 'tool']),
-    gantt: buildPreset('📋', 'premium-icon-g2', '甘特图', '项目计划与进度追踪', '工具', 'linear-gradient(135deg,#d1fae5,#a7f3d0)', ['tool']),
-    habit: buildPreset('🎯', 'premium-icon-g3', '21 天习惯养成计划', '用科学方法培养持续力', '习惯', 'linear-gradient(135deg,#fce7f3,#fbcfe8)', ['quick', 'recommend']),
-    checkin: buildPreset('🎯', 'premium-icon-g3', '打卡目标', '养成坚持记录的好习惯', '习惯', 'linear-gradient(135deg,#fce7f3,#fbcfe8)', ['quick', 'recommend']),
-    collection: buildPreset('📌', 'premium-icon-g8', '我的收藏', '快速回到你保存过的内容与入口', '收藏', 'linear-gradient(135deg,#fff7ed,#fde68a)', ['quick', 'tool']),
-    favorite: buildPreset('📌', 'premium-icon-g8', '收藏内容', '随时查看收藏的重点信息', '收藏', 'linear-gradient(135deg,#fff7ed,#fde68a)', ['quick', 'tool']),
-    customer: buildPreset('👥', 'premium-icon-g5', '客户管理', '智能跟进提醒，高效维护客户关系', '客户', 'linear-gradient(135deg,#ede9fe,#ddd6fe)', ['quick', 'tool']),
-    crm: buildPreset('👥', 'premium-icon-g5', '客户维护', '统一管理客户资料和跟进记录', '客户', 'linear-gradient(135deg,#ede9fe,#ddd6fe)', ['quick', 'tool']),
-    service: buildPreset('🛎️', 'premium-icon-g10', '在线客服支持', '快速联系平台客服获取帮助', '服务', 'linear-gradient(135deg,#d1fae5,#99f6e4)', ['quick', 'tool']),
-    support: buildPreset('🛎️', 'premium-icon-g10', '支持服务', '获取帮助与常见问题解答', '服务', 'linear-gradient(135deg,#d1fae5,#99f6e4)', ['quick', 'tool']),
-    finance: buildPreset('💳', 'premium-icon-g10', '财务管理', '查看财务信息与收支概况', '财务', 'linear-gradient(135deg,#ede9fe,#ddd6fe)', ['quick', 'tool']),
-    wallet: buildPreset('💳', 'premium-icon-g10', '钱包余额', '查看账户余额与充值记录', '财务', 'linear-gradient(135deg,#ede9fe,#ddd6fe)', ['quick', 'tool']),
-    data: buildPreset('📊', 'premium-icon-g6', '数据分析', '设备与业务数据洞察', '数据', 'linear-gradient(135deg,#e0f2fe,#bae6fd)', ['quick', 'tool']),
-    report: buildPreset('📄', 'premium-icon-g8', '报表导出', '一键生成运营报告', '工具', 'linear-gradient(135deg,#ede9fe,#ddd6fe)', ['tool']),
-    export: buildPreset('📄', 'premium-icon-g8', '报表导出', '一键生成运营报告', '工具', 'linear-gradient(135deg,#ede9fe,#ddd6fe)', ['tool']),
-    alert: buildPreset('🔔', 'premium-icon-g4', '告警中心', '异常事件统一管理', '工具', 'linear-gradient(135deg,#fee2e2,#fecaca)', ['tool']),
-    warning: buildPreset('🔔', 'premium-icon-g4', '告警中心', '重要提醒与异常事件汇总', '工具', 'linear-gradient(135deg,#fee2e2,#fecaca)', ['tool']),
-    news: buildPreset('📰', 'premium-icon-g9', '热门资讯', '及时了解平台资讯与行业动态', '资讯', 'linear-gradient(135deg,#dbeafe,#bfdbfe)', ['quick', 'recommend']),
-    article: buildPreset('📰', 'premium-icon-g9', '精选文章', '发现更有价值的内容与经验分享', '文章', 'linear-gradient(135deg,#dbeafe,#bfdbfe)', ['quick', 'recommend']),
-    content: buildPreset('📰', 'premium-icon-g9', '内容中心', '浏览最新内容与专题推荐', '内容', 'linear-gradient(135deg,#dbeafe,#bfdbfe)', ['quick', 'recommend'])
+    camera: buildPreset(
+        '📹',
+        'premium-icon-g1',
+        '智能摄像头接入指引',
+        '快速了解如何配置和接入你的设备',
+        '设备',
+        'linear-gradient(135deg,#e0e7ff,#c7d2fe)',
+        ['quick', 'recommend']
+    ),
+    device: buildPreset(
+        '📹',
+        'premium-icon-g1',
+        '智能设备管理',
+        '快速查看和管理你的智能设备',
+        '设备',
+        'linear-gradient(135deg,#e0e7ff,#c7d2fe)',
+        ['quick', 'recommend']
+    ),
+    monitor: buildPreset(
+        '📹',
+        'premium-icon-g1',
+        '监控中心',
+        '实时分析，异常告警，7x24h 守护',
+        '设备',
+        'linear-gradient(135deg,#e0e7ff,#c7d2fe)',
+        ['quick', 'recommend']
+    ),
+    schedule: buildPreset(
+        '📅',
+        'premium-icon-g2',
+        '四象限工作法',
+        '高效管理你的每日任务',
+        '效率',
+        'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        ['quick', 'recommend', 'tool']
+    ),
+    plan: buildPreset(
+        '📅',
+        'premium-icon-g2',
+        '计划管理升级',
+        '甘特图、日程、习惯打卡全新体验',
+        '计划',
+        'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        ['quick', 'recommend', 'tool']
+    ),
+    calendar: buildPreset(
+        '📅',
+        'premium-icon-g2',
+        '日历计划',
+        '统一查看近期日程与安排',
+        '计划',
+        'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        ['quick', 'recommend', 'tool']
+    ),
+    gantt: buildPreset(
+        '📋',
+        'premium-icon-g2',
+        '甘特图',
+        '项目计划与进度追踪',
+        '工具',
+        'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        ['tool']
+    ),
+    habit: buildPreset(
+        '🎯',
+        'premium-icon-g3',
+        '21 天习惯养成计划',
+        '用科学方法培养持续力',
+        '习惯',
+        'linear-gradient(135deg,#fce7f3,#fbcfe8)',
+        ['quick', 'recommend']
+    ),
+    checkin: buildPreset(
+        '🎯',
+        'premium-icon-g3',
+        '打卡目标',
+        '养成坚持记录的好习惯',
+        '习惯',
+        'linear-gradient(135deg,#fce7f3,#fbcfe8)',
+        ['quick', 'recommend']
+    ),
+    collection: buildPreset(
+        '📌',
+        'premium-icon-g8',
+        '我的收藏',
+        '快速回到你保存过的内容与入口',
+        '收藏',
+        'linear-gradient(135deg,#fff7ed,#fde68a)',
+        ['quick', 'tool']
+    ),
+    favorite: buildPreset(
+        '📌',
+        'premium-icon-g8',
+        '收藏内容',
+        '随时查看收藏的重点信息',
+        '收藏',
+        'linear-gradient(135deg,#fff7ed,#fde68a)',
+        ['quick', 'tool']
+    ),
+    customer: buildPreset(
+        '👥',
+        'premium-icon-g5',
+        '客户管理',
+        '智能跟进提醒，高效维护客户关系',
+        '客户',
+        'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        ['quick', 'tool']
+    ),
+    crm: buildPreset(
+        '👥',
+        'premium-icon-g5',
+        '客户维护',
+        '统一管理客户资料和跟进记录',
+        '客户',
+        'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        ['quick', 'tool']
+    ),
+    service: buildPreset(
+        '🛎️',
+        'premium-icon-g10',
+        '在线客服支持',
+        '快速联系平台客服获取帮助',
+        '服务',
+        'linear-gradient(135deg,#d1fae5,#99f6e4)',
+        ['quick', 'tool']
+    ),
+    support: buildPreset(
+        '🛎️',
+        'premium-icon-g10',
+        '支持服务',
+        '获取帮助与常见问题解答',
+        '服务',
+        'linear-gradient(135deg,#d1fae5,#99f6e4)',
+        ['quick', 'tool']
+    ),
+    finance: buildPreset(
+        '💳',
+        'premium-icon-g10',
+        '财务管理',
+        '查看财务信息与收支概况',
+        '财务',
+        'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        ['quick', 'tool']
+    ),
+    wallet: buildPreset(
+        '💳',
+        'premium-icon-g10',
+        '钱包余额',
+        '查看账户余额与充值记录',
+        '财务',
+        'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        ['quick', 'tool']
+    ),
+    data: buildPreset(
+        '📊',
+        'premium-icon-g6',
+        '数据分析',
+        '设备与业务数据洞察',
+        '数据',
+        'linear-gradient(135deg,#e0f2fe,#bae6fd)',
+        ['quick', 'tool']
+    ),
+    report: buildPreset(
+        '📄',
+        'premium-icon-g8',
+        '报表导出',
+        '一键生成运营报告',
+        '工具',
+        'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        ['tool']
+    ),
+    export: buildPreset(
+        '📄',
+        'premium-icon-g8',
+        '报表导出',
+        '一键生成运营报告',
+        '工具',
+        'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        ['tool']
+    ),
+    alert: buildPreset(
+        '🔔',
+        'premium-icon-g4',
+        '告警中心',
+        '异常事件统一管理',
+        '工具',
+        'linear-gradient(135deg,#fee2e2,#fecaca)',
+        ['tool']
+    ),
+    warning: buildPreset(
+        '🔔',
+        'premium-icon-g4',
+        '告警中心',
+        '重要提醒与异常事件汇总',
+        '工具',
+        'linear-gradient(135deg,#fee2e2,#fecaca)',
+        ['tool']
+    ),
+    news: buildPreset(
+        '📰',
+        'premium-icon-g9',
+        '热门资讯',
+        '及时了解平台资讯与行业动态',
+        '资讯',
+        'linear-gradient(135deg,#dbeafe,#bfdbfe)',
+        ['quick', 'recommend']
+    ),
+    article: buildPreset(
+        '📰',
+        'premium-icon-g9',
+        '精选文章',
+        '发现更有价值的内容与经验分享',
+        '文章',
+        'linear-gradient(135deg,#dbeafe,#bfdbfe)',
+        ['quick', 'recommend']
+    ),
+    content: buildPreset(
+        '📰',
+        'premium-icon-g9',
+        '内容中心',
+        '浏览最新内容与专题推荐',
+        '内容',
+        'linear-gradient(135deg,#dbeafe,#bfdbfe)',
+        ['quick', 'recommend']
+    )
 }
 
 const inferPresetCode = (item: RawHomeMenu) => {
-    const code = String(item.menuCode || '').toLowerCase().trim()
-    const name = String(item.menuName || '').toLowerCase().trim()
-    const path = String(item.path || '').toLowerCase().trim()
+    const code = String(item.menuCode || '')
+        .toLowerCase()
+        .trim()
+    const name = String(item.menuName || '')
+        .toLowerCase()
+        .trim()
+    const path = String(item.path || '')
+        .toLowerCase()
+        .trim()
 
     if (MENU_PRESETS[code]) return code
 
-    if (code.includes('camera') || code.includes('device') || path.includes('/camera')) return 'camera'
-    if (code.includes('schedule') || code.includes('calendar') || path.includes('/plan/schedule')) return 'schedule'
+    if (code.includes('camera') || code.includes('device') || path.includes('/camera'))
+        return 'camera'
+    if (code.includes('schedule') || code.includes('calendar') || path.includes('/plan/schedule'))
+        return 'schedule'
     if (code.includes('plan') || path.includes('/plan/home')) return 'plan'
-    if (code.includes('habit') || code.includes('checkin') || path.includes('/plan/habit')) return 'habit'
-    if (code.includes('customer') || code.includes('crm') || path.includes('/customer')) return 'customer'
-    if (code.includes('service') || code.includes('support') || path.includes('/customer_service')) return 'service'
-    if (code.includes('collection') || code.includes('favorite') || path.includes('/collection')) return 'collection'
+    if (code.includes('habit') || code.includes('checkin') || path.includes('/plan/habit'))
+        return 'habit'
+    if (code.includes('customer') || code.includes('crm') || path.includes('/customer'))
+        return 'customer'
+    if (code.includes('service') || code.includes('support') || path.includes('/customer_service'))
+        return 'service'
+    if (code.includes('collection') || code.includes('favorite') || path.includes('/collection'))
+        return 'collection'
     if (code.includes('news') || code.includes('article') || path.includes('/news')) return 'news'
     if (code.includes('data') || code.includes('analysis')) return 'data'
-    if (code.includes('finance') || code.includes('wallet') || path.includes('/wallet') || path.includes('/recharge')) return 'finance'
+    if (
+        code.includes('finance') ||
+        code.includes('wallet') ||
+        path.includes('/wallet') ||
+        path.includes('/recharge')
+    )
+        return 'finance'
     if (code.includes('gantt')) return 'gantt'
     if (code.includes('alert') || code.includes('warning') || code.includes('alarm')) return 'alert'
     if (code.includes('report') || code.includes('export')) return 'report'
@@ -189,6 +407,21 @@ export const REFERENCE_TOOL_ITEMS: HomeDisplayItem[] = [
         tag: '工具',
         thumbBg: 'linear-gradient(135deg,#ede9fe,#ddd6fe)',
         sections: ['tool']
+    },
+    {
+        id: 'tool-focus',
+        name: '番茄专注',
+        code: 'tool-focus',
+        path: '/pages/plan/focus/index',
+        icon: '🍅',
+        iconClass: 'premium-icon-g4',
+        iconIsImage: false,
+        sort: 5,
+        title: '番茄专注',
+        desc: '25 分钟专注与节奏化休息',
+        tag: '专注',
+        thumbBg: 'linear-gradient(135deg,#fca5a5,#f97316)',
+        sections: ['tool']
     }
 ]
 
@@ -203,7 +436,11 @@ const parseRenderConfig = (raw?: string | null): HomeRenderConfig => {
 
 const isImageLike = (value?: string | null) => {
     if (!value) return false
-    return value.startsWith('/') || value.startsWith('http') || /\.(png|jpg|jpeg|svg|webp)$/i.test(value)
+    return (
+        value.startsWith('/') ||
+        value.startsWith('http') ||
+        /\.(png|jpg|jpeg|svg|webp)$/i.test(value)
+    )
 }
 
 const isBrokenText = (value?: string | null) => {
@@ -253,7 +490,8 @@ export const normalizeHomeMenuItems = (menus: RawHomeMenu[] = []): HomeDisplayIt
                 title: safeText(config.title, titleFallback),
                 desc: safeText(config.desc, descFallback),
                 tag: safeText(config.tag, tagFallback),
-                thumbBg: config.thumbBg || preset?.thumbBg || 'linear-gradient(135deg,#e5e7eb,#cbd5e1)',
+                thumbBg:
+                    config.thumbBg || preset?.thumbBg || 'linear-gradient(135deg,#e5e7eb,#cbd5e1)',
                 sections: normalizeSections(config, code)
             }
         })
