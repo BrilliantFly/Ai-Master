@@ -1,0 +1,1 @@
+import{d as a,e as s,f as e}from"./index-3b49e567.js";import{P as m}from"./PremiumBottomNav.d5d02695.js";const t=a({__name:"index",setup:a=>(a,t)=>(s(),e(m))}),o=a({__name:"tabbar",setup:a=>(a,m)=>(s(),e(t))});export{o as _};
