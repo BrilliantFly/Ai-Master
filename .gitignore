@@ -7,3 +7,19 @@ rebel.xml
 /.idea/
 /nul
 /know-vue/node_modules/
+
+# Runtime logs
+*.log
+*.err
+logs/
+
+# Tool artifacts
+.sisyphus/
+.superpowers/
+.anchored-summary.md
+
+# Build test logs
+mvn-*-test.log
+npm-*-test.log
+rebuild_*.txt
+start-*-test.log
