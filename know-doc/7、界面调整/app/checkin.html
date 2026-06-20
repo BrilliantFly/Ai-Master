@@ -16,6 +16,7 @@
 .streak-card.accent .num{color:var(--primary)}
 .tab-bar{display:flex;gap:0;padding:0 20px 14px;border-bottom:1px solid var(--border-light);margin-bottom:16px}
 .tab-item2{flex:1;text-align:center;padding:8px 0;font-size:14px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all .25s ease;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.tab-item2:hover{color:var(--text-secondary)}
 .tab-item2.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
 .tab-item2 .badge{font-size:11px;color:var(--text-tertiary);margin-left:4px}
 .goal-list{padding:0 20px 140px;display:flex;flex-direction:column;gap:12px}
@@ -59,6 +60,7 @@
 .manage-item .mi-name{font-size:14px;font-weight:600;color:var(--text)}
 .manage-item .mi-sub{font-size:11px;color:var(--text-tertiary)}
 .manage-item .mi-action{font-size:12px;color:var(--danger);padding:6px 12px;border-radius:var(--radius-sm);border:none;background:var(--danger-soft);cursor:pointer;font-family:inherit}
+.manage-item .mi-action:hover{background:var(--danger);color:#fff}
 .manage-item.archived{opacity:.5}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;display:none;animation:fadeIn .2s ease}
@@ -70,45 +72,214 @@
 .modal-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:20px}
 .form-group{margin-bottom:16px}
 .form-group label{display:block;font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:5px}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;transition:all .25s ease}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(var(--primary-rgb),.1)}
-.form-group textarea{resize:none;min-height:60px}
+/* ===== Form input wrap with focus bar ===== */
+.fg-input-wrap{position:relative;display:block}
+.fg-input-wrap .focus-bar{position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--primary);opacity:0;transition:opacity .25s;pointer-events:none}
+.fg-input-wrap:focus-within .focus-bar{opacity:1}
+/* Custom select arrow */
+.fg-input-wrap:has(select)::after{content:'';position:absolute;right:14px;top:50%;width:7px;height:7px;border:2px solid var(--text-tertiary);border-top:none;border-left:none;transform:translateY(-65%) rotate(45deg);pointer-events:none;transition:border-color .22s;z-index:1}
+.fg-input-wrap:has(select):focus-within::after{border-color:var(--primary)}
+
+.form-group textarea{resize:vertical;min-height:60px}
+/* ===== Form-preview 卡片样式 ===== */
+.form-card-header{font-size:13px;font-weight:600;color:var(--primary);margin-bottom:12px;letter-spacing:.3px;display:flex;align-items:center;gap:6px}
+.form-card-header::after{content:'';flex:1;height:1px;background:var(--border);margin-left:8px}
+.form-card-schedule{background:var(--bg-card,var(--card-bg,var(--surface)));border-radius:var(--radius-md);box-shadow:var(--card-shadow,var(--shadow-sm));padding:18px 18px 20px;margin-bottom:14px;transition:all .3s cubic-bezier(.34,1.56,.64,1);animation:cardSlideIn .4s ease both}
+.form-card-schedule:hover{transform:translateY(-2px);box-shadow:0 4px 20px var(--card-hover-shadow,rgba(0,0,0,.1))}
+.form-card-schedule:active{transform:translateY(0)}
+.form-card-schedule:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.form-card-schedule:nth-child(1){animation-delay:0s}
+.form-card-schedule:nth-child(2){animation-delay:.06s}
+.form-card-schedule:nth-child(3){animation-delay:.12s}
+@keyframes cardSlideIn{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:translateY(0)}}
+.fg-label{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:5px;letter-spacing:.2px}
+.fg-label .required{color:var(--danger);font-size:15px;line-height:1}
+.fgs-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fgs-full{margin-top:10px}
+.mt-10{margin-top:10px}
+.fgs-row.mt-10{margin-top:10px}
+/* select 自定义箭头 */
+.fg-input-wrap:has(.fg-select)::after{content:'';position:absolute;right:14px;top:50%;width:7px;height:7px;border:2px solid var(--text-tertiary);border-top:none;border-left:none;transform:translateY(-65%) rotate(45deg);pointer-events:none;transition:border-color .22s;z-index:1}
+.fg-input-wrap:has(.fg-select):focus-within::after{border-color:var(--primary)}
+.fg-input,.fg-select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--input-bg);color:var(--text-primary,var(--text));font-size:14px;transition:all .22s;outline:none;font-family:inherit}
+.fg-input:hover,.fg-select:hover{border-color:var(--input-border-hover,#c8ccd8);background:var(--input-bg-hover)}
+.fg-input:active,.fg-select:active{border-color:var(--text-primary,var(--text))}
+.fg-input:focus,.fg-select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-alpha,rgba(var(--primary-rgb),.12));background:var(--input-bg-focus)}
+.fg-input:focus-visible,.fg-select:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.fg-input::placeholder{color:var(--text-tertiary);font-style:italic;font-weight:400;font-size:13px}
+input[type="date"].fg-input,input[type="time"].fg-input{min-height:42px;-webkit-appearance:none;appearance:none;color-scheme:var(--date-color-scheme,light)}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{opacity:.3;height:24px}
+.fg-select{-webkit-appearance:none;-moz-appearance:none;appearance:none;padding-right:34px;cursor:pointer}
+.fg-select option{color:var(--text-primary,var(--text));background:var(--bg-card,var(--card-bg,var(--surface)))}
+/* 折叠卡片 */
+.form-section-sch{background:var(--bg-card,var(--card-bg,var(--surface)));border-radius:var(--radius-md);box-shadow:var(--card-shadow,var(--shadow-sm));overflow:hidden;margin-bottom:14px;animation:cardSlideIn .4s ease both;animation-delay:.24s}
+.form-section-sch details{interpolate-size:allow-keywords}
+.form-section-sch summary{display:flex;align-items:center;gap:8px;padding:14px 18px;cursor:pointer;color:var(--text-secondary);font-size:13px;font-weight:500;list-style:none;-webkit-user-select:none;user-select:none;transition:color .25s,background .25s}
+.form-section-sch summary:hover{background:var(--primary-alpha,rgba(var(--primary-rgb),.04))}
+.form-section-sch summary:active{transform:scale(.99)}
+.form-section-sch summary:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.form-section-sch summary::-webkit-details-marker{display:none}
+.form-section-sch summary .arrow{font-size:12px;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.form-section-sch details[open] summary{color:var(--primary);background:var(--primary-alpha,rgba(var(--primary-rgb),.04))}
+.form-section-sch details[open] summary .arrow{transform:rotate(180deg)}
+.form-section-sch details .section-body{padding:0 18px;opacity:0;transition:opacity .35s ease,padding .35s ease}
+.form-section-sch details[open] .section-body{opacity:1;padding:0 18px 18px}
+/* 按钮组（与 form-preview 一致） */
+.btn-row{display:flex;gap:12px;margin-top:24px;padding-top:14px;border-top:1px solid var(--border)}
+.btn-primary,.btn-secondary{flex:1;padding:13px 0;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;font-family:inherit}
+.btn-primary{background:var(--accent-gradient);color:#fff;box-shadow:0 4px 14px var(--primary-alpha,rgba(var(--primary-rgb),.3))}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--primary-alpha,rgba(var(--primary-rgb),.4))}
+.btn-primary:active{transform:scale(.97);box-shadow:0 2px 8px var(--primary-alpha,rgba(var(--primary-rgb),.2))}
+.btn-primary:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.btn-secondary{background:var(--bg-secondary,var(--surface-soft));color:var(--text-secondary)}
+.btn-secondary:hover{background:var(--border);color:var(--text-primary,var(--text))}
+.btn-secondary:active{transform:scale(.97)}
+.btn-secondary:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.btn-primary:disabled,.btn-secondary:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-primary::after,.btn-secondary::after{content:'';position:absolute;left:50%;top:50%;width:100%;padding-bottom:100%;border-radius:50%;background:rgba(255,255,255,.22);transform:translate(-50%,-50%) scale(0);transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .35s;opacity:0;pointer-events:none}
+.btn-primary:active::after,.btn-secondary:active::after{transform:translate(-50%,-50%) scale(2.5);opacity:1;transition-duration:0s}
+.btn-primary:disabled::after,.btn-secondary:disabled::after{display:none}
+/* 颜色选择器（form-preview 风格） */
+.color-strip{display:flex;gap:10px;flex-wrap:wrap}
+.color-opt{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;position:relative;transition:all .22s;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.color-opt:hover{transform:scale(1.12);box-shadow:0 2px 8px rgba(0,0,0,.16)}
+.color-opt:active{transform:scale(.92)}
+.color-opt:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.color-opt.active{border-color:var(--text-primary,var(--text));transform:scale(1.08);box-shadow:0 0 0 3px var(--bg-card,var(--surface)),0 2px 8px rgba(0,0,0,.2)}
+.color-opt.active::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;font-size:16px;font-weight:700;color:#fff;mix-blend-mode:exclusion;text-shadow:0 0 3px rgba(0,0,0,.4),0 1px 4px rgba(0,0,0,.2)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.icon-picker{display:flex;gap:8px;flex-wrap:wrap}
-.icon-opt{width:40px;height:40px;border-radius:var(--radius-sm);border:2px solid var(--border-light);background:none;font-size:20px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}
-.icon-opt:hover{border-color:var(--primary)}
-.icon-opt.active{border-color:var(--primary);background:var(--primary-soft)}
+
+/* ===== Icon picker overlay ===== */
+.icon-preview-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--input-bg);cursor:pointer;transition:all .22s}
+.icon-preview-row:hover{border-color:var(--input-border-hover,#c8ccd8);background:var(--input-bg-hover)}
+.icon-preview-row:active{transform:scale(.98)}
+.icon-preview-row:focus-visible{outline:2px solid var(--primary);outline-offset:1px;border-color:var(--primary)}
+.icon-preview-row .ip-badge{width:40px;height:40px;border-radius:var(--radius-sm);display:grid;place-items:center;font-size:22px;flex-shrink:0;color:#fff}
+.icon-preview-row .ip-name{flex:1;font-size:14px;font-weight:500;color:var(--text-primary,var(--text))}
+.icon-preview-row .ip-arrow{color:var(--text-tertiary);font-size:18px;transition:transform .3s}
+.icon-preview-row:hover .ip-arrow{transform:translateX(3px)}
+
+.ip-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:all .3s}
+.ip-overlay.open{opacity:1;visibility:visible}
+.ip-modal{position:fixed;left:0;bottom:0;width:100%;max-height:68vh;z-index:1001;background:var(--bg-card,var(--card-bg,var(--surface)));border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:20px 20px 32px;transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.56,.64,1);overflow-y:auto}
+.ip-overlay.open .ip-modal{transform:translateY(0)}
+.ip-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.ip-modal-header h3{font-size:16px;font-weight:600}
+.ip-modal-close{width:30px;height:30px;border:none;border-radius:50%;background:var(--bg-secondary,var(--surface-soft));font-size:16px;cursor:pointer;display:grid;place-items:center;color:var(--text-secondary);transition:all .2s}
+.ip-modal-close:hover{background:var(--border);color:var(--text-primary,var(--text))}
+.ip-modal-close:active{transform:scale(.88)}
+.ip-modal-close:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+
+.ip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ip-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px;border:1.5px solid transparent;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;background:var(--bg-secondary,var(--surface-soft))}
+.ip-item:hover{border-color:var(--primary);background:var(--primary-alpha,rgba(var(--primary-rgb),.08));transform:translateY(-2px)}
+.ip-item:active{transform:scale(.94)}
+.ip-item:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.ip-item .ip-ico{width:40px;height:40px;border-radius:var(--radius-sm);display:grid;place-items:center;font-size:22px;color:#fff}
+.ip-item .ip-txt{font-size:11px;color:var(--text-secondary);font-weight:500}
+.ip-item.active{border-color:var(--primary);background:var(--primary)}
+.ip-item.active .ip-ico{background:rgba(255,255,255,.2)!important}
+.ip-item.active .ip-txt{color:#fff}
+
+/* ===== Icon picker inline fallback (hide when overlay used) ===== */
+.icon-picker{display:none}
 .form-section{margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--border-light)}
-.form-section summary{font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;padding:4px 0;outline:none;-webkit-user-select:none;user-select:none}
-.form-section summary::-webkit-details-marker{color:var(--text-tertiary)}
-.form-section[open] summary{margin-bottom:12px;color:var(--primary)}
-.color-picker{display:flex;gap:8px;flex-wrap:wrap}
-.color-opt{width:32px;height:32px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s ease;flex-shrink:0}
-.color-opt:hover{transform:scale(1.15)}
-.color-opt.active{border-color:var(--text);box-shadow:0 0 0 2px var(--bg-app)}
-.range-wrap{display:flex;align-items:center;gap:10px}
-.range-wrap input[type=range]{flex:1;height:6px;-webkit-appearance:none;appearance:none;background:linear-gradient(to right,var(--primary) 0%,var(--primary) var(--progress,0%),var(--border-light) var(--progress,0%),var(--border-light) 100%);border-radius:3px;outline:none;border:none;padding:0;transition:background .2s}
-.range-wrap input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px}
-.range-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 2px 6px rgba(var(--primary-rgb),.35);margin-top:-7px;transition:transform .2s}
-.range-wrap input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
-.range-wrap input[type=range]:active::-webkit-slider-thumb{transform:scale(.92)}
-.range-wrap input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--border-light)}
-.range-wrap input[type=range]::-moz-range-progress{background:var(--primary);border-radius:3px;height:6px}
-.range-wrap input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;border:none;box-shadow:0 2px 6px rgba(var(--primary-rgb),.35)}
-.range-val{min-width:32px;text-align:center;font-size:14px;font-weight:700;color:var(--primary)}
-.form-group .num-unit-wrap{display:flex;gap:6px;align-items:center}
-.form-group .num-unit-wrap input[type=number]{flex:2;min-width:0}
-.form-group .num-unit-wrap select{flex:1;min-width:0}
+.form-section details{interpolate-size:allow-keywords}
+.form-section summary{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;padding:4px 0;outline:none;-webkit-user-select:none;user-select:none;list-style:none;transition:color .25s,background .25s}
+.form-section summary:hover{color:var(--text-primary,var(--text))}
+.form-section summary:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.form-section summary::-webkit-details-marker{display:none}
+.form-section summary .arrow{font-size:12px;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.form-section details[open] summary{color:var(--primary)}
+.form-section details[open] summary .arrow{transform:rotate(180deg)}
+.form-section[open] .section-body{animation:sectionFadeIn .25s ease}
+@keyframes sectionFadeIn{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)}}
+/* ===== Toggle switch ===== */
+.switch-row{display:flex;justify-content:space-between;align-items:center}
+.slider-toggle{width:48px;height:28px;border-radius:var(--radius-md);background:var(--border);cursor:pointer;position:relative;transition:all .3s;flex-shrink:0}
+.slider-toggle.on{background:var(--primary)}
+.slider-toggle:hover{transform:scale(1.04)}
+.slider-toggle:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.slider-toggle .knob{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15);transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.slider-toggle.on .knob{left:23px}
+.slider-toggle:active{transform:scale(.94)}
+
+
+
 .goal-card.color-border{border-left:4px solid var(--primary)}
 .checkin-note{font-size:10px;color:var(--text-tertiary);margin:4px 0 0;padding:3px 6px;background:var(--surface-soft);border-radius:4px;line-height:1.4}
 .form-actions{display:flex;gap:10px;margin-top:20px}
-.form-actions button{flex:1;padding:12px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .25s ease;border:none}
+.form-actions button{flex:1;padding:12px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .25s ease;border:none;position:relative;overflow:hidden}
+/* Button ripple */
+.form-actions button::after{content:'';position:absolute;left:50%;top:50%;width:100%;padding-bottom:100%;border-radius:50%;background:rgba(255,255,255,.22);transform:translate(-50%,-50%) scale(0);transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .35s;opacity:0;pointer-events:none}
+.form-actions button:active::after{transform:translate(-50%,-50%) scale(2.5);opacity:1;transition-duration:0s}
+.form-actions button:disabled::after{display:none}
 .btn-cancel{background:var(--surface-soft);color:var(--text-secondary)}
+.btn-cancel:hover{background:var(--border-light);color:var(--text)}
 .btn-save{background:var(--accent-gradient);color:#fff;box-shadow:var(--shadow-glow)}
 .btn-save:hover{transform:translateY(-1px)}
 .empty-state{text-align:center;padding:60px 20px}
 .empty-state .icon{font-size:48px;opacity:.4;margin-bottom:12px}
 .empty-state p{font-size:14px;color:var(--text-tertiary)}
+
+/* ===== Keyboard focus indicators ===== */
+.tab-item2:focus-visible,
+.checkin-btn:focus-visible,
+.fab:focus-visible,
+.goal-card:focus-visible,
+.manage-item:focus-visible,
+.mi-action:focus-visible,
+.icon-opt:focus-visible,
+.color-opt:focus-visible,
+.btn-cancel:focus-visible,
+.btn-save:focus-visible,
+.theme-trigger:focus-visible,
+.theme-option:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ===== Button active states ===== */
+.tab-item2:active,
+.goal-card:active,
+.manage-item:active,
+.mi-action:active,
+.icon-opt:active { transform: scale(.96); }
+.btn-cancel:active,
+.btn-save:active { transform: scale(.97); }
+
+/* ===== Disabled states ===== */
+.form-actions button:disabled,
+.btn-save:disabled,
+.btn-cancel:disabled { opacity: .5; cursor: not-allowed; pointer-events: none; }
+
+/* ===== Custom scrollbar ===== */
+.modal-sheet::-webkit-scrollbar { width: 4px; }
+.modal-sheet::-webkit-scrollbar-track { background: transparent; }
+.modal-sheet::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.modal-sheet::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* ===== Accessibility ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* ===== Accessibility ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+}
+/* ===== Responsive ===== */
+@media (max-width: 420px) {
+  .checkin-top { padding: 16px 14px 12px; }
+  .checkin-top h1 { font-size: 19px; }
+  .streak-row { padding: 0 14px; }
+  .goal-list { padding: 0 14px 120px; }
+  .tab-bar { padding: 0 14px 12px; }
+  .fab { right: 20px; bottom: 80px; }
+  .modal-sheet { padding: 20px 16px max(20px, env(safe-area-inset-bottom)); }
+  .ip-grid { grid-template-columns: repeat(3, 1fr); }
+  .color-strip { gap: 8px; }
+  .color-opt { width: 28px; height: 28px; }
+  .form-section-sch .section-body { padding: 0 14px 14px; }
+  .fgs-row { grid-template-columns: 1fr; gap: 8px; }
+}
 </style>
 </head>
 <body>
@@ -116,18 +287,18 @@
   <div class="status-bar">
     <span class="time">9:41</span>
     <span class="icons">
-      <span class="theme-trigger" onclick="toggleThemePanel(event)" title="切换主题">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span class="theme-trigger" tabindex="0" role="button" onclick="toggleThemePanel(event)" title="切换主题">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </span> 📶 🔋
     </span>
     <div class="theme-panel" id="themePanel">
-      <div class="theme-option" data-theme="white" onclick="setTheme('white')"><span class="swatch sw-white"></span><span>纯白</span><span class="check">✓</span></div>
-      <div class="theme-option" data-theme="dark" onclick="setTheme('dark')"><span class="swatch sw-dark"></span><span>深空</span><span class="check">✓</span></div>
-      <div class="theme-option" data-theme="warm" onclick="setTheme('warm')"><span class="swatch sw-warm"></span><span>暖阳</span><span class="check">✓</span></div>
-      <div class="theme-option" data-theme="aurora" onclick="setTheme('aurora')"><span class="swatch sw-aurora"></span><span>极光</span><span class="check">✓</span></div>
-      <div class="theme-option" data-theme="purple" onclick="setTheme('purple')"><span class="swatch sw-purple"></span><span>暗紫</span><span class="check">✓</span></div>
-      <div class="theme-option" data-theme="glass" onclick="setTheme('glass')"><span class="swatch sw-glass"></span><span>玻璃</span><span class="check">✓</span></div>
-      <div class="theme-option" data-theme="orangold" onclick="setTheme('orangold')"><span class="swatch sw-orangold"></span><span>橘金</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="white" onclick="setTheme('white')"><span class="swatch sw-white"></span><span>纯白</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="dark" onclick="setTheme('dark')"><span class="swatch sw-dark"></span><span>深空</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="warm" onclick="setTheme('warm')"><span class="swatch sw-warm"></span><span>暖阳</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="aurora" onclick="setTheme('aurora')"><span class="swatch sw-aurora"></span><span>极光</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="purple" onclick="setTheme('purple')"><span class="swatch sw-purple"></span><span>暗紫</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="glass" onclick="setTheme('glass')"><span class="swatch sw-glass"></span><span>玻璃</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="orangold" onclick="setTheme('orangold')"><span class="swatch sw-orangold"></span><span>橘金</span><span class="check">✓</span></div>
     </div>
   </div>
 
@@ -178,11 +349,11 @@
   <button class="fab" onclick="openGoalForm()" title="新建目标">+</button>
 
   <div class="bottom-tab" style="margin-top:0">
-    <a class="tab-item" href="home.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span><span>首页</span></a>
-    <a class="tab-item" href="schedule.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>计划</span></a>
-    <a class="tab-item active" href="checkin.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span><span>打卡</span></a>
-    <a class="tab-item" href="customer.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span>客户</span></a>
-    <a class="tab-item" href="profile.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>我的</span></a>
+    <a class="tab-item" href="home.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span><span>首页</span></a>
+    <a class="tab-item" href="schedule.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>计划</span></a>
+    <a class="tab-item active" href="checkin.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span><span>打卡</span></a>
+    <a class="tab-item" href="customer.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span>客户</span></a>
+    <a class="tab-item" href="profile.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>我的</span></a>
   </div>
 </div>
 
@@ -191,86 +362,199 @@
     <div class="modal-handle"></div>
     <div class="modal-title" id="formTitle">新建目标</div>
     <input type="hidden" id="editGoalId" value="">
-    <div class="form-group"><label>图标</label>
-      <div class="icon-picker" id="iconPicker">
-        <button class="icon-opt" data-icon="📖" onclick="pickIcon(this)">📖</button>
-        <button class="icon-opt" data-icon="🏃" onclick="pickIcon(this)">🏃</button>
-        <button class="icon-opt" data-icon="💧" onclick="pickIcon(this)">💧</button>
-        <button class="icon-opt" data-icon="🥦" onclick="pickIcon(this)">🥦</button>
-        <button class="icon-opt" data-icon="🧘" onclick="pickIcon(this)">🧘</button>
-        <button class="icon-opt" data-icon="🎯" onclick="pickIcon(this)">🎯</button>
-        <button class="icon-opt" data-icon="✍️" onclick="pickIcon(this)">✍️</button>
-        <button class="icon-opt" data-icon="🎨" onclick="pickIcon(this)">🎨</button>
-        <button class="icon-opt" data-icon="💪" onclick="pickIcon(this)">💪</button>
-        <button class="icon-opt" data-icon="🧠" onclick="pickIcon(this)">🧠</button>
-        <button class="icon-opt" data-icon="📝" onclick="pickIcon(this)">📝</button>
-        <button class="icon-opt" data-icon="☕" onclick="pickIcon(this)">☕</button>
-        <button class="icon-opt" data-icon="🌅" onclick="pickIcon(this)">🌅</button>
-        <button class="icon-opt" data-icon="🌙" onclick="pickIcon(this)">🌙</button>
-        <button class="icon-opt" data-icon="🎵" onclick="pickIcon(this)">🎵</button>
-        <button class="icon-opt" data-icon="🧹" onclick="pickIcon(this)">🧹</button>
-        <button class="icon-opt" data-icon="💰" onclick="pickIcon(this)">💰</button>
-        <button class="icon-opt active" data-icon="🎯" onclick="pickIcon(this)">🎯</button>
-      </div>
-    </div>
-    <div class="form-group"><label>目标名称</label><input type="text" id="gName" placeholder="习惯名称" maxlength="20"></div>
-    <div class="form-row">
-      <div class="form-group"><label>目标值</label>
-        <div class="num-unit-wrap">
-          <input type="number" id="gTarget" placeholder="次数" min="1" value="1">
-          <select id="gUnit"><option value="次">次</option><option value="杯">杯</option><option value="分钟">分钟</option><option value="公里">公里</option><option value="页">页</option><option value="个">个</option><option value="组">组</option><option value="自定义">自定义</option></select>
+
+    <!-- 卡1：基本设置 -->
+    <div class="form-card-schedule">
+      <div class="form-card-header">基本设置</div>
+      <div class="fgs-full">
+        <label class="fg-label">🎨 图标 <span class="required">*</span></label>
+        <div class="icon-preview-row" id="iconPreview" tabindex="0">
+          <div class="ip-badge" id="iconPreviewBadge" style="background:#5b5bd6">🎯</div>
+          <span class="ip-name" id="iconPreviewName">目标</span>
+          <span class="ip-arrow">›</span>
         </div>
       </div>
-      <div class="form-group"><label>分类</label>
-        <select id="gCategory"><option value="健康">健康</option><option value="学习">学习</option><option value="生活">生活</option><option value="工作">工作</option><option value="兴趣">兴趣</option></select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>打卡频率</label>
-        <div class="num-unit-wrap">
-          <input type="number" id="gFreqTarget" placeholder="次数" min="1" value="1" style="flex:1">
-          <select id="gFreqPeriod" style="flex:1.5">
-            <option value="daily">/每天</option>
-            <option value="weekly">/每周</option>
-            <option value="monthly">/每月</option>
-          </select>
+      <div class="fgs-full">
+        <label class="fg-label">📝 名称 <span class="required">*</span></label>
+        <div class="fg-input-wrap">
+          <input type="text" class="fg-input" id="gName" placeholder="如：每日跑步" maxlength="20">
+          <span class="focus-bar"></span>
         </div>
       </div>
-      <div class="form-group"><label>提醒时间</label><input type="time" id="gRemind" value="09:00"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>时间段</label>
-        <select id="gTimePeriod"><option value="all">全天</option><option value="morning">早上</option><option value="noon">中午</option><option value="afternoon">下午</option><option value="evening">晚上</option></select>
+      <div class="fgs-full">
+        <label class="fg-label">🎯 目标值</label>
+        <div class="fg-input-wrap" style="flex:1">
+          <input type="number" class="fg-input" id="gTarget" value="1" min="1" step="1">
+          <span class="focus-bar"></span>
+        </div>
       </div>
-      <div class="form-group"><label>开始日期</label><input type="date" id="gStartDate"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>结束日期</label><input type="date" id="gEndDate" placeholder="可选"></div>
-      <div class="form-group"><label>颜色标识</label>
-        <div class="color-picker" id="colorPicker">
-          <button class="color-opt" data-color="#5b5bd6" style="background:#5b5bd6" onclick="pickColor(this)"></button>
-          <button class="color-opt" data-color="#22b573" style="background:#22b573" onclick="pickColor(this)"></button>
-          <button class="color-opt" data-color="#f0a020" style="background:#f0a020" onclick="pickColor(this)"></button>
-          <button class="color-opt" data-color="#e85a5a" style="background:#e85a5a" onclick="pickColor(this)"></button>
-          <button class="color-opt" data-color="#f97316" style="background:#f97316" onclick="pickColor(this)"></button>
-          <button class="color-opt" data-color="#a855f7" style="background:#a855f7" onclick="pickColor(this)"></button>
-          <button class="color-opt active" data-color="#5b5bd6" style="background:#5b5bd6" onclick="pickColor(this)"></button>
-          <button class="color-opt" data-color="#06b6d4" style="background:#06b6d4" onclick="pickColor(this)"></button>
+      <input type="hidden" id="gUnit" value="次">
+      <div class="fgs-row mt-10">
+        <div>
+          <label class="fg-label">🏷️ 分类</label>
+          <div class="fg-input-wrap">
+            <select class="fg-select" id="gCategory">
+              <option value="健康">健康</option><option value="学习">学习</option><option value="工作">工作</option><option value="生活">生活</option>
+            </select>
+            <span class="focus-bar"></span>
+          </div>
         </div>
       </div>
     </div>
-    <div class="form-group"><label>目标描述</label><textarea id="gDesc" placeholder="详细描述这个目标，为什么要坚持？计划怎么做？" maxlength="200" style="min-height:50px"></textarea></div>
-    <details class="form-section">
-      <summary>更多设置</summary>
-      <div class="form-group"><label>激励语</label><textarea id="gMotto" placeholder="给自己打气的一句话..." maxlength="50"></textarea></div>
-      <div class="form-group" style="display:flex;align-items:center;gap:10px">
-        <label style="margin-bottom:0;cursor:pointer">允许补卡</label>
-        <input type="checkbox" id="gAllowBackfill" checked style="width:auto;margin:0;accent-color:var(--primary)">
+
+    <!-- 卡2：目标设置 -->
+    <div class="form-card-schedule">
+      <div class="form-card-header">目标设置</div>
+      <div class="fgs-full">
+        <label class="fg-label">📖 目标描述</label>
+        <div class="fg-input-wrap">
+          <textarea class="fg-input" id="gDesc" rows="3" placeholder="写下你的目标…" style="resize:vertical;min-height:60px" maxlength="200"></textarea>
+          <span class="focus-bar"></span>
+        </div>
       </div>
-    </details>
-    <div class="form-actions">
-      <button class="btn-cancel" onclick="closeGoalForm()" type="button">取消</button>
-      <button class="btn-save" onclick="saveGoal()" type="button">保存</button>
+      <div class="fgs-full">
+        <label class="fg-label">💪 激励语</label>
+        <div class="fg-input-wrap">
+          <input type="text" class="fg-input" id="gMotto" placeholder="给自己的鼓励" maxlength="50">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡3：时间与外观 -->
+    <div class="form-card-schedule">
+      <div class="form-card-header">时间与外观</div>
+      <div class="fgs-row">
+        <div>
+          <label class="fg-label">🔄 频率</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <div class="fg-input-wrap" style="flex:1">
+              <input type="number" class="fg-input" id="gFreqTarget" value="1" min="1" step="1">
+              <span class="focus-bar"></span>
+            </div>
+            <div class="fg-input-wrap" style="flex:1.5">
+              <select class="fg-select" id="gFreqPeriod">
+                <option value="daily">/每天</option><option value="weekly">/每周</option><option value="monthly">/每月</option>
+              </select>
+              <span class="focus-bar"></span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="fg-label">🕐 时间段</label>
+          <div class="fg-input-wrap">
+            <select class="fg-select" id="gTimePeriod">
+              <option value="all">全天</option><option value="morning">早上</option><option value="noon">中午</option><option value="afternoon">下午</option><option value="evening">晚上</option>
+            </select>
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+      </div>
+      <div class="fgs-row mt-10">
+        <div>
+          <label class="fg-label">🔔 提醒时间</label>
+          <div class="fg-input-wrap">
+            <input type="time" class="fg-input" id="gRemind" value="09:00">
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+        <div>
+          <label class="fg-label">📅 开始日期</label>
+          <div class="fg-input-wrap">
+            <input type="date" class="fg-input" id="gStartDate">
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+      </div>
+      <div class="fgs-full">
+        <label class="fg-label">🎨 颜色标识</label>
+        <div class="color-strip">
+          <button class="color-opt active" data-color="#5b5bd6" style="background:#5b5bd6" onclick="pickColor(this)" aria-label="靛蓝色 #5b5bd6"></button>
+          <button class="color-opt" data-color="#22b573" style="background:#22b573" onclick="pickColor(this)" aria-label="绿色 #22b573"></button>
+          <button class="color-opt" data-color="#f0a020" style="background:#f0a020" onclick="pickColor(this)" aria-label="金色 #f0a020"></button>
+          <button class="color-opt" data-color="#e85a5a" style="background:#e85a5a" onclick="pickColor(this)" aria-label="红色 #e85a5a"></button>
+          <button class="color-opt" data-color="#f97316" style="background:#f97316" onclick="pickColor(this)" aria-label="橙色 #f97316"></button>
+          <button class="color-opt" data-color="#a855f7" style="background:#a855f7" onclick="pickColor(this)" aria-label="紫色 #a855f7"></button>
+          <button class="color-opt" data-color="#06b6d4" style="background:#06b6d4" onclick="pickColor(this)" aria-label="青色 #06b6d4"></button>
+          <button class="color-opt" data-color="#6366f1" style="background:#6366f1" onclick="pickColor(this)" aria-label="宝蓝色 #6366f1"></button>
+        </div>
+      </div>
+      <div class="fgs-full">
+        <div class="switch-row">
+          <label class="fg-label" style="margin-bottom:0">✅ 允许补卡</label>
+          <div class="slider-toggle on" id="backfillToggle" tabindex="0" role="switch" aria-checked="true">
+            <div class="knob"></div>
+          </div>
+        </div>
+        <input type="hidden" id="gAllowBackfill" value="true">
+      </div>
+    </div>
+
+    <!-- 更多设置（折叠） -->
+    <div class="form-section-sch">
+      <details>
+        <summary><span class="arrow">▼</span> 更多设置</summary>
+        <div class="section-body">
+          <div class="fgs-row">
+            <div>
+              <label class="fg-label">📅 结束日期</label>
+              <div class="fg-input-wrap">
+                <input type="date" class="fg-input" id="gEndDate">
+                <span class="focus-bar"></span>
+              </div>
+            </div>
+            <div>
+              <label class="fg-label">🔔 第二提醒</label>
+              <div class="fg-input-wrap">
+                <input type="time" class="fg-input">
+                <span class="focus-bar"></span>
+              </div>
+            </div>
+          </div>
+          <div class="fgs-full">
+            <label class="fg-label">💬 备注</label>
+            <div class="fg-input-wrap">
+              <textarea class="fg-input" rows="3" placeholder="可选备注…" style="resize:vertical;min-height:60px"></textarea>
+              <span class="focus-bar"></span>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeGoalForm()" type="button">取消</button>
+      <button class="btn-primary" onclick="saveGoal()" type="button">保存打卡</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 图标选择器全屏弹窗 ========== -->
+<div class="ip-overlay" id="iconOverlay">
+  <div class="ip-modal">
+    <div class="ip-modal-header">
+      <h3>🎨 选择图标</h3>
+      <button class="ip-modal-close" id="iconClose">✕</button>
+    </div>
+    <div class="ip-grid" id="iconGrid">
+      <div class="ip-item" tabindex="0" data-icon="🏃" data-name="跑步" data-color="#6366f1"><div class="ip-ico" style="background:#6366f1">🏃</div><span class="ip-txt">跑步</span></div>
+      <div class="ip-item" tabindex="0" data-icon="📚" data-name="阅读" data-color="#ef4444"><div class="ip-ico" style="background:#ef4444">📚</div><span class="ip-txt">阅读</span></div>
+      <div class="ip-item" tabindex="0" data-icon="💪" data-name="健身" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">💪</div><span class="ip-txt">健身</span></div>
+      <div class="ip-item" tabindex="0" data-icon="🧘" data-name="冥想" data-color="#10b981"><div class="ip-ico" style="background:#10b981">🧘</div><span class="ip-txt">冥想</span></div>
+      <div class="ip-item" tabindex="0" data-icon="✍️" data-name="写作" data-color="#06b6d4"><div class="ip-ico" style="background:#06b6d4">✍️</div><span class="ip-txt">写作</span></div>
+      <div class="ip-item" tabindex="0" data-icon="💧" data-name="喝水" data-color="#3b82f6"><div class="ip-ico" style="background:#3b82f6">💧</div><span class="ip-txt">喝水</span></div>
+      <div class="ip-item" tabindex="0" data-icon="🥗" data-name="健康饮食" data-color="#22c55e"><div class="ip-ico" style="background:#22c55e">🥗</div><span class="ip-txt">健康饮食</span></div>
+      <div class="ip-item" tabindex="0" data-icon="🧠" data-name="脑力" data-color="#a855f7"><div class="ip-ico" style="background:#a855f7">🧠</div><span class="ip-txt">脑力</span></div>
+      <div class="ip-item" tabindex="0" data-icon="🧹" data-name="整理" data-color="#f97316"><div class="ip-ico" style="background:#f97316">🧹</div><span class="ip-txt">整理</span></div>
+      <div class="ip-item" tabindex="0" data-icon="🎯" data-name="目标" data-color="#ec4899"><div class="ip-ico" style="background:#ec4899">🎯</div><span class="ip-txt">目标</span></div>
+      <div class="ip-item" tabindex="0" data-icon="🎵" data-name="音乐" data-color="#8b5cf6"><div class="ip-ico" style="background:#8b5cf6">🎵</div><span class="ip-txt">音乐</span></div>
+      <div class="ip-item" tabindex="0" data-icon="📷" data-name="摄影" data-color="#14b8a6"><div class="ip-ico" style="background:#14b8a6">📷</div><span class="ip-txt">摄影</span></div>
+      <div class="ip-item" tabindex="0" data-icon="🌄" data-name="早起" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">🌄</div><span class="ip-txt">早起</span></div>
+      <div class="ip-item" tabindex="0" data-icon="📝" data-name="日记" data-color="#6366f1"><div class="ip-ico" style="background:#6366f1">📝</div><span class="ip-txt">日记</span></div>
+      <div class="ip-item" tabindex="0" data-icon="👨‍💻" data-name="编程" data-color="#3b82f6"><div class="ip-ico" style="background:#3b82f6">👨‍💻</div><span class="ip-txt">编程</span></div>
+      <div class="ip-item" tabindex="0" data-icon="🌱" data-name="习惯" data-color="#22c55e"><div class="ip-ico" style="background:#22c55e">🌱</div><span class="ip-txt">习惯</span></div>
+      <div class="ip-item" tabindex="0" data-icon="❤️" data-name="关爱" data-color="#ef4444"><div class="ip-ico" style="background:#ef4444">❤️</div><span class="ip-txt">关爱</span></div>
+      <div class="ip-item" tabindex="0" data-icon="💰" data-name="理财" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">💰</div><span class="ip-txt">理财</span></div>
     </div>
   </div>
 </div>
@@ -286,7 +570,7 @@
   function records(){return ld(RK)||{}}
   function saveRecords(r){sd(RK,r)}
 
-  var T=new Date(),icons=['📖','🏃','💧','🥦','🧘','🎯','✍️','🎨','💪','🧠','📝','☕','🌅','🌙','🎵','🧹','💰','🗓️'];
+  var T=new Date();
   function fm(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
   function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
   var today=fm(T);
@@ -328,7 +612,7 @@
       var borderCol=g.color||'#5b5bd6';
       var nk='know_checkin_notes',notes=ld(nk)||{};
       var todayNote=notes[g.id]&&notes[g.id][today]||'';
-      html+='<div class="goal-card color-border" data-id="'+g.id+'" style="border-left-color:'+borderCol+'">';
+      html+='<div class="goal-card color-border" tabindex="0" data-id="'+g.id+'" style="border-left-color:'+borderCol+'">';
       html+='<div class="g-header"><span class="g-icon">'+g.icon+'</span><span class="g-name">'+g.name+'</span><span class="g-badge" style="background:'+borderCol+'22;color:'+borderCol+'">';
       if(g.freqPeriod&&g.freqTarget>1){html+=g.freqTarget+'/'+({daily:'天',weekly:'周',monthly:'月'}[g.freqPeriod]||'天')}
       else if(g.freqPeriod){html+=g.freqPeriod==='daily'?'每天':(g.freqPeriod==='weekly'?'每周':'每月')}
@@ -348,9 +632,15 @@
       });
       html+='</div>';
       html+='<button class="checkin-btn'+(checkedToday?' checked':'')+'" onclick="toggleCheckin(\''+g.id+'\')">'+(checkedToday?'✓':'○')+'</button>';
-      html+='</div></div>';
+      html+='<div class="delete-overlay" onclick="event.stopPropagation();archiveGoal(\''+g.id+'\')">结束</div></div></div>';
     });
     list.innerHTML=html;
+    document.querySelectorAll('.goal-card').forEach(function(c){
+      var sx=0,cx=0;
+      c.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+      c.addEventListener('touchmove',function(e){cx=e.touches[0].clientX;var d=sx-cx;if(d>10){c.classList.add('swiping')}else if(d<-10){c.classList.remove('swiping')}},{passive:true});
+      c.addEventListener('touchend',function(){cx=0},{passive:true})
+    });
     updateStats();
   }
 
@@ -366,14 +656,14 @@
       if(notes[id])delete notes[id][today];
     } else {
       recs[id].push(today);
-      var note=prompt('✏️ 打卡备注（可选，直接确定可跳过）','');
-      if(note!==null&&note.trim()){if(!notes[id])notes[id]={};notes[id][today]=note.trim()}
+      var note='';
+      if(!notes[id])notes[id]={};notes[id][today]=note;
     }
     saveRecords(recs);
     sd(nk,notes);
     var curTab=document.querySelector('.tab-item2.active');
     if(curTab&&curTab.getAttribute('data-tab')==='checkin')renderCheckin();
-    else{switchTab('checkin')}
+    else{switchTab('checkin');renderCheckin()}
     if(curTab&&curTab.getAttribute('data-tab')==='stats')renderStats();
   }
   window.toggleCheckin=toggleCheckin;
@@ -437,7 +727,7 @@
     function renderList(arr,isArchived){
       if(arr.length===0)return '<div style="text-align:center;padding:30px;color:var(--text-tertiary);font-size:13px">暂无</div>';
       var h='';arr.forEach(function(g){
-        h+='<div class="manage-item'+(isArchived?' archived':'')+'" onclick="editGoal(\''+g.id+'\')">';
+        h+='<div class="manage-item'+(isArchived?' archived':'')+'" tabindex="0" onclick="editGoal(\''+g.id+'\')">';
         h+='<span class="mi-icon">'+g.icon+'</span><div class="mi-info"><div class="mi-name">'+g.name+'</div><div class="mi-sub">'+(g.freqPeriod?({daily:'每天',weekly:'每周',monthly:'每月'}[g.freqPeriod]||'每天'):(g.repeat==='weekday'?'工作日':'每天'))+' · '+(g.category||'健康')+' · '+(g.target||1)+(g.unit||'次')+'/天'+(g.endDate?' · 截止'+g.endDate:'')+' · 创建于'+g.created+'</div></div>';
         if(!isArchived)h+='<button class="mi-action" onclick="event.stopPropagation();archiveGoal(\''+g.id+'\')">结束</button>';
         else h+='<button class="mi-action" onclick="event.stopPropagation();archiveGoal(\''+g.id+'\')" style="background:var(--primary-soft);color:var(--primary)">恢复</button>';
@@ -452,7 +742,9 @@
   function archiveGoal(id){
     var gs=goals();
     for(var i=0;i<gs.length;i++){if(gs[i].id===id){gs[i].archived=!gs[i].archived;break}}
-    saveGoals(gs);renderManage();
+    saveGoals(gs);
+    if(document.querySelector('.tab-item2.active')?.getAttribute('data-tab')==='manage'){renderManage()}
+    else{renderCheckin()}
   }
   window.archiveGoal=archiveGoal;
 
@@ -481,18 +773,67 @@
     document.getElementById('gEndDate').value=editData?editData.endDate||'':'';
     document.getElementById('gDesc').value=editData?editData.desc||'':'';
     document.getElementById('gMotto').value=editData?editData.motto:'';
-    document.getElementById('gAllowBackfill').checked=editData?editData.allowBackfill!==false:true;
-    document.querySelectorAll('.icon-opt').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-icon')===(editData?editData.icon:'🎯'))});
+    /* Sync slider-toggle for backfill */
+    var bf=editData?editData.allowBackfill!==false:true;
+    document.getElementById('backfillToggle').classList.toggle('on',bf);
+    document.getElementById('backfillToggle').setAttribute('aria-checked',bf);
+    document.getElementById('gAllowBackfill').value=bf?'true':'false';
+    /* Sync icon preview */
+    curIcon=editData?editData.icon||'🎯':'🎯';
+    curName=editData?editData.name||'目标':'目标';
+    curColor=editData?editData.color||'#5b5bd6':'#5b5bd6';
+    document.getElementById('iconPreviewBadge').style.background=curColor;
+    document.getElementById('iconPreviewBadge').textContent=curIcon;
+    document.getElementById('iconPreviewName').textContent=curName;
+    /* Active state in overlay grid */
+    document.querySelectorAll('#iconGrid .ip-item').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-icon')===curIcon)});
     document.querySelectorAll('.color-opt').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-color')===(editData?editData.color||'#5b5bd6':'#5b5bd6'))});
     document.getElementById('formOverlay').classList.add('open');
   }
   window.openGoalForm=openGoalForm;
 
-  function pickIcon(el){
-    document.querySelectorAll('.icon-opt').forEach(function(b){b.classList.remove('active')});
-    el.classList.add('active');
-  }
-  window.pickIcon=pickIcon;
+  /* ===== Icon picker overlay ===== */
+  var overlay=document.getElementById('iconOverlay');
+  var preview=document.getElementById('iconPreview');
+  var closeBtn=document.getElementById('iconClose');
+  var curIcon='🎯',curName='目标',curColor='#5b5bd6';
+
+  preview.addEventListener('click',function(){overlay.classList.add('open')});
+  preview.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();overlay.classList.add('open')}});
+  closeBtn.addEventListener('click',function(){overlay.classList.remove('open')});
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.classList.remove('open')});
+
+  document.querySelectorAll('#iconGrid .ip-item').forEach(function(item){
+    item.addEventListener('click',function(){
+      document.querySelectorAll('#iconGrid .ip-item').forEach(function(i){i.classList.remove('active')});
+      item.classList.add('active');
+      curIcon=item.getAttribute('data-icon');
+      curName=item.getAttribute('data-name');
+      curColor=item.getAttribute('data-color');
+      overlay.classList.remove('open');
+      var badge=document.getElementById('iconPreviewBadge');
+      var name=document.getElementById('iconPreviewName');
+      badge.style.background=curColor;
+      badge.textContent=curIcon;
+      name.textContent=curName;
+    });
+    item.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();item.click()}
+    });
+  });
+
+  /* ===== Slider-toggle ===== */
+  var backfillToggle=document.getElementById('backfillToggle');
+  var backfillInput=document.getElementById('gAllowBackfill');
+  backfillToggle.addEventListener('click',function(){
+    backfillToggle.classList.toggle('on');
+    var checked=backfillToggle.classList.contains('on');
+    backfillToggle.setAttribute('aria-checked',checked);
+    backfillInput.value=checked?'true':'false';
+  });
+  backfillToggle.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();backfillToggle.click()}
+  });
   function pickColor(el){
     document.querySelectorAll('.color-opt').forEach(function(b){b.classList.remove('active')});
     el.classList.add('active');
@@ -524,11 +865,10 @@
     var endDate=document.getElementById('gEndDate').value||'';
     var desc=document.getElementById('gDesc').value.trim();
     var motto=document.getElementById('gMotto').value.trim();
-    var allowBackfill=document.getElementById('gAllowBackfill').checked;
-    var iconEl=document.querySelector('.icon-opt.active');
-    var icon=iconEl?iconEl.getAttribute('data-icon'):'🎯';
+    var icon=curIcon||'🎯';
     var colorEl=document.querySelector('.color-opt.active');
     var color=colorEl?colorEl.getAttribute('data-color'):'#5b5bd6';
+    var allowBackfill=document.getElementById('gAllowBackfill').value==='true';
     if(!name){alert('请输入目标名称');return}
     if(!startDate){startDate=today}
     var gs=goals();
