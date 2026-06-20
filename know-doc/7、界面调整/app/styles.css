@@ -37,6 +37,7 @@
   --success:        #22b573;
   --warning:        #f0a020;
   --danger:         #e85a5a;
+  --mc2:            #3b82f6;
   --success-soft:   #e8f5ee;
   --warning-soft:   #fff8ed;
   --danger-soft:    #fef0f0;
@@ -52,6 +53,7 @@
   --font-mono: 'SF Mono', 'Menlo', 'Cascadia Code', monospace;
 
   /* 圆角 — 统一圆润 */
+  --radius-xs:   4px;
   --radius-sm:   8px;
   --radius-md:   14px;
   --radius-lg:   20px;
@@ -333,7 +335,7 @@ html[data-theme="orangold"] {
 /* ===== 表单组件 Scrollbar ===== */
 .form-card-schedule::-webkit-scrollbar,
 .form-section-sch::-webkit-scrollbar,
-.ip-modal::-webkit-scrollbar { width: 3px; }
+.ip-modal::-webkit-scrollbar { width: 4px; }
 .form-card-schedule::-webkit-scrollbar-track,
 .form-section-sch::-webkit-scrollbar-track,
 .ip-modal::-webkit-scrollbar-track { background: transparent; }

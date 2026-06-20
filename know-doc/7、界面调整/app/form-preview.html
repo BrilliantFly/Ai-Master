@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN" data-theme="white">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -56,6 +56,7 @@ body {
   display: grid; place-items: center; transition: all 0.2s;
 }
 .preview-header button:hover { background: var(--primary); color: #fff; transform: scale(1.05); }
+.preview-header button:active { transform: scale(.92); }
 .preview-header button:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
@@ -64,14 +65,15 @@ body {
 .tab-bar {
   display: flex;
   background: var(--bg-secondary, var(--surface-soft));
-  margin: 0 20px 8px; border-radius: 10px; padding: 3px;
+  margin: 0 20px 8px; border-radius: var(--radius-sm); padding: 3px;
   position: sticky; top: 60px; z-index: 99;
 }
 .tab-bar button {
-  flex: 1; padding: 9px 0; border: none; border-radius: 8px;
+  flex: 1; padding: 9px 0; border: none; border-radius: var(--radius-sm);
   background: transparent; color: var(--text-secondary);
   font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.25s;
 }
+.tab-bar button:hover { color: var(--primary); }
 .tab-bar button.active {
   background: var(--bg-card, var(--card-bg, var(--surface)));
   color: var(--primary); font-weight: 600;
@@ -100,7 +102,7 @@ body {
 
 .form-card-schedule {
   background: var(--bg-card, var(--card-bg, var(--surface)));
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--card-shadow, var(--shadow-sm));
   padding: 18px 18px 20px; margin-bottom: 14px;
   transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
@@ -111,6 +113,7 @@ body {
   box-shadow: 0 4px 20px var(--card-hover-shadow, rgba(0,0,0,.1));
 }
 .form-card-schedule:active { transform: translateY(0); }
+.form-card-schedule:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* stagger 入场 */
 .form-card-schedule:nth-child(1) { animation-delay: 0s; }
@@ -143,7 +146,7 @@ body {
   color: var(--text-secondary); margin-bottom: 5px;
   letter-spacing: 0.2px;
 }
-.fg-label .required { color: #ef4444; font-size: 15px; line-height: 1; }
+.fg-label .required { color: var(--danger); font-size: 15px; line-height: 1; }
 
 /* ========== input 包裹层（聚焦竖线） ========== */
 .fg-input-wrap {
@@ -185,7 +188,7 @@ body {
 .fg-input, .fg-select {
   width: 100%; padding: 10px 13px;
   border: 1.5px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--input-bg);
   color: var(--text-primary, var(--text));
   font-size: 14px;
@@ -196,6 +199,9 @@ body {
 .fg-input:hover, .fg-select:hover {
   border-color: var(--input-border-hover, #c8ccd8);
   background: var(--input-bg-hover);
+}
+.fg-input:active, .fg-select:active {
+  border-color: var(--text-primary, var(--text));
 }
 .fg-input:focus, .fg-select:focus {
   border-color: var(--primary);
@@ -226,8 +232,6 @@ input[type=number]::-webkit-outer-spin-button {
 
 /* ========== 行容器 ========== */
 .fgs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.fgs-row-3 { grid-template-columns: 1fr 1fr 1fr; }
-.fgs-row-4 { grid-template-columns: repeat(4, 1fr); }
 .fgs-full { margin-top: 10px; }
 .mt-10 { margin-top: 10px; }
 .fgs-row.mt-10 { margin-top: 10px; }
@@ -245,7 +249,7 @@ input[type=number]::-webkit-outer-spin-button {
 /* ========== 四象限 ========== */
 .quad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .quad-option {
-  padding: 8px 6px; border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 8px 6px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
   text-align: center; font-size: 12px; cursor: pointer;
   transition: all 0.2s; background: var(--input-bg);
   color: var(--text-secondary); font-weight: 500;
@@ -261,7 +265,7 @@ input[type=number]::-webkit-outer-spin-button {
 .check-chip {
   position: relative;
   display: flex; align-items: center; justify-content: center;
-  padding: 9px 4px; border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 9px 4px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
   background: var(--input-bg); cursor: pointer;
   font-size: 12px; color: var(--text-secondary); font-weight: 500;
   transition: all 0.2s;
@@ -305,17 +309,17 @@ input[type=number]::-webkit-outer-spin-button {
 }
 .subtask-row .fg-input { flex: 1; }
 .subtask-del {
-  width: 32px; height: 32px; border: none; border-radius: 8px;
+  width: 32px; height: 32px; border: none; border-radius: var(--radius-sm);
   background: var(--bg-secondary, var(--surface-soft));
   color: var(--text-tertiary); font-size: 16px; cursor: pointer;
   display: grid; place-items: center; transition: all 0.2s; flex-shrink: 0;
 }
-.subtask-del:hover { background: #fee2e2; color: #ef4444; }
+.subtask-del:hover { background: var(--danger-soft); color: var(--danger); }
 .subtask-del:active { transform: scale(.88); }
 .subtask-del:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 .btn-add-sub {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: 8px;
+  padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm);
   background: transparent; color: var(--text-tertiary);
   font-size: 12px; font-weight: 500; cursor: pointer;
   transition: all 0.2s; margin-top: 2px; width: fit-content;
@@ -323,16 +327,22 @@ input[type=number]::-webkit-outer-spin-button {
 .btn-add-sub:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-alpha, rgba(var(--primary-rgb), .04)); gap: 7px; }
 .btn-add-sub:active { transform: scale(.96); }
 .btn-add-sub:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.subtask-count {
+  font-size: 12px; color: var(--text-tertiary);
+  font-weight: 500; transition: opacity 0.2s;
+}
 
 /* ========== 折叠更多 ========== */
 .form-section-sch {
   background: var(--bg-card, var(--card-bg, var(--surface)));
-  border-radius: 12px; box-shadow: var(--card-shadow, var(--shadow-sm));
+  border-radius: var(--radius-md); box-shadow: var(--card-shadow, var(--shadow-sm));
   overflow: hidden; margin-bottom: 14px;
   animation: cardSlideIn 0.4s ease both;
   animation-delay: 0.24s;
 }
-.form-section-sch details { transition: all 0.3s; }
+.form-section-sch details {
+  interpolate-size: allow-keywords;
+}
 .form-section-sch summary {
   display: flex; align-items: center; gap: 8px;
   padding: 14px 18px; cursor: pointer;
@@ -340,6 +350,9 @@ input[type=number]::-webkit-outer-spin-button {
   list-style: none; -webkit-user-select: none; user-select: none;
   transition: color 0.25s, background 0.25s;
 }
+.form-section-sch summary:hover { background: var(--primary-alpha, rgba(var(--primary-rgb), .04)); }
+.form-section-sch summary:active { transform: scale(.99); }
+.form-section-sch summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 .form-section-sch summary::-webkit-details-marker { display: none; }
 .form-section-sch summary .arrow {
   font-size: 12px;
@@ -350,15 +363,26 @@ input[type=number]::-webkit-outer-spin-button {
   background: var(--primary-alpha, rgba(var(--primary-rgb), .04));
 }
 .form-section-sch details[open] summary .arrow { transform: rotate(180deg); }
-.form-section-sch .section-body { padding: 0 18px 18px; }
-
+.form-section-sch details .section-body {
+  padding: 0 18px;
+  opacity: 0;
+  transition: opacity 0.35s ease, padding 0.35s ease;
+}
+.form-section-sch details[open] .section-body {
+  opacity: 1;
+  padding: 0 18px 18px;
+}
+@keyframes sectionFadeIn {
+  0%   { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
 /* ========== 按钮 ========== */
 .btn-row {
   display: flex; gap: 12px; margin-top: 24px;
   padding-top: 14px; border-top: 1px solid var(--border);
 }
 .btn-primary, .btn-secondary {
-  flex: 1; padding: 13px 0; border: none; border-radius: 10px;
+  flex: 1; padding: 13px 0; border: none; border-radius: var(--radius-sm);
   font-size: 15px; font-weight: 600; cursor: pointer;
   transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
   position: relative; overflow: hidden;
@@ -412,14 +436,14 @@ input[type=number]::-webkit-outer-spin-button {
 .icon-preview-row {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 12px; border: 1.5px solid var(--border);
-  border-radius: 8px; background: var(--input-bg);
+  border-radius: var(--radius-sm); background: var(--input-bg);
   cursor: pointer; transition: all 0.22s;
 }
 .icon-preview-row:hover { border-color: var(--input-border-hover, #c8ccd8); background: var(--input-bg-hover); }
 .icon-preview-row:active { transform: scale(.98); }
 .icon-preview-row:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; border-color: var(--primary); }
 .icon-preview-row .ip-badge {
-  width: 40px; height: 40px; border-radius: 10px;
+  width: 40px; height: 40px; border-radius: var(--radius-sm);
   display: grid; place-items: center; font-size: 22px;
   flex-shrink: 0; color: #fff;
 }
@@ -437,7 +461,7 @@ input[type=number]::-webkit-outer-spin-button {
   position: fixed; left: 0; bottom: 0;
   width: 100%; max-height: 68vh; z-index: 1001;
   background: var(--bg-card, var(--card-bg, var(--surface)));
-  border-radius: 20px 20px 0 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   padding: 20px 20px 32px;
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
@@ -454,12 +478,13 @@ input[type=number]::-webkit-outer-spin-button {
   color: var(--text-secondary); transition: all 0.2s;
 }
 .ip-modal-close:hover { background: var(--border); color: var(--text-primary, var(--text)); }
+.ip-modal-close:active { transform: scale(.88); }
 .ip-modal-close:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 
 .ip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .ip-item {
   display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 12px 4px; border: 1.5px solid transparent; border-radius: 10px;
+  padding: 12px 4px; border: 1.5px solid transparent; border-radius: var(--radius-sm);
   cursor: pointer; transition: all 0.2s;
   background: var(--bg-secondary, var(--surface-soft));
 }
@@ -467,7 +492,7 @@ input[type=number]::-webkit-outer-spin-button {
 .ip-item:active { transform: scale(.94); }
 .ip-item:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 .ip-item .ip-ico {
-  width: 40px; height: 40px; border-radius: 10px;
+  width: 40px; height: 40px; border-radius: var(--radius-sm);
   display: grid; place-items: center; font-size: 22px; color: #fff;
 }
 .ip-item .ip-txt { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
@@ -489,7 +514,7 @@ input[type=number]::-webkit-outer-spin-button {
 .color-dot.active {
   border-color: var(--text-primary, var(--text));
   transform: scale(1.08);
-  box-shadow: 0 0 0 3px rgba(255,255,255,.8), 0 2px 8px rgba(0,0,0,.2);
+  box-shadow: 0 0 0 3px var(--bg-card, var(--surface)), 0 2px 8px rgba(0,0,0,.2);
 }
 .color-dot.active::after {
   content: '✓'; position: absolute; inset: 0;
@@ -497,16 +522,18 @@ input[type=number]::-webkit-outer-spin-button {
   font-size: 16px; font-weight: 700;
   color: #fff;
   mix-blend-mode: exclusion;
+  text-shadow: 0 0 3px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.2);
 }
 
 /* ========== 开关 ========== */
 .switch-row { display: flex; justify-content: space-between; align-items: center; }
 .slider-toggle {
-  width: 48px; height: 28px; border-radius: 14px;
+  width: 48px; height: 28px; border-radius: var(--radius-md);
   background: var(--border); cursor: pointer;
   position: relative; transition: all 0.3s; flex-shrink: 0;
 }
 .slider-toggle.on { background: var(--primary); }
+.slider-toggle:hover { transform: scale(1.04); }
 .slider-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .slider-toggle .knob {
   position: absolute; top: 3px; left: 3px;
@@ -583,7 +610,6 @@ html[data-theme="orangold"] .form-section-sch {
   .form-card-schedule { padding: 14px 14px 16px; }
   .form-card-header { font-size: 12px; }
   .fgs-row { grid-template-columns: 1fr; gap: 8px; }
-  .fgs-row-4 { grid-template-columns: repeat(2, 1fr); }
   .check-grid { grid-template-columns: repeat(2, 1fr); }
   .form-section-sch .section-body { padding: 0 14px 14px; }
   .ip-grid { grid-template-columns: repeat(3, 1fr); }
@@ -763,7 +789,10 @@ html[data-theme="orangold"] .form-section-sch {
               <button class="subtask-del" onclick="removeSubtask(this)">✕</button>
             </div>
           </div>
-          <button class="btn-add-sub" id="addSubtask">＋ 添加子任务</button>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
+            <button class="btn-add-sub" id="addSubtask">＋ 添加子任务</button>
+            <span class="subtask-count" id="subtaskCount">2 项</span>
+          </div>
         </div>
 
         <div class="fgs-full">
@@ -1025,10 +1054,17 @@ document.querySelectorAll('.quad-option').forEach(el => {
 });
 
 // ========== 子任务 ==========
+function updateSubtaskCount() {
+  const list = document.getElementById('subtaskList');
+  const cnt = document.getElementById('subtaskCount');
+  if (!list || !cnt) return;
+  const n = list.querySelectorAll('.subtask-row').length;
+  cnt.textContent = n + ' 项';
+}
 function removeSubtask(btn) {
   const row = btn.closest('.subtask-row');
   row.classList.add('removing');
-  setTimeout(() => row.remove(), 200);
+  setTimeout(() => { row.remove(); updateSubtaskCount(); }, 200);
 }
 
 document.getElementById('addSubtask')?.addEventListener('click', () => {
@@ -1046,6 +1082,7 @@ document.getElementById('addSubtask')?.addEventListener('click', () => {
   del.onclick = function () { removeSubtask(this); };
   row.append(wrap, del);
   list.appendChild(row);
+  updateSubtaskCount();
   row.querySelector('.fg-input').focus();
 });
 
@@ -1119,11 +1156,11 @@ document.querySelectorAll('.slider-toggle').forEach(tog => {
 // ========== 主题切换 ==========
 document.getElementById('themeToggle')?.addEventListener('click', () => {
   const html = document.documentElement;
-  const themes = ['light', 'dark', 'warm'];
-  const cur = html.getAttribute('data-theme') || 'light';
+  const themes = ['white', 'dark', 'warm', 'aurora', 'purple', 'glass', 'orangold'];
+  const cur = html.getAttribute('data-theme') || 'white';
   const next = themes[(themes.indexOf(cur) + 1) % themes.length];
   html.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
+  localStorage.setItem('know-theme', next);
 });
 
 // 初始化默认选中第一个图标
