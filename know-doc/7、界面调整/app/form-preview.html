@@ -36,6 +36,7 @@ html {
 body {
   min-height: 100vh;
   padding-bottom: env(safe-area-inset-bottom);
+  overscroll-behavior: contain;
 }
 
 /* ========== 顶栏 + Tab ========== */
@@ -53,9 +54,9 @@ body {
   width: 36px; height: 36px; border: none; border-radius: 50%;
   background: var(--bg-secondary, var(--surface-soft));
   color: var(--text-secondary); font-size: 18px; cursor: pointer;
-  display: grid; place-items: center; transition: all 0.2s;
+  display: grid; place-items: center; transition: background 0.2s, transform 0.2s;
 }
-.preview-header button:hover { background: var(--primary); color: #fff; transform: scale(1.05); }
+.preview-header button:hover { background: var(--primary); color: var(--text-inverse); transform: scale(1.05); }
 .preview-header button:active { transform: scale(.92); }
 .preview-header button:focus-visible {
   outline: 2px solid var(--primary);
@@ -71,7 +72,7 @@ body {
 .tab-bar button {
   flex: 1; padding: 9px 0; border: none; border-radius: var(--radius-sm);
   background: transparent; color: var(--text-secondary);
-  font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.25s;
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.25s, background 0.25s;
 }
 .tab-bar button:hover { color: var(--primary); }
 .tab-bar button.active {
@@ -105,7 +106,7 @@ body {
   border-radius: var(--radius-md);
   box-shadow: var(--card-shadow, var(--shadow-sm));
   padding: 18px 18px 20px; margin-bottom: 14px;
-  transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s cubic-bezier(.34,1.56,.64,1);
   animation: cardSlideIn 0.4s ease both;
 }
 .form-card-schedule:hover {
@@ -122,22 +123,6 @@ body {
 .form-card-schedule:nth-child(4) { animation-delay: 0.18s; }
 .form-card-schedule:nth-child(5) { animation-delay: 0.24s; }
 .form-card-schedule:nth-child(6) { animation-delay: 0.30s; }
-
-@keyframes cardSlideIn {
-  0%   { opacity: 0; transform: translateY(18px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-/* 关闭动画（无障碍） */
-@media (prefers-reduced-motion: reduce) {
-  .form-card-schedule,
-  .form-section-sch,
-  .subtask-row,
-  .btn-primary, .btn-secondary {
-    animation: none !important;
-    transition-duration: 0.01ms !important;
-  }
-}
 
 /* ========== label ========== */
 .fg-label {
@@ -192,7 +177,7 @@ body {
   background: var(--input-bg);
   color: var(--text-primary, var(--text));
   font-size: 14px;
-  transition: all 0.22s;
+  transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
   outline: none;
   font-family: inherit;
 }
@@ -251,11 +236,11 @@ input[type=number]::-webkit-outer-spin-button {
 .quad-option {
   padding: 8px 6px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
   text-align: center; font-size: 12px; cursor: pointer;
-  transition: all 0.2s; background: var(--input-bg);
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s; background: var(--input-bg);
   color: var(--text-secondary); font-weight: 500;
 }
 .quad-option:hover { border-color: var(--primary); background: var(--primary-alpha, rgba(var(--primary-rgb), .06)); }
-.quad-option.active { border-color: var(--primary); background: var(--primary); color: #fff; font-weight: 600; }
+.quad-option.active { border-color: var(--primary); background: var(--primary); color: var(--text-inverse); font-weight: 600; }
 .quad-option .q-icon { display: block; font-size: 16px; margin-bottom: 2px; }
 .quad-option:active { transform: scale(.95); }
 .quad-option:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
@@ -268,7 +253,7 @@ input[type=number]::-webkit-outer-spin-button {
   padding: 9px 4px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
   background: var(--input-bg); cursor: pointer;
   font-size: 12px; color: var(--text-secondary); font-weight: 500;
-  transition: all 0.2s;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
   -webkit-user-select: none; user-select: none;
 }
 .check-chip:hover { border-color: var(--primary); }
@@ -299,20 +284,12 @@ input[type=number]::-webkit-outer-spin-button {
   animation: subFadeOut 0.2s ease forwards;
   pointer-events: none;
 }
-@keyframes subFadeIn {
-  0%   { opacity: 0; transform: translateY(-6px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes subFadeOut {
-  0%   { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-8px); }
-}
 .subtask-row .fg-input { flex: 1; }
 .subtask-del {
   width: 32px; height: 32px; border: none; border-radius: var(--radius-sm);
   background: var(--bg-secondary, var(--surface-soft));
   color: var(--text-tertiary); font-size: 16px; cursor: pointer;
-  display: grid; place-items: center; transition: all 0.2s; flex-shrink: 0;
+  display: grid; place-items: center; transition: background 0.2s, color 0.2s, transform 0.2s; flex-shrink: 0;
 }
 .subtask-del:hover { background: var(--danger-soft); color: var(--danger); }
 .subtask-del:active { transform: scale(.88); }
@@ -322,7 +299,7 @@ input[type=number]::-webkit-outer-spin-button {
   padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm);
   background: transparent; color: var(--text-tertiary);
   font-size: 12px; font-weight: 500; cursor: pointer;
-  transition: all 0.2s; margin-top: 2px; width: fit-content;
+  transition: border-color 0.2s, color 0.2s, background 0.2s, gap 0.2s; margin-top: 2px; width: fit-content;
 }
 .btn-add-sub:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-alpha, rgba(var(--primary-rgb), .04)); gap: 7px; }
 .btn-add-sub:active { transform: scale(.96); }
@@ -372,10 +349,6 @@ input[type=number]::-webkit-outer-spin-button {
   opacity: 1;
   padding: 0 18px 18px;
 }
-@keyframes sectionFadeIn {
-  0%   { opacity: 0; transform: translateY(-8px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
 /* ========== 按钮 ========== */
 .btn-row {
   display: flex; gap: 12px; margin-top: 24px;
@@ -384,13 +357,13 @@ input[type=number]::-webkit-outer-spin-button {
 .btn-primary, .btn-secondary {
   flex: 1; padding: 13px 0; border: none; border-radius: var(--radius-sm);
   font-size: 15px; font-weight: 600; cursor: pointer;
-  transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s cubic-bezier(.34,1.56,.64,1), background 0.25s, color 0.25s;
   position: relative; overflow: hidden;
   font-family: inherit;
 }
 .btn-primary {
   background: var(--accent-gradient);
-  color: #fff;
+  color: var(--text-inverse);
   box-shadow: 0 4px 14px var(--primary-alpha, rgba(var(--primary-rgb), .3));
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--primary-alpha, rgba(var(--primary-rgb), .4)); }
@@ -437,7 +410,7 @@ input[type=number]::-webkit-outer-spin-button {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 12px; border: 1.5px solid var(--border);
   border-radius: var(--radius-sm); background: var(--input-bg);
-  cursor: pointer; transition: all 0.22s;
+  cursor: pointer; transition: border-color 0.22s, background 0.22s;
 }
 .icon-preview-row:hover { border-color: var(--input-border-hover, #c8ccd8); background: var(--input-bg-hover); }
 .icon-preview-row:active { transform: scale(.98); }
@@ -445,7 +418,7 @@ input[type=number]::-webkit-outer-spin-button {
 .icon-preview-row .ip-badge {
   width: 40px; height: 40px; border-radius: var(--radius-sm);
   display: grid; place-items: center; font-size: 22px;
-  flex-shrink: 0; color: #fff;
+  flex-shrink: 0; color: var(--text-inverse);
 }
 .icon-preview-row .ip-name { flex: 1; font-size: 14px; font-weight: 500; color: var(--text-primary, var(--text)); }
 .icon-preview-row .ip-arrow { color: var(--text-tertiary); font-size: 18px; transition: transform 0.3s; }
@@ -453,8 +426,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 .ip-overlay {
   position: fixed; inset: 0; z-index: 1000;
-  background: rgba(0,0,0,.45);
-  opacity: 0; visibility: hidden; transition: all 0.3s;
+  background: var(--overlay-bg, rgba(0,0,0,.45));
+  opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;
 }
 .ip-overlay.open { opacity: 1; visibility: visible; }
 .ip-modal {
@@ -475,17 +448,22 @@ input[type=number]::-webkit-outer-spin-button {
   background: var(--bg-secondary, var(--surface-soft));
   font-size: 16px; cursor: pointer;
   display: grid; place-items: center;
-  color: var(--text-secondary); transition: all 0.2s;
+  color: var(--text-secondary); transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 .ip-modal-close:hover { background: var(--border); color: var(--text-primary, var(--text)); }
 .ip-modal-close:active { transform: scale(.88); }
 .ip-modal-close:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 
+.ip-modal::-webkit-scrollbar { width: 4px; }
+.ip-modal::-webkit-scrollbar-track { background: transparent; }
+.ip-modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.ip-modal::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
 .ip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .ip-item {
   display: flex; flex-direction: column; align-items: center; gap: 5px;
   padding: 12px 4px; border: 1.5px solid transparent; border-radius: var(--radius-sm);
-  cursor: pointer; transition: all 0.2s;
+  cursor: pointer; transition: transform 0.2s, background 0.2s, border-color 0.2s;
   background: var(--bg-secondary, var(--surface-soft));
 }
 .ip-item:hover { border-color: var(--primary); background: var(--primary-alpha, rgba(var(--primary-rgb), .08)); transform: translateY(-2px); }
@@ -493,19 +471,19 @@ input[type=number]::-webkit-outer-spin-button {
 .ip-item:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 .ip-item .ip-ico {
   width: 40px; height: 40px; border-radius: var(--radius-sm);
-  display: grid; place-items: center; font-size: 22px; color: #fff;
+  display: grid; place-items: center; font-size: 22px; color: var(--text-inverse);
 }
 .ip-item .ip-txt { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
 .ip-item.active { border-color: var(--primary); background: var(--primary); }
 .ip-item.active .ip-ico { background: rgba(255,255,255,.2) !important; }
-.ip-item.active .ip-txt { color: #fff; }
+.ip-item.active .ip-txt { color: var(--text-inverse); }
 
 /* ========== 颜色选择器 ========== */
 .color-strip { display: flex; gap: 10px; flex-wrap: wrap; }
 .color-dot {
   width: 32px; height: 32px; border-radius: 50%;
   border: 2px solid transparent; cursor: pointer; position: relative;
-  transition: all 0.22s;
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
   box-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
 .color-dot:hover { transform: scale(1.12); box-shadow: 0 2px 8px rgba(0,0,0,.16); }
@@ -520,7 +498,7 @@ input[type=number]::-webkit-outer-spin-button {
   content: '✓'; position: absolute; inset: 0;
   display: grid; place-items: center;
   font-size: 16px; font-weight: 700;
-  color: #fff;
+  color: var(--text-inverse);
   mix-blend-mode: exclusion;
   text-shadow: 0 0 3px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.2);
 }
@@ -530,7 +508,7 @@ input[type=number]::-webkit-outer-spin-button {
 .slider-toggle {
   width: 48px; height: 28px; border-radius: var(--radius-md);
   background: var(--border); cursor: pointer;
-  position: relative; transition: all 0.3s; flex-shrink: 0;
+  position: relative; transition: background 0.3s, transform 0.3s; flex-shrink: 0;
 }
 .slider-toggle.on { background: var(--primary); }
 .slider-toggle:hover { transform: scale(1.04); }
@@ -539,7 +517,7 @@ input[type=number]::-webkit-outer-spin-button {
   position: absolute; top: 3px; left: 3px;
   width: 22px; height: 22px; border-radius: 50%;
   background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.15);
-  transition: all 0.35s cubic-bezier(.34,1.56,.64,1);
+  transition: left 0.35s cubic-bezier(.34,1.56,.64,1), transform 0.35s cubic-bezier(.34,1.56,.64,1);
 }
 .slider-toggle.on .knob { left: 23px; }
 .slider-toggle:active { transform: scale(.94); }
@@ -617,6 +595,22 @@ html[data-theme="orangold"] .form-section-sch {
   .color-dot { width: 28px; height: 28px; }
   .progress-slider { height: 5px; }
 }
+
+/* 粗指针触摸目标放大 */
+@media (pointer: coarse) {
+  .ip-modal-close, .color-dot { min-width: 44px; min-height: 44px; }
+}
+
+/* 平板断点 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .preview-wrapper { max-width: 600px; margin: 0 auto; }
+  .check-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 1024px) {
+  .preview-header, .tab-bar { max-width: 1000px; margin-left: auto; margin-right: auto; }
+  .preview-wrapper { max-width: 640px; margin: 0 auto; }
+  .tab-bar { width: calc(100% - 40px); }
+}
 </style>
 </head>
 <body>
@@ -624,13 +618,13 @@ html[data-theme="orangold"] .form-section-sch {
 <div class="preview-header">
   <h1>📋 表单预览</h1>
   <div class="hdr-actions">
-    <button id="themeToggle" title="切换主题">🎨</button>
+    <button id="themeToggle" type="button" title="切换主题">🎨</button>
   </div>
 </div>
 
 <div class="tab-bar">
-  <button class="active" data-tab="schedule">📅 日程</button>
-  <button data-tab="checkin">✅ 打卡</button>
+  <button type="button" class="active" data-tab="schedule">📅 日程</button>
+  <button type="button" data-tab="checkin">✅ 打卡</button>
 </div>
 
 <div class="preview-wrapper">
@@ -640,28 +634,28 @@ html[data-theme="orangold"] .form-section-sch {
 
   <!-- 卡1：基本信息 -->
   <div class="form-card-schedule">
-    <div class="form-card-header">基本信息</div>
+    <h3 class="form-card-header">基本信息</h3>
 
     <div class="fgs-full">
-      <label class="fg-label">📝 标题 <span class="required">*</span></label>
+      <label class="fg-label" for="fTitle">📝 标题 <span class="required">*</span></label>
       <div class="fg-input-wrap">
-        <input type="text" class="fg-input" placeholder="输入日程标题…">
+        <input type="text" class="fg-input" id="fTitle" placeholder="输入日程标题…">
         <span class="focus-bar"></span>
       </div>
     </div>
 
     <div class="fgs-row mt-10">
       <div>
-        <label class="fg-label">📅 日期 <span class="required">*</span></label>
+        <label class="fg-label" for="fDate">📅 日期 <span class="required">*</span></label>
         <div class="fg-input-wrap">
-          <input type="date" class="fg-input">
+          <input type="date" class="fg-input" id="fDate">
           <span class="focus-bar"></span>
         </div>
       </div>
       <div>
-        <label class="fg-label">🏷️ 分类</label>
+        <label class="fg-label" for="fCategory">🏷️ 分类</label>
         <div class="fg-input-wrap">
-          <select class="fg-select">
+          <select class="fg-select" id="fCategory">
             <option>工作</option><option>个人</option><option>学习</option><option>健康</option>
           </select>
           <span class="focus-bar"></span>
@@ -671,25 +665,25 @@ html[data-theme="orangold"] .form-section-sch {
 
     <div class="fgs-row mt-10">
       <div>
-        <label class="fg-label">🕐 开始时间</label>
+        <label class="fg-label" for="fStartTime">🕐 开始时间</label>
         <div class="fg-input-wrap">
-          <input type="time" class="fg-input">
+          <input type="time" class="fg-input" id="fStartTime">
           <span class="focus-bar"></span>
         </div>
       </div>
       <div>
-        <label class="fg-label">🕐 结束时间</label>
+        <label class="fg-label" for="fEndTime">🕐 结束时间</label>
         <div class="fg-input-wrap">
-          <input type="time" class="fg-input">
+          <input type="time" class="fg-input" id="fEndTime">
           <span class="focus-bar"></span>
         </div>
       </div>
     </div>
 
     <div class="fgs-full">
-      <label class="fg-label">📍 地点</label>
+      <label class="fg-label" for="fLocation">📍 地点</label>
       <div class="fg-input-wrap">
-        <input type="text" class="fg-input" placeholder="添加地点（可选）…">
+        <input type="text" class="fg-input" id="fLocation" placeholder="添加地点（可选）…">
         <span class="focus-bar"></span>
       </div>
     </div>
@@ -697,22 +691,22 @@ html[data-theme="orangold"] .form-section-sch {
 
   <!-- 卡2：优先级设置 -->
   <div class="form-card-schedule">
-    <div class="form-card-header">优先级设置</div>
+    <h3 class="form-card-header">优先级设置</h3>
 
     <div class="fgs-full">
       <label class="fg-label">🎯 四象限</label>
       <div class="quad-grid">
-        <div class="quad-option" tabindex="0" data-quad="1"><span class="q-icon">🔴</span>重要紧急</div>
-        <div class="quad-option" tabindex="0" data-quad="2"><span class="q-icon">🟡</span>重要不紧急</div>
-        <div class="quad-option" tabindex="0" data-quad="3"><span class="q-icon">🔵</span>紧急不重要</div>
-        <div class="quad-option" tabindex="0" data-quad="4"><span class="q-icon">⚪</span>不重要不紧急</div>
+        <div class="quad-option" role="button" tabindex="0" aria-pressed="false" data-quad="1"><span class="q-icon">🔴</span>重要紧急</div>
+        <div class="quad-option" role="button" tabindex="0" aria-pressed="false" data-quad="2"><span class="q-icon">🟡</span>重要不紧急</div>
+        <div class="quad-option" role="button" tabindex="0" aria-pressed="false" data-quad="3"><span class="q-icon">🔵</span>紧急不重要</div>
+        <div class="quad-option" role="button" tabindex="0" aria-pressed="false" data-quad="4"><span class="q-icon">⚪</span>不重要不紧急</div>
       </div>
     </div>
 
     <div class="fgs-full">
-      <label class="fg-label">⚡ 优先级</label>
+      <label class="fg-label" for="fPriority">⚡ 优先级</label>
       <div class="fg-input-wrap">
-        <select class="fg-select">
+        <select class="fg-select" id="fPriority">
           <option>P0 — 最高</option><option>P1 — 高</option><option selected>P2 — 中</option><option>P3 — 低</option>
         </select>
         <span class="focus-bar"></span>
@@ -722,12 +716,12 @@ html[data-theme="orangold"] .form-section-sch {
 
   <!-- 卡3：时间与提醒 -->
   <div class="form-card-schedule">
-    <div class="form-card-header">时间与提醒</div>
+    <h3 class="form-card-header">时间与提醒</h3>
 
     <div class="fgs-full">
-      <label class="fg-label">🔄 重复</label>
+      <label class="fg-label" for="fRepeat">🔄 重复</label>
       <div class="fg-input-wrap">
-        <select class="fg-select">
+        <select class="fg-select" id="fRepeat">
           <option>不重复</option><option>每天</option><option>每周</option><option>每月</option><option>每年</option><option>自定义</option>
         </select>
         <span class="focus-bar"></span>
@@ -749,8 +743,8 @@ html[data-theme="orangold"] .form-section-sch {
     </div>
 
     <div class="fgs-full">
-      <label class="fg-label">📊 进度</label>
-      <div style="display:flex;align-items:center;gap:12px">
+      <label class="fg-label" for="progressRange">📊 进度</label>
+      <div class="flex-gap-12">
         <input type="range" class="progress-slider" min="0" max="100" value="0" id="progressRange">
         <span class="progress-val" id="progressVal">0%</span>
       </div>
@@ -764,9 +758,9 @@ html[data-theme="orangold"] .form-section-sch {
       <div class="section-body">
 
         <div class="fgs-full">
-          <label class="fg-label">🏷️ 标签</label>
+          <label class="fg-label" for="fTag">🏷️ 标签</label>
           <div class="fg-input-wrap">
-            <input type="text" class="fg-input" placeholder="多个标签用逗号分隔…">
+            <input type="text" class="fg-input" id="fTag" placeholder="多个标签用逗号分隔…">
             <span class="focus-bar"></span>
           </div>
         </div>
@@ -775,30 +769,30 @@ html[data-theme="orangold"] .form-section-sch {
           <label class="fg-label">📋 子任务</label>
           <div class="subtask-list" id="subtaskList">
             <div class="subtask-row">
-              <div class="fg-input-wrap" style="flex:1">
+              <div class="fg-input-wrap flex-1">
                 <input type="text" class="fg-input" placeholder="输入子任务…">
                 <span class="focus-bar"></span>
               </div>
-              <button class="subtask-del" onclick="removeSubtask(this)">✕</button>
+              <button type="button" class="subtask-del" onclick="removeSubtask(this)">✕</button>
             </div>
             <div class="subtask-row">
-              <div class="fg-input-wrap" style="flex:1">
+              <div class="fg-input-wrap flex-1">
                 <input type="text" class="fg-input" placeholder="输入子任务…">
                 <span class="focus-bar"></span>
               </div>
-              <button class="subtask-del" onclick="removeSubtask(this)">✕</button>
+              <button type="button" class="subtask-del" onclick="removeSubtask(this)">✕</button>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
-            <button class="btn-add-sub" id="addSubtask">＋ 添加子任务</button>
+            <button type="button" class="btn-add-sub" id="addSubtask">＋ 添加子任务</button>
             <span class="subtask-count" id="subtaskCount">2 项</span>
           </div>
         </div>
 
         <div class="fgs-full">
-          <label class="fg-label">💬 备注</label>
+          <label class="fg-label" for="fRemark">💬 备注</label>
           <div class="fg-input-wrap">
-            <textarea class="fg-input" rows="3" placeholder="输入备注…" style="resize:vertical;min-height:60px"></textarea>
+            <textarea class="fg-input ta-vert" id="fRemark" rows="3" placeholder="输入备注…"></textarea>
             <span class="focus-bar"></span>
           </div>
         </div>
@@ -808,8 +802,8 @@ html[data-theme="orangold"] .form-section-sch {
   </div>
 
   <div class="btn-row">
-    <button class="btn-secondary">取消</button>
-    <button class="btn-primary">保存日程</button>
+    <button type="button" class="btn-secondary">取消</button>
+    <button type="button" class="btn-primary">保存日程</button>
   </div>
 </div>
 
@@ -818,7 +812,7 @@ html[data-theme="orangold"] .form-section-sch {
 
   <!-- 卡1：基本设置 -->
   <div class="form-card-schedule">
-    <div class="form-card-header">基本设置</div>
+    <h3 class="form-card-header">基本设置</h3>
 
     <div class="fgs-full">
       <label class="fg-label">🎨 图标 <span class="required">*</span></label>
@@ -830,25 +824,25 @@ html[data-theme="orangold"] .form-section-sch {
     </div>
 
     <div class="fgs-full">
-      <label class="fg-label">📝 名称 <span class="required">*</span></label>
+      <label class="fg-label" for="fName">📝 名称 <span class="required">*</span></label>
       <div class="fg-input-wrap">
-        <input type="text" class="fg-input" placeholder="如：每日跑步">
+        <input type="text" class="fg-input" id="fName" placeholder="如：每日跑步">
         <span class="focus-bar"></span>
       </div>
     </div>
 
     <div class="fgs-row mt-10">
       <div>
-        <label class="fg-label">🎯 目标值</label>
+        <label class="fg-label" for="fGoalValue">🎯 目标值</label>
         <div class="fg-input-wrap">
-          <input type="number" class="fg-input" value="1" min="1" step="1">
+          <input type="number" class="fg-input" id="fGoalValue" value="1" min="1" step="1">
           <span class="focus-bar"></span>
         </div>
       </div>
       <div>
-        <label class="fg-label">🏷️ 分类</label>
+        <label class="fg-label" for="fCheckinCategory">🏷️ 分类</label>
         <div class="fg-input-wrap">
-          <select class="fg-select">
+          <select class="fg-select" id="fCheckinCategory">
             <option>健康</option><option>学习</option><option>工作</option><option>生活</option>
           </select>
           <span class="focus-bar"></span>
@@ -859,20 +853,20 @@ html[data-theme="orangold"] .form-section-sch {
 
   <!-- 卡2：目标设置 -->
   <div class="form-card-schedule">
-    <div class="form-card-header">目标设置</div>
+    <h3 class="form-card-header">目标设置</h3>
 
     <div class="fgs-full">
-      <label class="fg-label">📖 目标描述</label>
+      <label class="fg-label" for="fGoalDesc">📖 目标描述</label>
       <div class="fg-input-wrap">
-        <textarea class="fg-input" rows="3" placeholder="写下你的目标…" style="resize:vertical;min-height:60px"></textarea>
+        <textarea class="fg-input ta-vert" id="fGoalDesc" rows="3" placeholder="写下你的目标…"></textarea>
         <span class="focus-bar"></span>
       </div>
     </div>
 
     <div class="fgs-full">
-      <label class="fg-label">💪 激励语</label>
+      <label class="fg-label" for="fMotivation">💪 激励语</label>
       <div class="fg-input-wrap">
-        <input type="text" class="fg-input" placeholder="给自己的鼓励">
+        <input type="text" class="fg-input" id="fMotivation" placeholder="给自己的鼓励">
         <span class="focus-bar"></span>
       </div>
     </div>
@@ -880,22 +874,22 @@ html[data-theme="orangold"] .form-section-sch {
 
   <!-- 卡3：时间与外观 -->
   <div class="form-card-schedule">
-    <div class="form-card-header">时间与外观</div>
+    <h3 class="form-card-header">时间与外观</h3>
 
     <div class="fgs-row">
       <div>
-        <label class="fg-label">🔄 频率</label>
+        <label class="fg-label" for="fFrequency">🔄 频率</label>
         <div class="fg-input-wrap">
-          <select class="fg-select">
+          <select class="fg-select" id="fFrequency">
             <option>每天</option><option>每周</option><option>每月</option><option>自定义</option>
           </select>
           <span class="focus-bar"></span>
         </div>
       </div>
       <div>
-        <label class="fg-label">🕐 时间段</label>
+        <label class="fg-label" for="fTimeSlot">🕐 时间段</label>
         <div class="fg-input-wrap">
-          <select class="fg-select">
+          <select class="fg-select" id="fTimeSlot">
             <option>不限</option><option>早上</option><option>中午</option><option>下午</option><option>晚上</option>
           </select>
           <span class="focus-bar"></span>
@@ -905,16 +899,16 @@ html[data-theme="orangold"] .form-section-sch {
 
     <div class="fgs-row mt-10">
       <div>
-        <label class="fg-label">🔔 提醒时间</label>
+        <label class="fg-label" for="fRemindTime">🔔 提醒时间</label>
         <div class="fg-input-wrap">
-          <input type="time" class="fg-input">
+          <input type="time" class="fg-input" id="fRemindTime">
           <span class="focus-bar"></span>
         </div>
       </div>
       <div>
-        <label class="fg-label">📅 开始日期</label>
+        <label class="fg-label" for="fStartDate">📅 开始日期</label>
         <div class="fg-input-wrap">
-          <input type="date" class="fg-input">
+          <input type="date" class="fg-input" id="fStartDate">
           <span class="focus-bar"></span>
         </div>
       </div>
@@ -923,21 +917,21 @@ html[data-theme="orangold"] .form-section-sch {
     <div class="fgs-full">
       <label class="fg-label">🎨 颜色标识</label>
       <div class="color-strip">
-        <div class="color-dot active" tabindex="0" style="background:#6366f1" data-color="#6366f1"></div>
-        <div class="color-dot" tabindex="0" style="background:#ef4444" data-color="#ef4444"></div>
-        <div class="color-dot" tabindex="0" style="background:#f59e0b" data-color="#f59e0b"></div>
-        <div class="color-dot" tabindex="0" style="background:#10b981" data-color="#10b981"></div>
-        <div class="color-dot" tabindex="0" style="background:#06b6d4" data-color="#06b6d4"></div>
-        <div class="color-dot" tabindex="0" style="background:#ec4899" data-color="#ec4899"></div>
-        <div class="color-dot" tabindex="0" style="background:#8b5cf6" data-color="#8b5cf6"></div>
-        <div class="color-dot" tabindex="0" style="background:#f97316" data-color="#f97316"></div>
+        <div class="color-dot active" role="button" tabindex="0" aria-label="靛蓝" style="background:#6366f1" data-color="#6366f1"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="红" style="background:#ef4444" data-color="#ef4444"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="金" style="background:#f59e0b" data-color="#f59e0b"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="绿" style="background:#10b981" data-color="#10b981"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="青" style="background:#06b6d4" data-color="#06b6d4"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="粉" style="background:#ec4899" data-color="#ec4899"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="紫" style="background:#8b5cf6" data-color="#8b5cf6"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="橙" style="background:#f97316" data-color="#f97316"></div>
       </div>
     </div>
 
     <div class="fgs-full">
       <div class="switch-row">
-        <label class="fg-label" style="margin-bottom:0">✅ 允许补卡</label>
-        <div class="slider-toggle" id="allowCatchUp" tabindex="0" role="switch" aria-checked="false">
+        <label class="fg-label mb-0">✅ 允许补卡</label>
+        <div class="slider-toggle" id="allowCatchUp" tabindex="0" role="switch" aria-checked="false" aria-label="允许补卡">
           <div class="knob"></div>
         </div>
       </div>
@@ -953,25 +947,25 @@ html[data-theme="orangold"] .form-section-sch {
 
         <div class="fgs-row">
           <div>
-            <label class="fg-label">📅 结束日期</label>
+            <label class="fg-label" for="fEndDate">📅 结束日期</label>
             <div class="fg-input-wrap">
-              <input type="date" class="fg-input">
+              <input type="date" class="fg-input" id="fEndDate">
               <span class="focus-bar"></span>
             </div>
           </div>
           <div>
-            <label class="fg-label">🔔 第二提醒</label>
+            <label class="fg-label" for="fSecondRemind">🔔 第二提醒</label>
             <div class="fg-input-wrap">
-              <input type="time" class="fg-input">
+              <input type="time" class="fg-input" id="fSecondRemind">
               <span class="focus-bar"></span>
             </div>
           </div>
         </div>
 
         <div class="fgs-full">
-          <label class="fg-label">💬 备注</label>
+          <label class="fg-label" for="fRemark2">💬 备注</label>
           <div class="fg-input-wrap">
-            <textarea class="fg-input" rows="3" placeholder="可选备注…" style="resize:vertical;min-height:60px"></textarea>
+            <textarea class="fg-input ta-vert" id="fRemark2" rows="3" placeholder="可选备注…"></textarea>
             <span class="focus-bar"></span>
           </div>
         </div>
@@ -981,43 +975,44 @@ html[data-theme="orangold"] .form-section-sch {
   </div>
 
   <div class="btn-row">
-    <button class="btn-secondary">取消</button>
-    <button class="btn-primary">保存打卡</button>
+    <button type="button" class="btn-secondary">取消</button>
+    <button type="button" class="btn-primary">保存打卡</button>
   </div>
 </div>
 
 </div><!-- /preview-wrapper -->
 
 <!-- ========== 图标选择器全屏弹窗 ========== -->
-<div class="ip-overlay" id="iconOverlay">
+<div class="ip-overlay" id="iconOverlay" role="dialog" aria-modal="true">
   <div class="ip-modal">
     <div class="ip-modal-header">
       <h3>🎨 选择图标</h3>
-      <button class="ip-modal-close" id="iconClose">✕</button>
+      <button type="button" class="ip-modal-close" id="iconClose">✕</button>
     </div>
     <div class="ip-grid" id="iconGrid">
-      <div class="ip-item" tabindex="0" data-icon="🏃" data-name="跑步" data-color="#6366f1"><div class="ip-ico" style="background:#6366f1">🏃</div><span class="ip-txt">跑步</span></div>
-      <div class="ip-item" tabindex="0" data-icon="📚" data-name="阅读" data-color="#ef4444"><div class="ip-ico" style="background:#ef4444">📚</div><span class="ip-txt">阅读</span></div>
-      <div class="ip-item" tabindex="0" data-icon="💪" data-name="健身" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">💪</div><span class="ip-txt">健身</span></div>
-      <div class="ip-item" tabindex="0" data-icon="🧘" data-name="冥想" data-color="#10b981"><div class="ip-ico" style="background:#10b981">🧘</div><span class="ip-txt">冥想</span></div>
-      <div class="ip-item" tabindex="0" data-icon="✍️" data-name="写作" data-color="#06b6d4"><div class="ip-ico" style="background:#06b6d4">✍️</div><span class="ip-txt">写作</span></div>
-      <div class="ip-item" tabindex="0" data-icon="💧" data-name="喝水" data-color="#3b82f6"><div class="ip-ico" style="background:#3b82f6">💧</div><span class="ip-txt">喝水</span></div>
-      <div class="ip-item" tabindex="0" data-icon="🥗" data-name="健康饮食" data-color="#22c55e"><div class="ip-ico" style="background:#22c55e">🥗</div><span class="ip-txt">健康饮食</span></div>
-      <div class="ip-item" tabindex="0" data-icon="🧠" data-name="脑力" data-color="#a855f7"><div class="ip-ico" style="background:#a855f7">🧠</div><span class="ip-txt">脑力</span></div>
-      <div class="ip-item" tabindex="0" data-icon="🧹" data-name="整理" data-color="#f97316"><div class="ip-ico" style="background:#f97316">🧹</div><span class="ip-txt">整理</span></div>
-      <div class="ip-item" tabindex="0" data-icon="🎯" data-name="目标" data-color="#ec4899"><div class="ip-ico" style="background:#ec4899">🎯</div><span class="ip-txt">目标</span></div>
-      <div class="ip-item" tabindex="0" data-icon="🎵" data-name="音乐" data-color="#8b5cf6"><div class="ip-ico" style="background:#8b5cf6">🎵</div><span class="ip-txt">音乐</span></div>
-      <div class="ip-item" tabindex="0" data-icon="📷" data-name="摄影" data-color="#14b8a6"><div class="ip-ico" style="background:#14b8a6">📷</div><span class="ip-txt">摄影</span></div>
-      <div class="ip-item" tabindex="0" data-icon="🌄" data-name="早起" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">🌄</div><span class="ip-txt">早起</span></div>
-      <div class="ip-item" tabindex="0" data-icon="📝" data-name="日记" data-color="#6366f1"><div class="ip-ico" style="background:#6366f1">📝</div><span class="ip-txt">日记</span></div>
-      <div class="ip-item" tabindex="0" data-icon="👨‍💻" data-name="编程" data-color="#3b82f6"><div class="ip-ico" style="background:#3b82f6">👨‍💻</div><span class="ip-txt">编程</span></div>
-      <div class="ip-item" tabindex="0" data-icon="🌱" data-name="习惯" data-color="#22c55e"><div class="ip-ico" style="background:#22c55e">🌱</div><span class="ip-txt">习惯</span></div>
-      <div class="ip-item" tabindex="0" data-icon="❤️" data-name="关爱" data-color="#ef4444"><div class="ip-ico" style="background:#ef4444">❤️</div><span class="ip-txt">关爱</span></div>
-      <div class="ip-item" tabindex="0" data-icon="💰" data-name="理财" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">💰</div><span class="ip-txt">理财</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="跑步图标" data-icon="🏃" data-name="跑步" data-color="#6366f1"><div class="ip-ico" style="background:#6366f1">🏃</div><span class="ip-txt">跑步</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="阅读图标" data-icon="📚" data-name="阅读" data-color="#ef4444"><div class="ip-ico" style="background:#ef4444">📚</div><span class="ip-txt">阅读</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="健身图标" data-icon="💪" data-name="健身" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">💪</div><span class="ip-txt">健身</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="冥想图标" data-icon="🧘" data-name="冥想" data-color="#10b981"><div class="ip-ico" style="background:#10b981">🧘</div><span class="ip-txt">冥想</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="写作图标" data-icon="✍️" data-name="写作" data-color="#06b6d4"><div class="ip-ico" style="background:#06b6d4">✍️</div><span class="ip-txt">写作</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="喝水图标" data-icon="💧" data-name="喝水" data-color="#3b82f6"><div class="ip-ico" style="background:#3b82f6">💧</div><span class="ip-txt">喝水</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="健康饮食图标" data-icon="🥗" data-name="健康饮食" data-color="#22c55e"><div class="ip-ico" style="background:#22c55e">🥗</div><span class="ip-txt">健康饮食</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="脑力图标" data-icon="🧠" data-name="脑力" data-color="#a855f7"><div class="ip-ico" style="background:#a855f7">🧠</div><span class="ip-txt">脑力</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="整理图标" data-icon="🧹" data-name="整理" data-color="#f97316"><div class="ip-ico" style="background:#f97316">🧹</div><span class="ip-txt">整理</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="目标图标" data-icon="🎯" data-name="目标" data-color="#ec4899"><div class="ip-ico" style="background:#ec4899">🎯</div><span class="ip-txt">目标</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="音乐图标" data-icon="🎵" data-name="音乐" data-color="#8b5cf6"><div class="ip-ico" style="background:#8b5cf6">🎵</div><span class="ip-txt">音乐</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="摄影图标" data-icon="📷" data-name="摄影" data-color="#14b8a6"><div class="ip-ico" style="background:#14b8a6">📷</div><span class="ip-txt">摄影</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="早起图标" data-icon="🌄" data-name="早起" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">🌄</div><span class="ip-txt">早起</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="日记图标" data-icon="📝" data-name="日记" data-color="#6366f1"><div class="ip-ico" style="background:#6366f1">📝</div><span class="ip-txt">日记</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="编程图标" data-icon="👨‍💻" data-name="编程" data-color="#3b82f6"><div class="ip-ico" style="background:#3b82f6">👨‍💻</div><span class="ip-txt">编程</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="习惯图标" data-icon="🌱" data-name="习惯" data-color="#22c55e"><div class="ip-ico" style="background:#22c55e">🌱</div><span class="ip-txt">习惯</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="关爱图标" data-icon="❤️" data-name="关爱" data-color="#ef4444"><div class="ip-ico" style="background:#ef4444">❤️</div><span class="ip-txt">关爱</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="理财图标" data-icon="💰" data-name="理财" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">💰</div><span class="ip-txt">理财</span></div>
     </div>
   </div>
 </div>
 
+<script src="shared.js"></script>
 <script src="theme.js"></script>
 <script>
 // ========== Tab切换 ==========
@@ -1054,19 +1049,6 @@ document.querySelectorAll('.quad-option').forEach(el => {
 });
 
 // ========== 子任务 ==========
-function updateSubtaskCount() {
-  const list = document.getElementById('subtaskList');
-  const cnt = document.getElementById('subtaskCount');
-  if (!list || !cnt) return;
-  const n = list.querySelectorAll('.subtask-row').length;
-  cnt.textContent = n + ' 项';
-}
-function removeSubtask(btn) {
-  const row = btn.closest('.subtask-row');
-  row.classList.add('removing');
-  setTimeout(() => { row.remove(); updateSubtaskCount(); }, 200);
-}
-
 document.getElementById('addSubtask')?.addEventListener('click', () => {
   const list = document.getElementById('subtaskList');
   if (!list) return;
@@ -1077,6 +1059,7 @@ document.getElementById('addSubtask')?.addEventListener('click', () => {
   const row = document.createElement('div');
   row.className = 'subtask-row';
   const del = document.createElement('button');
+  del.type = 'button';
   del.className = 'subtask-del';
   del.textContent = '✕';
   del.onclick = function () { removeSubtask(this); };

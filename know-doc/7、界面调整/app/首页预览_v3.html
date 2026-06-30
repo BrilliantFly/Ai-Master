@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>工作台预览 · v3（7主题兼容）</title>
+  <title>工作台预览 · v3（20主题兼容）</title>
   <style>
     /* ============================================
        Theme System (7 themes) — adapted from know-uniapp-page
@@ -139,6 +139,138 @@
       --success-soft: rgba(34,181,115,0.1);
       --warning-soft: rgba(240,160,32,0.1);
       --danger-soft: rgba(232,90,90,0.1);
+    }
+
+    /* Macaron */
+    html[data-theme="macaron"] {
+      --primary: #ff8ba7; --primary-rgb: 255, 139, 167; --primary-soft: rgba(255,139,167,.12); --primary-mist: rgba(255,139,167,.08);
+      --bg: #fff5f7; --bg-app: #fff5f7; --surface: #fff; --surface-soft: #fff0f3;
+      --text: #2d1b1f; --text-secondary: #6b4a52; --text-tertiary: #a87d87;
+      --border: #ffd6de; --border-light: #ffe8ed;
+      --accent-gradient: linear-gradient(135deg,#ff8ba7,rgba(255,139,167,.8)); --shadow-glow: 0 8px 32px rgba(255,139,167,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Mint */
+    html[data-theme="mint"] {
+      --primary: #34d399; --primary-rgb: 52, 211, 153; --primary-soft: rgba(52,211,153,.12); --primary-mist: rgba(52,211,153,.08);
+      --bg: #ecfdf5; --bg-app: #ecfdf5; --surface: #fff; --surface-soft: #d1fae5;
+      --text: #064e3b; --text-secondary: #047857; --text-tertiary: #6ee7b7;
+      --border: #a7f3d0; --border-light: #d1fae5;
+      --accent-gradient: linear-gradient(135deg,#34d399,rgba(52,211,153,.8)); --shadow-glow: 0 8px 32px rgba(52,211,153,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Lavender */
+    html[data-theme="lavender"] {
+      --primary: #a78bfa; --primary-rgb: 167, 139, 250; --primary-soft: rgba(167,139,250,.12); --primary-mist: rgba(167,139,250,.08);
+      --bg: #f5f3ff; --bg-app: #f8f6ff; --surface: #fff; --surface-soft: #ede9fe;
+      --text: #1e1b3a; --text-secondary: #6d5a9a; --text-tertiary: #a08cc0;
+      --border: #ddd6fe; --border-light: #e9e4ff;
+      --accent-gradient: linear-gradient(135deg,#a78bfa,rgba(167,139,250,.8)); --shadow-glow: 0 8px 32px rgba(167,139,250,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Milky */
+    html[data-theme="milky"] {
+      --primary: #f59e0b; --primary-rgb: 245, 158, 11; --primary-soft: rgba(245,158,11,.12); --primary-mist: rgba(245,158,11,.08);
+      --bg: #fefcf5; --bg-app: #fffdf8; --surface: #fff; --surface-soft: #fffbeb;
+      --text: #2d2418; --text-secondary: #8a7a5a; --text-tertiary: #b8a88a;
+      --border: #fde68a; --border-light: #fef3c7;
+      --accent-gradient: linear-gradient(135deg,#f59e0b,rgba(245,158,11,.8)); --shadow-glow: 0 8px 32px rgba(245,158,11,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Matcha */
+    html[data-theme="matcha"] {
+      --primary: #65a30d; --primary-rgb: 101, 163, 13; --primary-soft: rgba(101,163,13,.12); --primary-mist: rgba(101,163,13,.08);
+      --bg: #f7fce8; --bg-app: #fafff0; --surface: #fff; --surface-soft: #ecfccb;
+      --text: #1a2e06; --text-secondary: #4a6a2a; --text-tertiary: #8aaa6a;
+      --border: #d9f99d; --border-light: #e8f8c8;
+      --accent-gradient: linear-gradient(135deg,#65a30d,rgba(101,163,13,.8)); --shadow-glow: 0 8px 32px rgba(101,163,13,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Berry */
+    html[data-theme="berry"] {
+      --primary: #ec4899; --primary-rgb: 236, 72, 153; --primary-soft: rgba(236,72,153,.12); --primary-mist: rgba(236,72,153,.08);
+      --bg: #fdf2f8; --bg-app: #fff5fa; --surface: #fff; --surface-soft: #fce7f3;
+      --text: #2d0a1e; --text-secondary: #7a3a5a; --text-tertiary: #b87a9a;
+      --border: #fbcfe8; --border-light: #fce7f3;
+      --accent-gradient: linear-gradient(135deg,#ec4899,rgba(236,72,153,.8)); --shadow-glow: 0 8px 32px rgba(236,72,153,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Ocean */
+    html[data-theme="ocean"] {
+      --primary: #0ea5e9; --primary-rgb: 14, 165, 233; --primary-soft: rgba(14,165,233,.12); --primary-mist: rgba(14,165,233,.08);
+      --bg: #f0f9ff; --bg-app: #f5fbff; --surface: #fff; --surface-soft: #e0f2fe;
+      --text: #0a2a3a; --text-secondary: #2a6a8a; --text-tertiary: #7aaaca;
+      --border: #bae6fd; --border-light: #d0eefe;
+      --accent-gradient: linear-gradient(135deg,#0ea5e9,rgba(14,165,233,.8)); --shadow-glow: 0 8px 32px rgba(14,165,233,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Cream */
+    html[data-theme="cream"] {
+      --primary: #d97706; --primary-rgb: 217, 119, 6; --primary-soft: rgba(217,119,6,.12); --primary-mist: rgba(217,119,6,.08);
+      --bg: #fef7ee; --bg-app: #fffaef; --surface: #fff; --surface-soft: #fef3e2;
+      --text: #2d1f0a; --text-secondary: #7a603a; --text-tertiary: #baa07a;
+      --border: #fde0b2; --border-light: #feebc8;
+      --accent-gradient: linear-gradient(135deg,#d97706,rgba(217,119,6,.8)); --shadow-glow: 0 8px 32px rgba(217,119,6,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Chocolate */
+    html[data-theme="chocolate"] {
+      --primary: #8D6E63; --primary-rgb: 141, 110, 99; --primary-soft: rgba(141,110,99,.15); --primary-mist: rgba(141,110,99,.10);
+      --bg: #f5f0ed; --bg-app: #faf5f0; --surface: #fff; --surface-soft: #efe8e2;
+      --text: #2a1f18; --text-secondary: #7a6a5a; --text-tertiary: #b0a090;
+      --border: #ddd0c8; --border-light: #e8ddd6;
+      --accent-gradient: linear-gradient(135deg,#8D6E63,rgba(141,110,99,.8)); --shadow-glow: 0 8px 32px rgba(141,110,99,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Neon */
+    html[data-theme="neon"] {
+      --primary: #00FF88; --primary-rgb: 0, 255, 136; --primary-soft: rgba(0,255,136,.12); --primary-mist: rgba(0,255,136,.08);
+      --bg: #0a0f0a; --bg-app: #0f140f; --surface: #1a221a; --surface-soft: #1f2a1f;
+      --text: #e0f0e0; --text-secondary: #8aaa8a; --text-tertiary: #5a7a5a;
+      --border: #2a4a2a; --border-light: #2a4a2a;
+      --accent-gradient: linear-gradient(135deg,#00FF88,rgba(0,255,136,.8)); --shadow-glow: 0 8px 32px rgba(0,255,136,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.25); --shadow-md: 0 8px 28px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.25); --shadow-lg: 0 20px 56px rgba(0,0,0,.45), 0 4px 16px rgba(0,0,0,.3);
+      --success-soft: rgba(34,181,115,0.15); --warning-soft: rgba(240,160,32,0.15); --danger-soft: rgba(232,90,90,0.15);
+    }
+    /* Sakura */
+    html[data-theme="sakura"] {
+      --primary: #FF69B4; --primary-rgb: 255, 105, 180; --primary-soft: rgba(255,105,180,.12); --primary-mist: rgba(255,105,180,.08);
+      --bg: #fef0f8; --bg-app: #fff5fa; --surface: #fff; --surface-soft: #fce4f0;
+      --text: #2d0a1e; --text-secondary: #7a3a5a; --text-tertiary: #b87a9a;
+      --border: #fcc8e0; --border-light: #fdd8ea;
+      --accent-gradient: linear-gradient(135deg,#FF69B4,rgba(255,105,180,.8)); --shadow-glow: 0 8px 32px rgba(255,105,180,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Forest */
+    html[data-theme="forest"] {
+      --primary: #4CAF50; --primary-rgb: 76, 175, 80; --primary-soft: rgba(76,175,80,.12); --primary-mist: rgba(76,175,80,.08);
+      --bg: #f0f8f0; --bg-app: #f5faf5; --surface: #fff; --surface-soft: #e0f0e0;
+      --text: #0a2a0a; --text-secondary: #2a6a2a; --text-tertiary: #7aaa7a;
+      --border: #b8d8b8; --border-light: #d0e8d0;
+      --accent-gradient: linear-gradient(135deg,#4CAF50,rgba(76,175,80,.8)); --shadow-glow: 0 8px 32px rgba(76,175,80,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    }
+    /* Sunset */
+    html[data-theme="sunset"] {
+      --primary: #FF6B35; --primary-rgb: 255, 107, 53; --primary-soft: rgba(255,107,53,.12); --primary-mist: rgba(255,107,53,.08);
+      --bg: #fef5f0; --bg-app: #fff8f5; --surface: #fff; --surface-soft: #feede8;
+      --text: #2d180a; --text-secondary: #7a503a; --text-tertiary: #ba907a;
+      --border: #fdd0c0; --border-light: #feE0d0;
+      --accent-gradient: linear-gradient(135deg,#FF6B35,rgba(255,107,53,.8)); --shadow-glow: 0 8px 32px rgba(255,107,53,.2);
+      --success: #22b573; --warning: #f0a020; --danger: #e85a5a;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06); --shadow-md: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); --shadow-lg: 0 20px 56px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
     }
 
     /* ===== Base ===== */
@@ -634,6 +766,8 @@
       display: none;
       z-index: 200;
       min-width: 160px;
+      max-height: 400px;
+      overflow-y: auto;
       transform-origin: top right;
       animation: themeIn 0.2s var(--ease-out-expo);
     }
@@ -673,6 +807,19 @@
     .sw-purple::after  { background: #7c3aed; }
     .sw-glass::after   { background: linear-gradient(135deg, #667eea, #764ba2); }
     .sw-orangold::after{ background: linear-gradient(135deg, #E87A5D, #D4A04A); }
+    .sw-macaron::after  { background: #ff8ba7; }
+    .sw-mint::after     { background: #34d399; }
+    .sw-lavender::after { background: #a78bfa; }
+    .sw-milky::after    { background: #f59e0b; }
+    .sw-matcha::after   { background: #65a30d; }
+    .sw-berry::after    { background: #ec4899; }
+    .sw-ocean::after    { background: #0ea5e9; }
+    .sw-cream::after    { background: #d97706; }
+    .sw-chocolate::after{ background: #8D6E63; }
+    .sw-neon::after     { background: #00FF88; }
+    .sw-sakura::after   { background: #FF69B4; }
+    .sw-forest::after   { background: #4CAF50; }
+    .sw-sunset::after   { background: #FF6B35; }
     .theme-option.active .swatch { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-mist); }
     .check { display: none; margin-left: auto; font-size: 14px; color: var(--primary); }
     .theme-option.active .check { display: inline-flex; }
@@ -772,6 +919,19 @@
           <div class="theme-option" data-theme="purple"   onclick="applyTheme('purple')"><span class="swatch sw-purple"></span> 暗紫 <span class="check">✓</span></div>
           <div class="theme-option" data-theme="glass"    onclick="applyTheme('glass')"><span class="swatch sw-glass"></span> 玻璃 <span class="check">✓</span></div>
           <div class="theme-option" data-theme="orangold" onclick="applyTheme('orangold')"><span class="swatch sw-orangold"></span> 橘金 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="macaron" onclick="applyTheme('macaron')"><span class="swatch sw-macaron"></span> 马卡龙 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="mint" onclick="applyTheme('mint')"><span class="swatch sw-mint"></span> 薄荷 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="lavender" onclick="applyTheme('lavender')"><span class="swatch sw-lavender"></span> 薰衣草 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="milky" onclick="applyTheme('milky')"><span class="swatch sw-milky"></span> 奶白 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="matcha" onclick="applyTheme('matcha')"><span class="swatch sw-matcha"></span> 抹茶 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="berry" onclick="applyTheme('berry')"><span class="swatch sw-berry"></span> 浆果 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="ocean" onclick="applyTheme('ocean')"><span class="swatch sw-ocean"></span> 海洋 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="cream" onclick="applyTheme('cream')"><span class="swatch sw-cream"></span> 奶油 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="chocolate" onclick="applyTheme('chocolate')"><span class="swatch sw-chocolate"></span> 巧克力 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="neon" onclick="applyTheme('neon')"><span class="swatch sw-neon"></span> 霓虹 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="sakura" onclick="applyTheme('sakura')"><span class="swatch sw-sakura"></span> 樱花 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="forest" onclick="applyTheme('forest')"><span class="swatch sw-forest"></span> 森林 <span class="check">✓</span></div>
+          <div class="theme-option" data-theme="sunset" onclick="applyTheme('sunset')"><span class="swatch sw-sunset"></span> 日落 <span class="check">✓</span></div>
         </div>
       </div>
       <span>📶 🔋</span>
