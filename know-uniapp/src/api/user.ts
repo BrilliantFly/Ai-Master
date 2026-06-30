@@ -56,4 +56,3 @@ export function updatePassword(oldPwd: string, newPwd: string) {
         isAuth: true
     })
 }
-

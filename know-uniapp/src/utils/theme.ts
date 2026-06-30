@@ -21,11 +21,7 @@ const darkConfig = {
  * 可选值有primary、success、warning、error、info
  */
 
-export const generateVarsMap = (
-    color: string,
-    type = 'primary',
-    isDark = false
-) => {
+export const generateVarsMap = (color: string, type = 'primary', isDark = false) => {
     const colors = {
         [`--color-${type}`]: color
     }
@@ -45,15 +41,9 @@ export const generateVars = (
     extra: Record<string, string> = {},
     isDark = false
 ) => {
-    const varsMap: Record<string, string> = Object.keys(options).reduce(
-        (prev, key) => {
-            return Object.assign(
-                prev,
-                generateVarsMap(options[key], key, isDark)
-            )
-        },
-        extra
-    )
+    const varsMap: Record<string, string> = Object.keys(options).reduce((prev, key) => {
+        return Object.assign(prev, generateVarsMap(options[key], key, isDark))
+    }, extra)
 
     const vars = Object.keys(varsMap).reduce((prev, key) => {
         const color = colors.convert(varsMap[key])

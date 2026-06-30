@@ -1,13 +1,9 @@
 <template>
     <view class="login-container">
         <view class="login-header">
-            <image
-                :src="appStore.getWebsiteConfig.shop_logo"
-                mode="widthFix"
-                class="logo"
-            />
+            <image :src="appStore.getWebsiteConfig.shop_logo" mode="widthFix" class="logo" />
         </view>
-        
+
         <view class="login-form">
             <view class="input-item">
                 <image src="/static/images/icon/icon_user.png" class="input-icon" />
@@ -18,7 +14,7 @@
                     class="input-field"
                 />
             </view>
-            
+
             <view class="input-item">
                 <image src="/static/images/icon/icon_password.png" class="input-icon" />
                 <input
@@ -28,7 +24,7 @@
                     class="input-field"
                 />
             </view>
-            
+
             <view class="login-btn" :class="{ disabled: !canLogin }" @click="handleLogin">
                 登录
             </view>
@@ -57,7 +53,7 @@ const canLogin = computed(() => {
 
 const handleLogin = async () => {
     if (!canLogin.value) return
-    
+
     if (!formData.username) {
         uni.showToast({ title: '请输入用户名', icon: 'none' })
         return
@@ -66,24 +62,24 @@ const handleLogin = async () => {
         uni.showToast({ title: '请输入密码', icon: 'none' })
         return
     }
-    
+
     uni.showLoading({ title: '登录中...' })
-    
+
     try {
         const data = await login(formData.username, formData.password)
-        
+
         // Store token
         userStore.login(data.token)
-        
+
         // Get user info
         await userStore.getUser()
-        
+
         // 登录后重新加载菜单配置（tabBar/首页菜单）
         await appStore.loadUserMenuConfig()
-        
+
         uni.hideLoading()
         uni.showToast({ title: '登录成功', icon: 'success' })
-        
+
         // Navigate to home page
         router.switchTab('/pages/index/index')
     } catch (error: any) {
@@ -147,7 +143,7 @@ const handleLogin = async () => {
     border-radius: 45rpx;
     font-size: 32rpx;
     margin-top: 60rpx;
-    
+
     &.disabled {
         opacity: 0.5;
     }

@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>工作台预览</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', system-ui, sans-serif;
+      background: #f2f3f7;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 12px 0;
+    }
+    :root {
+      --primary: #c53d43;
+      --primary-dark: #a62e34;
+      --primary-light: #e85a60;
+      --gold: #d4a853;
+      --gold-light: #f0d68a;
+      --bg: #f2f3f7;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .phone-frame {
+      width: 375px;
+      min-height: 812px;
+      background: var(--bg);
+      border-radius: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Status Bar ── */
+    .status-bar {
+      height: 44px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      color: rgba(255,255,255,0.9);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ── Hero Bar ── */
+    .hero-bar {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 22px 20px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bar::before {
+      content: '';
+      position: absolute;
+      right: -30px; top: -20px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .hero-bar::after {
+      content: '';
+      position: absolute;
+      left: -40px; bottom: -30px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .hero-bar .deco-ring {
+      position: absolute;
+      right: 40px; top: -10px;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.08);
+    }
+    .hero-bar .deco-dot {
+      position: absolute;
+      left: 60px; top: 8px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+    }
+    .hero-bar .deco-dot2 {
+      position: absolute;
+      right: 100px; bottom: 8px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+    }
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative; z-index: 1;
+    }
+    .hero-welcome { display: flex; align-items: center; gap: 10px; }
+    .hero-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      color: var(--primary-dark); font-weight: 700; font-size: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .hero-greeting { color: #fff; }
+    .hero-greeting .name { font-size: 18px; font-weight: 700; display: block; }
+    .hero-greeting .sub { font-size: 12px; opacity: 0.75; margin-top: 3px; display: block; }
+    .hero-actions { display: flex; gap: 12px; }
+    .hero-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer; position: relative;
+    }
+    .hero-icon .badge {
+      position: absolute; top: -2px; right: -2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--gold); font-size: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: var(--primary-dark);
+      border: 2px solid var(--primary);
+    }
+
+    /* ── Asset Card ── */
+    .asset-card {
+      margin: -14px 16px 0;
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 6px 24px rgba(197,61,67,0.12);
+      position: relative; z-index: 2;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .asset-left { flex: 1; }
+    .asset-label { font-size: 12px; color: var(--text-muted); letter-spacing: 0.5px; }
+    .asset-motto { font-size: 10px; color: var(--text-muted); opacity: 0.6; margin-top: 2px; font-style: italic; }
+    .asset-amount { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.3; }
+    .asset-amount small { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+    .asset-eye { font-size: 18px; cursor: pointer; opacity: 0.3; }
+    .asset-right {
+      display: flex; gap: 20px;
+      padding-left: 16px; border-left: 1px solid var(--border);
+    }
+    .asset-item { text-align: center; }
+    .asset-item .num { font-size: 16px; font-weight: 700; color: var(--text); }
+    .asset-item .lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── Search ── */
+    .search-row {
+      margin: 12px 16px 0;
+      display: flex; gap: 8px;
+    }
+    .search-input {
+      flex: 1;
+      display: flex; align-items: center; gap: 8px;
+      background: #fff; border-radius: 10px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+    .search-input .icon { font-size: 14px; opacity: 0.35; }
+    .search-input .text { flex: 1; font-size: 13px; color: var(--text-muted); }
+    .search-input .shortcut {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px;
+      background: var(--bg); color: var(--text-muted); font-weight: 600;
+    }
+    .search-qr {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: #fff; box-shadow: var(--shadow);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer;
+    }
+
+    /* ── Content ── */
+    .content { padding: 12px 16px 100px; }
+
+    /* ── Carousel ── */
+    .carousel-wrap {
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(.25,.46,.45,.94); }
+    .carousel-slide {
+      flex: 0 0 100%;
+      height: 130px;
+      padding: 20px 18px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .carousel-slide .c-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+    .carousel-slide .c-title { font-size: 15px; font-weight: 700; display: block; }
+    .carousel-slide .c-desc { font-size: 11px; opacity: 0.8; display: block; margin-top: 2px; }
+    .carousel-dots {
+      position: absolute;
+      bottom: 8px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 5px;
+    }
+    .carousel-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer; transition: all 0.3s;
+    }
+    .carousel-dot.active { width: 16px; border-radius: 3px; background: #fff; }
+
+
+
+    .metric-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .metric-icon.green { background: #e8f5ee; color: #1e7e6c; }
+    .metric-icon.red { background: #fef2f2; color: var(--primary); }
+    .metric-icon.blue { background: #eef0ff; color: #4f6de6; }
+    /* ── Section Header ── */
+    .section-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 20px 0 10px;
+    }
+    .section-hdr:first-child { margin-top: 4px; }
+    .section-hdr .title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .section-hdr .more {
+      font-size: 11px; color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; gap: 3px;
+    }
+
+    /* ── Notice ── */
+    .notice-strip {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 14px;
+      background: #fff; border-radius: 10px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+    .notice-strip .n-icon {
+      font-size: 14px; flex-shrink: 0;
+      width: 24px; height: 24px; border-radius: 6px;
+      background: #fef2f2; color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .notice-strip .n-wrap { flex: 1; overflow: hidden; height: 16px; position: relative; }
+    .notice-strip .n-scroll { animation: scrollUp 6s infinite; }
+    .notice-strip .n-text {
+      font-size: 12px; color: var(--text-secondary); line-height: 16px; display: block;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .notice-strip .n-arrow { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+    @keyframes scrollUp {
+      0%, 35% { transform: translateY(0); }
+      40%, 70% { transform: translateY(-16px); }
+      75%, 100% { transform: translateY(-32px); }
+    }
+
+    /* ── Quick Menu (金刚区 2x5 无Tab) ── */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px 0;
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px 8px 8px;
+      box-shadow: var(--shadow);
+    }
+    .quick-item {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px;
+      cursor: pointer; text-decoration: none;
+      padding: 4px 0;
+    }
+    .quick-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: #fff;
+    }
+    .quick-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+
+    /* ── Topic Grid (热门推荐) ── */
+    .topic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .topic-card {
+      border-radius: 12px;
+      overflow: hidden;
+      height: 80px;
+      position: relative;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .topic-card .topic-bg {
+      position: absolute; inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    .topic-card .topic-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.15));
+    }
+    .topic-card .topic-label {
+      position: relative; z-index: 1;
+      font-size: 14px; font-weight: 700;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
+    }
+    .topic-card .topic-sub {
+      position: absolute;
+      bottom: 8px; right: 10px;
+      font-size: 10px; opacity: 0.7;
+      z-index: 1;
+    }
+
+    /* ── Tools Grid (feature-card 精致风格) ── */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .tool-card {
+      background: #fff; border-radius: 14px;
+      padding: 16px 14px 14px;
+      box-shadow: var(--shadow);
+      cursor: pointer; text-decoration: none; color: inherit;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .tool-card::before {
+      content: '';
+      position: absolute; top: 0; left: 12px; right: 12px;
+      height: 3px; border-radius: 0 0 3px 3px;
+      background: linear-gradient(90deg, var(--primary-light), var(--gold));
+    }
+    .tool-card:active { transform: scale(0.97); }
+    .tool-card .t-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .tool-card .t-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff;
+      flex-shrink: 0;
+    }
+    .tool-card .t-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .tool-card .t-tag {
+      font-size: 10px; padding: 2px 8px; border-radius: 999px;
+      background: linear-gradient(135deg, #fef2f2, #fff);
+      color: var(--primary);
+      margin-left: auto;
+      font-weight: 600;
+      border: 1px solid rgba(197,61,67,0.12);
+    }
+    .tool-card .t-desc { font-size: 11px; color: var(--text-muted); display: block; }
+    .tool-card .t-bar {
+      margin-top: 10px; height: 5px; border-radius: 3px;
+      background: var(--bg); overflow: hidden;
+    }
+    .tool-card .t-bar-in {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, var(--primary-light), var(--gold));
+      transition: width 0.6s ease;
+    }
+    .tool-card .t-bar-label {
+      display: flex; justify-content: space-between;
+      font-size: 10px; color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── Tool Strip ── */
+    .tool-strip {
+      display: flex; gap: 10px;
+      overflow-x: auto; scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .tool-strip::-webkit-scrollbar { display: none; }
+    .tool-chip {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 999px;
+      background: #fff; box-shadow: var(--shadow);
+      cursor: pointer; font-size: 12px; color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .tool-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    /* ── Bottom Tab ── */
+    .bottom-tab {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 6px 0 env(safe-area-inset-bottom, 0);
+    }
+    .tab-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      cursor: pointer; text-decoration: none; color: inherit;
+      padding: 0 18px; position: relative;
+    }
+    .tab-item.active .tab-icon-c { background: #fef2f2; color: var(--primary); }
+    .tab-item.active .tab-label { color: var(--primary); font-weight: 600; }
+    .tab-item.active::after {
+      content: ''; position: absolute; top: -6px;
+      width: 20px; height: 3px; border-radius: 2px;
+      background: var(--primary);
+    }
+    .tab-icon-c {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .tab-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim-fade { animation: fadeUp 0.5s ease both; }
+    .anim-d1 { animation-delay: 0.05s; }
+    .anim-d2 { animation-delay: 0.1s; }
+    .anim-d3 { animation-delay: 0.15s; }
+    .anim-d4 { animation-delay: 0.2s; }
+    .anim-d5 { animation-delay: 0.25s; }
+    .anim-d6 { animation-delay: 0.3s; }
+    .anim-d7 { animation-delay: 0.35s; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>📶 📶 🔋</span>
+  </div>
+
+  <!-- ── Hero ── -->
+  <div class="hero-bar">
+    <div class="deco-ring"></div>
+    <div class="deco-dot"></div>
+    <div class="deco-dot2"></div>
+    <div class="hero-top">
+      <div class="hero-welcome">
+        <div class="hero-avatar">王</div>
+        <div class="hero-greeting">
+          <span class="name">王工，早上好 ☀️</span>
+          <span class="sub">您有 3 条待处理告警</span>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <div class="hero-icon" onclick="alert('消息')">
+          🔔 <span class="badge">3</span>
+        </div>
+        <div class="hero-icon" onclick="alert('设置')">⚙️</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Metrics ── -->
+  <!-- ── Asset Card (带图标版本，展示指标数据) ── -->
+  <div class="asset-card anim-fade">
+    <div class="asset-left">
+      <div class="asset-label">今日概要</div>
+      <div class="asset-motto">✨ 努力是光，坚持是路</div>
+      <div class="asset-amount" style="display:flex;align-items:center;gap:8px;">
+        <span class="metric-icon blue" style="width:28px;height:28px;font-size:12px;border-radius:6px;">📋</span>
+        5 <small>今日待办</small>
+      </div>
+    </div>
+    <div class="asset-eye" onclick="alert('切换')">👁</div>
+    <div class="asset-right">
+      <div class="asset-item">
+        <div class="num" style="color:var(--primary);display:flex;align-items:center;gap:4px;justify-content:center;">
+          <span class="metric-icon red" style="width:22px;height:22px;font-size:10px;border-radius:5px;">🔔</span> 3
+        </div>
+        <div class="lbl">待处理告警</div>
+      </div>
+      <div class="asset-item">
+        <div class="num" style="color:#1e7e6c;display:flex;align-items:center;gap:4px;justify-content:center;">
+          <span class="metric-icon green" style="width:22px;height:22px;font-size:10px;border-radius:5px;">🛡️</span> 12
+        </div>
+        <div class="lbl">在线设备</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Search ── -->
+  <div class="search-row anim-fade anim-d1">
+    <div class="search-input" onclick="alert('搜索')">
+      <span class="icon">🔍</span>
+      <span class="text">搜索功能、设备、文档...</span>
+      <span class="shortcut">⌘K</span>
+    </div>
+    <div class="search-qr" onclick="alert('扫码')">📷</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── Carousel ── -->
+    <div class="carousel-wrap anim-fade anim-d1">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="carousel-slide" style="background:linear-gradient(135deg,#c53d43,#a62e34);" onclick="alert('活动1')">
+          <span class="c-icon">🏆</span>
+          <span class="c-title">AI 智能监控升级</span>
+          <span class="c-desc">实时分析 · 异常告警 · 7x24h 守护</span>
+        </div>
+        <div class="carousel-slide" style="background:linear-gradient(135deg,#d4a853,#b8913a);" onclick="alert('活动2')">
+          <span class="c-icon">📋</span>
+          <span class="c-title">计划管理 3.0 上线</span>
+          <span class="c-desc">甘特图 · 日程 · 打卡 · 目标追踪</span>
+        </div>
+        <div class="carousel-slide" style="background:linear-gradient(135deg,#1e7e6c,#146354);" onclick="alert('活动3')">
+          <span class="c-icon">📊</span>
+          <span class="c-title">数据分析工具上新</span>
+          <span class="c-desc">经营看板 · 报表导出 · 智能分析</span>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots">
+        <span class="carousel-dot active" data-index="0"></span>
+        <span class="carousel-dot" data-index="1"></span>
+        <span class="carousel-dot" data-index="2"></span>
+      </div>
+    </div>
+
+    <!-- ── Notice ── -->
+    <div class="notice-strip anim-fade anim-d2" onclick="alert('公告列表')">
+      <span class="n-icon">📰</span>
+      <div class="n-wrap">
+        <div class="n-scroll">
+          <span class="n-text">📢 系统 v2.4 已发布，新增甘特图与批量操作</span>
+          <span class="n-text">📢 7月份设备巡检计划已生成，请查看</span>
+          <span class="n-text">📢 客户模块新增批量导入功能</span>
+        </div>
+      </div>
+      <span class="n-arrow">›</span>
+    </div>
+
+    <!-- ── Quick Menu (金刚区 2行x5列) ── -->
+    <div class="section-hdr anim-fade anim-d3">
+      <span class="title">快捷功能</span>
+      <span class="more" onclick="alert('全部功能')">全部 <span>→</span></span>
+    </div>
+    <div class="quick-grid anim-fade anim-d3">
+      <a class="quick-item" onclick="alert('智能监控')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#c53d43,#e85a60);">📹</div>
+        <span class="quick-label">智能监控</span>
+      </a>
+      <a class="quick-item" onclick="alert('日程计划')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#d4a853,#f0d68a);">📅</div>
+        <span class="quick-label">日程计划</span>
+      </a>
+      <a class="quick-item" onclick="alert('习惯打卡')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#1e7e6c,#34a88e);">🎯</div>
+        <span class="quick-label">习惯打卡</span>
+      </a>
+      <a class="quick-item" onclick="alert('客户管理')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#4f6de6,#7b93f5);">👥</div>
+        <span class="quick-label">客户管理</span>
+      </a>
+      <a class="quick-item" onclick="alert('数据分析')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#f0a020,#fbbf24);">📊</div>
+        <span class="quick-label">数据分析</span>
+      </a>
+      <a class="quick-item" onclick="alert('告警中心')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#e85a5a,#ff6b6b);">🔔</div>
+        <span class="quick-label">告警中心</span>
+      </a>
+      <a class="quick-item" onclick="alert('财务管理')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">💳</div>
+        <span class="quick-label">财务管理</span>
+      </a>
+      <a class="quick-item" onclick="alert('项目管理')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#06b6d4,#22d3ee);">📋</div>
+        <span class="quick-label">项目管理</span>
+      </a>
+      <a class="quick-item" onclick="alert('文档管理')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#f97316,#fb923c);">📄</div>
+        <span class="quick-label">文档管理</span>
+      </a>
+      <a class="quick-item" onclick="alert('更多')">
+        <div class="quick-icon" style="background:linear-gradient(135deg,#9ca3af,#d1d5db);">•••</div>
+        <span class="quick-label">更多</span>
+      </a>
+    </div>
+
+    <!-- ── 热门推荐 ── -->
+    <div class="section-hdr anim-fade anim-d4">
+      <span class="title">热门推荐</span>
+      <span class="more" onclick="alert('全部专题')">全部 <span>→</span></span>
+    </div>
+    <div class="topic-grid anim-fade anim-d4">
+      <a class="topic-card" onclick="alert('AI技术专题')">
+        <div class="topic-bg" style="background:linear-gradient(135deg,#c53d43,#e85a60);"></div>
+        <div class="topic-overlay"></div>
+        <span class="topic-label"># AI 技术专题</span>
+        <span class="topic-sub">6篇</span>
+      </a>
+      <a class="topic-card" onclick="alert('项目管理')">
+        <div class="topic-bg" style="background:linear-gradient(135deg,#06b6d4,#22d3ee);"></div>
+        <div class="topic-overlay"></div>
+        <span class="topic-label"># 项目管理实践</span>
+        <span class="topic-sub">4篇</span>
+      </a>
+      <a class="topic-card" onclick="alert('数据分析')">
+        <div class="topic-bg" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);"></div>
+        <div class="topic-overlay"></div>
+        <span class="topic-label"># 数据分析方法</span>
+        <span class="topic-sub">5篇</span>
+      </a>
+      <a class="topic-card" onclick="alert('行业趋势')">
+        <div class="topic-bg" style="background:linear-gradient(135deg,#f0a020,#fbbf24);"></div>
+        <div class="topic-overlay"></div>
+        <span class="topic-label"># 行业趋势洞察</span>
+        <span class="topic-sub">3篇</span>
+      </a>
+    </div>
+
+    <!-- ── Tools ── -->
+    <div class="section-hdr anim-fade anim-d5">
+      <span class="title">常用工具</span>
+      <span class="more" onclick="alert('所有工具')">更多 <span>→</span></span>
+    </div>
+    <div class="tools-grid anim-fade anim-d5">
+      <div class="tool-card" onclick="alert('甘特图')">
+        <div class="t-top">
+          <div class="t-icon" style="background:linear-gradient(135deg,#06b6d4,#22d3ee);">📋</div>
+          <span class="t-title">甘特图</span>
+          <span class="t-tag">进度</span>
+        </div>
+        <span class="t-desc">项目计划与进度追踪</span>
+        <div class="t-bar"><div class="t-bar-in" style="width:65%;"></div></div>
+        <div class="t-bar-label"><span>完成度</span><span>65%</span></div>
+      </div>
+      <div class="tool-card" onclick="alert('告警分析')">
+        <div class="t-top">
+          <div class="t-icon" style="background:linear-gradient(135deg,#e85a5a,#ff6b6b);">🔔</div>
+          <span class="t-title">告警分析</span>
+          <span class="t-tag">3条</span>
+        </div>
+        <span class="t-desc">异常事件与趋势分析</span>
+        <div class="t-bar"><div class="t-bar-in" style="width:35%;"></div></div>
+        <div class="t-bar-label"><span>处理率</span><span>35%</span></div>
+      </div>
+      <div class="tool-card" onclick="alert('报表导出')">
+        <div class="t-top">
+          <div class="t-icon" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">📄</div>
+          <span class="t-title">报表导出</span>
+        </div>
+        <span class="t-desc">一键生成运营报告</span>
+        <div class="t-bar"><div class="t-bar-in" style="width:80%;"></div></div>
+        <div class="t-bar-label"><span>本月</span><span>80%</span></div>
+      </div>
+      <div class="tool-card" onclick="alert('待办')">
+        <div class="t-top">
+          <div class="t-icon" style="background:linear-gradient(135deg,#f97316,#fb923c);">📌</div>
+          <span class="t-title">待办事项</span>
+          <span class="t-tag">5项</span>
+        </div>
+        <span class="t-desc">今日待办 · 优先处理</span>
+        <div class="t-bar"><div class="t-bar-in" style="width:45%;"></div></div>
+        <div class="t-bar-label"><span>完成</span><span>45%</span></div>
+      </div>
+    </div>
+
+    <!-- ── Tool Chips ── -->
+    <div class="section-hdr anim-fade anim-d6" style="margin-top:20px;">
+      <span class="title">便捷工具</span>
+    </div>
+    <div class="tool-strip anim-fade anim-d7">
+      <span class="tool-chip" onclick="alert('天气')"><span class="dot" style="background:#f0a020;"></span> 今日天气 ⛅ 28°</span>
+      <span class="tool-chip" onclick="alert('日历')"><span class="dot" style="background:#c53d43;"></span> 📅 6月17日 周三</span>
+      <span class="tool-chip" onclick="alert('审批')"><span class="dot" style="background:#1e7e6c;"></span> 📝 待审批 3</span>
+      <span class="tool-chip" onclick="alert('考勤')"><span class="dot" style="background:#4f6de6;"></span> ⏰ 已打卡</span>
+      <span class="tool-chip" onclick="alert('公告')"><span class="dot" style="background:#8b5cf6;"></span> 📢 企业公告</span>
+    </div>
+
+  </div>
+
+  <!-- ── Bottom Tab ── -->
+  <div class="bottom-tab">
+    <a class="tab-item active" onclick="alert('首页')">
+      <div class="tab-icon-c">🏠</div>
+      <span class="tab-label">首页</span>
+    </a>
+    <a class="tab-item" onclick="alert('工作')">
+      <div class="tab-icon-c">💼</div>
+      <span class="tab-label">工作</span>
+    </a>
+    <a class="tab-item" onclick="alert('消息')">
+      <div class="tab-icon-c">💬</div>
+      <span class="tab-label">消息</span>
+    </a>
+    <a class="tab-item" onclick="alert('我的')">
+      <div class="tab-icon-c">👤</div>
+      <span class="tab-label">我的</span>
+    </a>
+  </div>
+</div>
+
+<script>
+  // Carousel
+  const track = document.getElementById('carouselTrack');
+  const dots = document.querySelectorAll('.carousel-dot');
+  let current = 0, timer;
+  function goTo(i) {
+    current = i;
+    track.style.transform = 'translateX(-' + (i * 100) + '%)';
+    dots.forEach((d, j) => d.classList.toggle('active', j === i));
+  }
+  dots.forEach(dot => {
+    dot.addEventListener('click', function() {
+      clearInterval(timer);
+      goTo(parseInt(this.dataset.index));
+      timer = setInterval(() => goTo((current + 1) % dots.length), 3500);
+    });
+  });
+  timer = setInterval(() => goTo((current + 1) % dots.length), 3500);
+</script>
+
+</body>
+</html>

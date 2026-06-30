@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="white">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Theme Test</title>
+<style>
+  html[data-theme="white"] { --bg: #fff; --fg: #000; }
+  html[data-theme="dark"]  { --bg: #222; --fg: #eee; }
+  body { background: var(--bg); color: var(--fg); font: 18px sans-serif; padding: 40px; }
+  .panel { display: none; margin-top: 20px; background: var(--bg); border: 1px solid var(--fg); padding: 15px; border-radius: 8px; }
+  .panel.open { display: block; }
+  .opt { cursor: pointer; padding: 8px 12px; margin: 4px; display: inline-block; border: 1px solid var(--fg); border-radius: 6px; }
+  .opt.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+</style>
+</head>
+<body>
+
+<h2>Theme Test</h2>
+<button onclick="togglePanel(event)" id="themeBtn">🎨 Switch Theme</button>
+
+<div class="panel" id="themePanel">
+  <div class="opt active" data-theme="white"    onclick="setTheme('white')">White</div>
+  <div class="opt"        data-theme="dark"     onclick="setTheme('dark')">Dark</div>
+</div>
+
+<script>
+var K = 'test-theme', saved = 'white';
+try { saved = localStorage.getItem(K) || 'white'; } catch(e) {}
+
+window.setTheme = function(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem(K, t); } catch(e) {}
+  document.querySelectorAll('.opt').forEach(function(o) {
+    o.classList.toggle('active', o.getAttribute('data-theme') === t);
+  });
+  document.getElementById('themePanel').classList.remove('open');
+};
+
+window.togglePanel = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  document.getElementById('themePanel').classList.toggle('open');
+};
+
+window.setTheme(saved);
+</script>
+
+</body>
+</html>

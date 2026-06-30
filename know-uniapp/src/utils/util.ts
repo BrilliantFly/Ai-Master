@@ -1,6 +1,6 @@
-import {isObject} from '@vue/shared'
-import {getToken} from './auth'
-import {parseQuery} from "uniapp-router-next";
+import { isObject } from '@vue/shared'
+import { getToken } from './auth'
+import { parseQuery } from 'uniapp-router-next'
 
 /**
  * @description 获取元素节点信息（在组件中的元素必须要传ctx）
@@ -57,7 +57,10 @@ export enum LinkTypeEnum {
     'COPY' = 'copy'
 }
 
-export function navigateTo(link: Link, navigateType: 'navigateTo' | 'switchTab' | 'reLaunch' = 'navigateTo') {
+export function navigateTo(
+    link: Link,
+    navigateType: 'navigateTo' | 'switchTab' | 'reLaunch' = 'navigateTo'
+) {
     // H5外链
     if (link.type === LinkTypeEnum.WEBVIEW) {
         const url = encodeURIComponent(link.path)
@@ -88,11 +91,11 @@ export function navigateTo(link: Link, navigateType: 'navigateTo' | 'switchTab' 
         return
     }
 
-    const url = link?.query ? `${link.path}?${objectToQuery(link?.query)}` : link.path;
+    const url = link?.query ? `${link.path}?${objectToQuery(link?.query)}` : link.path
 
-    (navigateType == 'switchTab' || link.canTab) && uni.switchTab({url})
-    navigateType == 'navigateTo' && uni.navigateTo({url})
-    navigateType == 'reLaunch' && uni.reLaunch({url})
+    ;(navigateType == 'switchTab' || link.canTab) && uni.switchTab({ url })
+    navigateType == 'navigateTo' && uni.navigateTo({ url })
+    navigateType == 'reLaunch' && uni.reLaunch({ url })
 }
 
 /**
@@ -100,10 +103,12 @@ export function navigateTo(link: Link, navigateType: 'navigateTo' | 'switchTab' 
  * @param link 跳转信息，由装修数据进行输入
  */
 export function navigateToMiniProgram(link: Link) {
-    const query = link.query;
+    const query = link.query
     // #ifdef H5
     window.open(
-        `weixin://dl/business/?appid=${query?.appId}&path=${query?.path}&env_version=${query?.env_version}&query=${encodeURIComponent(query?.query)}`
+        `weixin://dl/business/?appid=${query?.appId}&path=${query?.path}&env_version=${
+            query?.env_version
+        }&query=${encodeURIComponent(query?.query)}`
     )
     // #endif
     // #ifdef MP
@@ -111,7 +116,7 @@ export function navigateToMiniProgram(link: Link) {
         appId: query?.appId,
         path: query?.path,
         extraData: parseQuery(query?.query),
-        envVersion: query?.env_version,
+        envVersion: query?.env_version
     })
     // #endif
 }
@@ -183,7 +188,7 @@ export const addUnit = (value: string | number, unit = 'rpx') => {
  * @param  { string } take 小数点操作
  * @param  { string } prec 小数位补
  */
-export function formatPrice({price, take = 'all', prec = undefined}: any) {
+export function formatPrice({ price, take = 'all', prec = undefined }: any) {
     let [integer, decimals = ''] = (price + '').split('.')
 
     // 小数位补

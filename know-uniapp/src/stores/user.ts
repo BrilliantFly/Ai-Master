@@ -1,4 +1,12 @@
-import { login as loginApi, logout as logoutApi, getUserInfo as getUserInfoApi, refreshToken as refreshTokenApi, setToken, removeToken, getToken } from '@/api/auth'
+import {
+    login as loginApi,
+    logout as logoutApi,
+    getUserInfo as getUserInfoApi,
+    refreshToken as refreshTokenApi,
+    setToken,
+    removeToken,
+    getToken
+} from '@/api/auth'
 import { useDictStore } from './dict'
 import cache from '@/utils/cache'
 import { defineStore } from 'pinia'

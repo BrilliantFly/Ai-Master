@@ -66,12 +66,7 @@ module.exports = {
             '5xl': '44rpx'
         },
         fontFamily: {
-            sans: [
-                'Source Han Sans CN',
-                'Helvetica Neue',
-                'Arial',
-                'sans-serif'
-            ]
+            sans: ['Source Han Sans CN', 'Helvetica Neue', 'Arial', 'sans-serif']
         }
     },
     plugins: [],

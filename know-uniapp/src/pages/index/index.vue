@@ -34,7 +34,11 @@
                 circular
                 interval="3500"
             >
-                <swiper-item v-for="(item, index) in heroSlides" :key="index" @tap="goLink(item.link)">
+                <swiper-item
+                    v-for="(item, index) in heroSlides"
+                    :key="index"
+                    @tap="goLink(item.link)"
+                >
                     <view class="hero-card" :style="{ background: item.background }">
                         <view class="hero-copy">
                             <text class="hero-title">{{ item.title }}</text>
@@ -54,13 +58,25 @@
                 <text class="segment-title">首页菜单</text>
             </view>
             <view class="quick-grid">
+                <view class="quick-item quick-item-focus" @tap="goLink('/pages/plan/focus/index')">
+                    <view class="quick-icon quick-icon-focus premium-icon-gw">
+                        <text>🍅</text>
+                    </view>
+                    <text class="quick-label quick-label-focus">番茄专注</text>
+                </view>
                 <view
                     v-for="item in quickEntries"
                     :key="item.id"
                     class="quick-item"
                     @tap="goLink(item.path)"
                 >
-                    <view class="quick-icon" :class="[item.iconClass, item.iconIsImage ? 'quick-icon-has-image' : 'premium-icon-gw']">
+                    <view
+                        class="quick-icon"
+                        :class="[
+                            item.iconClass,
+                            item.iconIsImage ? 'quick-icon-has-image' : 'premium-icon-gw'
+                        ]"
+                    >
                         <image
                             v-if="item.iconIsImage"
                             class="quick-image"
@@ -432,6 +448,11 @@ onShow(() => {
     font-size: 38rpx;
 }
 
+.quick-icon-focus {
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    box-shadow: 0 16rpx 30rpx rgba(239, 68, 68, 0.22);
+}
+
 .quick-icon-has-image {
     box-shadow: var(--shadow-sm);
 }
@@ -444,6 +465,11 @@ onShow(() => {
 .quick-label {
     font-size: 22rpx;
     color: var(--color-text-secondary);
+}
+
+.quick-label-focus {
+    color: var(--color-primary);
+    font-weight: 700;
 }
 
 .notice-banner {
@@ -540,7 +566,7 @@ onShow(() => {
     font-size: 18rpx;
     padding: 4rpx 12rpx;
     border-radius: 999rpx;
-    background: rgba(255,255,255,0.24);
+    background: rgba(255, 255, 255, 0.24);
     color: #fff;
 }
 

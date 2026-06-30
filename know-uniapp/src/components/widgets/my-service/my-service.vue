@@ -91,7 +91,10 @@ const userStore = useUserStore()
 const { isLogin } = storeToRefs(userStore)
 const router = useRouter()
 
-const ITEM_CONFIG: Record<string, { icon: string; iconBg: string; desc: string; fixedLink?: string }> = {
+const ITEM_CONFIG: Record<
+    string,
+    { icon: string; iconBg: string; desc: string; fixedLink?: string }
+> = {
     我的订单: { icon: '🧾', iconBg: '#eef2ff', desc: '查看所有服务和购买记录' },
     我的收藏: { icon: '⭐', iconBg: '#f0fdf4', desc: '收藏的设备、文章和模板' },
     消息通知: { icon: '🔔', iconBg: '#f0f9ff', desc: '推送、告警、通知偏好' },
@@ -100,7 +103,12 @@ const ITEM_CONFIG: Record<string, { icon: string; iconBg: string; desc: string; 
     关于我们: { icon: 'ℹ️', iconBg: '#eef2ff', desc: '版本 v2.4.0 · 检查更新' },
     我的资料: { icon: '👤', iconBg: '#fce7f3', desc: '编辑个人资料信息' },
     联系客服: { icon: '💬', iconBg: '#f3e8ff', desc: '在线客服为您服务' },
-    主题设置: { icon: '🎨', iconBg: '#eef2ff', desc: '切换 7 套视觉主题', fixedLink: '/pages/user_set/user_set?section=theme' }
+    主题设置: {
+        icon: '🎨',
+        iconBg: '#eef2ff',
+        desc: '切换 7 套视觉主题',
+        fixedLink: '/pages/user_set/user_set?section=theme'
+    }
 }
 
 const normalizeLink = (item: DecorateItem): DecorateLink => {
@@ -110,10 +118,15 @@ const normalizeLink = (item: DecorateItem): DecorateLink => {
 }
 
 const showList = computed<DecorateItem[]>(() => {
-    const base = (props.content.data || []).filter((item: DecorateItem) => `${item.is_show}` === '1')
+    const base = (props.content.data || []).filter(
+        (item: DecorateItem) => `${item.is_show}` === '1'
+    )
     const hasTheme = base.some((item: DecorateItem) => item.name === '主题设置')
     if (hasTheme) return base
-    return [...base, { name: '主题设置', link: '/pages/user_set/user_set?section=theme', is_show: '1' }]
+    return [
+        ...base,
+        { name: '主题设置', link: '/pages/user_set/user_set?section=theme', is_show: '1' }
+    ]
 })
 
 const menuGroups = computed(() => {
@@ -195,16 +208,20 @@ const handleClick = (item: DecorateItem) => {
     align-items: center;
     gap: 20rpx;
     padding: 28rpx 24rpx;
-    background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-primary-soft) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-primary-soft) 0%,
+        var(--color-primary-soft) 100%
+    );
     border-radius: 24rpx;
     margin-bottom: 24rpx;
     border: 2rpx solid rgba(var(--color-primary-rgb), 0.12);
-    transition: all .25s;
+    transition: all 0.25s;
     cursor: pointer;
 }
 
 .wallet-card:active {
-    transform: scale(.98);
+    transform: scale(0.98);
     box-shadow: 0 4rpx 20rpx rgba(var(--color-primary-rgb), 0.15);
 }
 
@@ -255,8 +272,8 @@ const handleClick = (item: DecorateItem) => {
     border-radius: 24rpx;
     overflow: hidden;
     margin-bottom: 24rpx;
-    border: 1rpx solid rgba(0, 0, 0, .04);
-    box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, .04);
+    border: 1rpx solid rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 .group-title {
@@ -277,7 +294,7 @@ const handleClick = (item: DecorateItem) => {
     width: 100%;
     text-align: left;
     font-family: inherit;
-    transition: all .15s;
+    transition: all 0.15s;
     cursor: pointer;
     box-sizing: border-box;
 }

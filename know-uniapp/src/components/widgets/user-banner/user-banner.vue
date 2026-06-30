@@ -40,15 +40,19 @@ const handleClick = () => {
     padding: 28rpx 28rpx;
     margin: 0 24rpx;
     margin-top: 16rpx;
-    background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-primary-mist) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-primary-soft) 0%,
+        var(--color-primary-mist) 100%
+    );
     border-radius: 24rpx;
     border: 2rpx solid rgba(var(--color-primary-rgb), 0.12);
-    transition: all .25s;
+    transition: all 0.25s;
     cursor: pointer;
 }
 
 .service-banner:active {
-    transform: scale(.98);
+    transform: scale(0.98);
     box-shadow: 0 4rpx 24rpx rgba(var(--color-primary-rgb), 0.12);
 }
 

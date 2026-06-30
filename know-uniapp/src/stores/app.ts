@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia'
-import { getTabbarMenu, getHomeMenu, getTabbarMenuByUser, getHomeMenuByUser } from '@/api/system/menu'
+import {
+    getTabbarMenu,
+    getHomeMenu,
+    getTabbarMenuByUser,
+    getHomeMenuByUser
+} from '@/api/system/menu'
 
 interface AppState {
     config: Record<string, any>
@@ -37,7 +42,10 @@ export const useAppStore = defineStore({
             }
             const clean = url.replace(/^\.?\//, '')
             // #ifdef H5
-            const base = (((import.meta as any).env?.BASE_URL as string) || '/mobile/').replace(/\/?$/, '/')
+            const base = (((import.meta as any).env?.BASE_URL as string) || '/mobile/').replace(
+                /\/?$/,
+                '/'
+            )
             return `${base}${clean}`
             // #endif
             return `/${clean}`
@@ -66,10 +74,7 @@ export const useAppStore = defineStore({
         },
         async loadPublicMenuConfig() {
             try {
-                const [tabbarRes, homeRes] = await Promise.all([
-                    getTabbarMenu(),
-                    getHomeMenu()
-                ])
+                const [tabbarRes, homeRes] = await Promise.all([getTabbarMenu(), getHomeMenu()])
                 this.menuConfig.tabbar = Array.isArray(tabbarRes) ? tabbarRes : []
                 this.menuConfig.home = Array.isArray(homeRes) ? homeRes : []
             } catch (error) {

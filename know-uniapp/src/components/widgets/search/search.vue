@@ -23,11 +23,7 @@
                 </navigator>
             </template>
             <template #title>
-                <image
-                    class="!h-[54rpx]"
-                    :src="metaData.title_img"
-                    mode="widthFix"
-                ></image>
+                <image class="!h-[54rpx]" :src="metaData.title_img" mode="widthFix"></image>
             </template>
         </u-navbar>
     </u-sticky>
@@ -50,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed} from "vue";
+import { computed } from 'vue'
 
 const props = defineProps({
     pageMeta: {

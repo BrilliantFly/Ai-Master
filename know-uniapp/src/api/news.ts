@@ -53,27 +53,27 @@ export function getCollect() {
 
 /**
  * 新增评论
- * @param {any} data 
- * @return 
- */ 
+ * @param {any} data
+ * @return
+ */
 export function addComment(data: any) {
     return request.post({ url: '/comment/addNew', data: data })
 }
 
 /**
  * 获取评论
- * @param {any} data 
- * @return 
- */ 
+ * @param {any} data
+ * @return
+ */
 export function getComment(data: { articleId: number }) {
     return request.get({ url: '/comment/getComment', data: data })
 }
 
 /**
  * 删除
- * @param {any} data 
- * @return 
- */ 
+ * @param {any} data
+ * @return
+ */
 export function deleteComment(data: any) {
     return request.post({ url: '/comment/delNew', data: data })
 }

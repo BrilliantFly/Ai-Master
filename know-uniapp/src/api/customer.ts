@@ -7,7 +7,7 @@ import { getToken } from '@/utils/auth'
 // Customer service request instance
 const customerRequestOptions = {
     requestOptions: {
-        timeout: appConfig.timeout,
+        timeout: appConfig.timeout
     },
     baseUrl: appConfig.customerBaseUrl,
     isReturnDefaultResponse: false,
@@ -17,7 +17,7 @@ const customerRequestOptions = {
     withToken: true,
     isAuth: false,
     retryCount: 2,
-    retryTimeout: 1000,
+    retryTimeout: 1000
 }
 
 const customerRequestHooks = {
@@ -29,10 +29,12 @@ const customerRequestHooks = {
         }
         options.header.version = appConfig.version
         return options
-    },
+    }
 }
 
-const customerRequest = new HttpRequest(merge(customerRequestOptions, { requestHooks: customerRequestHooks }))
+const customerRequest = new HttpRequest(
+    merge(customerRequestOptions, { requestHooks: customerRequestHooks })
+)
 
 export { customerRequest }
 

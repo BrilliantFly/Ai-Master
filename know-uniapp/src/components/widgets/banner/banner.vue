@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import LSwiper from '@/components/l-swiper/l-swiper.vue'
-import {useAppStore} from "@/stores/app";
+import { useAppStore } from '@/stores/app'
 
 const emit = defineEmits(['change'])
 const props = defineProps({
@@ -35,7 +35,7 @@ const props = defineProps({
         type: Boolean
     }
 })
-const {getImageUrl} = useAppStore();
+const { getImageUrl } = useAppStore()
 
 const handleChange = (index: number) => {
     emit('change', getImageUrl(props['content'].data[index].bg))

@@ -179,13 +179,27 @@ const selectTheme = (key: string) => {
     border-radius: 50%;
 }
 
-.sw-white::after { background: #5b5bd6; }
-.sw-dark::after { background: #6b6be0; }
-.sw-warm::after { background: #d4956b; }
-.sw-aurora::after { background: #6366f1; }
-.sw-purple::after { background: #7c3aed; }
-.sw-glass::after { background: linear-gradient(135deg, #667eea, #764ba2); }
-.sw-orangold::after { background: linear-gradient(135deg, #E87A5D, #D4A04A); }
+.sw-white::after {
+    background: #5b5bd6;
+}
+.sw-dark::after {
+    background: #6b6be0;
+}
+.sw-warm::after {
+    background: #d4956b;
+}
+.sw-aurora::after {
+    background: #6366f1;
+}
+.sw-purple::after {
+    background: #7c3aed;
+}
+.sw-glass::after {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+.sw-orangold::after {
+    background: linear-gradient(135deg, #e87a5d, #d4a04a);
+}
 
 .theme-option.active .swatch {
     border-color: var(--color-primary);

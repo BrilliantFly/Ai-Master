@@ -21,7 +21,7 @@
                             class="flex flex-col items-center"
                             @click="handleClick(item.link)"
                         >
-                            <u-image width="82" height="82" :src="getImageUrl(item.image)" alt=""/>
+                            <u-image width="82" height="82" :src="getImageUrl(item.image)" alt="" />
                             <view class="mt-[14rpx] text-xs">{{ item.name }}</view>
                         </view>
                     </view>
@@ -32,9 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch, computed} from 'vue'
-import {useAppStore} from '@/stores/app'
-import {navigateTo, sliceArray} from '@/utils/util'
+import { ref, watch, computed } from 'vue'
+import { useAppStore } from '@/stores/app'
+import { navigateTo, sliceArray } from '@/utils/util'
 
 const props = defineProps({
     content: {
@@ -47,7 +47,7 @@ const props = defineProps({
     }
 })
 
-const {getImageUrl} = useAppStore()
+const { getImageUrl } = useAppStore()
 const swiperCurrent = ref<number>(0)
 const navList = ref<Record<string, any>>([])
 
@@ -58,13 +58,13 @@ const pagesNum = computed<number>(() => {
 watch(
     () => props.content.data,
     (val) => {
-		console.log("1111")
-		console.log(val)
+        console.log('1111')
+        console.log(val)
         const num = props.content.style === 1 ? val.length : pagesNum.value
         navList.value = sliceArray(val, num)
         console.log(navList.value)
     },
-    {deep: true, immediate: true}
+    { deep: true, immediate: true }
 )
 
 const handleClick = (link: any) => {

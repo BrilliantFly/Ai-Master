@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>艾森豪威尔矩阵 · v2</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrapper {
+    max-width: 780px;
+    width: 100%;
+  }
+  .title {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .title h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1f2937;
+    letter-spacing: 1px;
+  }
+  .title h1 span { color: #6366f1; }
+  .title p {
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: #e5e7eb;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  }
+  .cell {
+    background: #fff;
+    padding: 24px 20px 20px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+  }
+  .cell-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f3f4f6;
+  }
+  .cell-header .badge {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .cell-header .lbl {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+  }
+  .cell-header .tag {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .cell-body {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #4b5563;
+  }
+  .cell-body .desc {
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #6b7280;
+    padding: 2px 0;
+  }
+  .cell-body .highlight {
+    font-weight: 600;
+    color: #1f2937;
+  }
+  .cell-body li {
+    list-style: none;
+    padding: 4px 0 4px 16px;
+    position: relative;
+  }
+  .cell-body li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+
+  /* Q1 — 紧急重要 */
+  .c1 .badge, .c1 li::before { background: #ef4444; }
+  .c1 .tag { background: #fef2f2; color: #dc2626; }
+  .c1 { border-bottom: 3px solid #ef4444; }
+
+  /* Q2 — 重要不紧急 */
+  .c2 .badge, .c2 li::before { background: #3b82f6; }
+  .c2 .tag { background: #eff6ff; color: #2563eb; }
+  .c2 { border-bottom: 3px solid #3b82f6; }
+
+  /* Q3 — 紧急不重要 */
+  .c3 .badge, .c3 li::before { background: #f59e0b; }
+  .c3 .tag { background: #fffbeb; color: #d97706; }
+  .c3 { border-bottom: 3px solid #f59e0b; }
+
+  /* Q4 — 不紧急不重要 */
+  .c4 .badge, .c4 li::before { background: #9ca3af; }
+  .c4 .tag { background: #f9fafb; color: #6b7280; }
+  .c4 { border-bottom: 3px solid #9ca3af; }
+
+  /* Axis labels */
+  .axis {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-top: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+  .axis .left { text-align: left; flex: 1; }
+  .axis .center { text-align: center; flex: 0 0 auto; padding: 0 20px; }
+  .axis .right { text-align: right; flex: 1; }
+  .grid-wrap { position: relative; }
+  .grid-wrap .y-top { position: absolute; left: -58px; top: 18%; font-size: 11px; color: #9ca3af; font-weight: 500; }
+  .grid-wrap .y-bot { position: absolute; left: -58px; bottom: 18%; font-size: 11px; color: #9ca3af; font-weight: 500; }
+
+  @media (max-width: 600px) {
+    body { padding: 16px; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 1px; }
+    .cell { padding: 16px 14px 14px; min-height: 160px; }
+    .title h1 { font-size: 20px; }
+    .y-top, .y-bot, .axis { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="title">
+    <h1>艾森豪威尔 <span>矩阵</span></h1>
+    <p>Eisenhower Matrix · 四象限法则</p>
+  </div>
+
+  <div class="grid-wrap">
+    <div class="y-top">重 要</div>
+    <div class="y-bot">不 重 要</div>
+
+    <div class="grid">
+      <!-- Q1 重要紧急 -->
+      <div class="cell c1">
+        <div class="cell-header">
+          <span class="badge"></span>
+          <span class="lbl">重要且紧急</span>
+          <span class="tag">Do First</span>
+        </div>
+        <div class="cell-body">
+          <div class="desc"><span class="highlight">危机驱动：</span>需立即响应，通常与紧急问题、截止日期或突发事件相关。</div>
+          <div class="desc"><span class="highlight">核心策略：</span>优先处理但应控制占比，通过前置规划将任务向 Q2 迁移。</div>
+          <div class="desc"><span class="highlight">注意：</span>长期停留此象限会导致疲劳与决策质量下降。</div>
+        </div>
+      </div>
+
+      <!-- Q2 重要不紧急 -->
+      <div class="cell c2">
+        <div class="cell-header">
+          <span class="badge"></span>
+          <span class="lbl">重要不紧急</span>
+          <span class="tag">Schedule</span>
+        </div>
+        <div class="cell-body">
+          <div class="desc"><span class="highlight">战略核心：</span>关乎长期目标、自我提升与深度工作，是高杠杆活动所在。</div>
+          <div class="desc"><span class="highlight">核心策略：</span>主动规划、预留整块时间，是高效能人士最应投入的象限。</div>
+          <div class="desc"><span class="highlight">注意：</span>容易被 Q1 和 Q3 挤压，需刻意保护时间预算。</div>
+        </div>
+      </div>
+
+      <!-- Q3 紧急不重要 -->
+      <div class="cell c3">
+        <div class="cell-header">
+          <span class="badge"></span>
+          <span class="lbl">紧急不重要</span>
+          <span class="tag">Delegate</span>
+        </div>
+        <div class="cell-body">
+          <div class="desc"><span class="highlight">虚假紧迫：</span>看似需要快速响应，但对核心目标贡献有限。</div>
+          <div class="desc"><span class="highlight">核心策略：</span>委派、标准化处理或批量集中处理，减少注意力碎片化。</div>
+          <div class="desc"><span class="highlight">注意：</span>识别并抵制"忙碌感"的诱惑，区分真伪紧急。</div>
+        </div>
+      </div>
+
+      <!-- Q4 不重要不紧急 -->
+      <div class="cell c4">
+        <div class="cell-header">
+          <span class="badge"></span>
+          <span class="lbl">不重要不紧急</span>
+          <span class="tag">Eliminate</span>
+        </div>
+        <div class="cell-body">
+          <div class="desc"><span class="highlight">纯粹干扰：</span>既不重要也不紧急，对目标无贡献，占用时间资源。</div>
+          <div class="desc"><span class="highlight">核心策略：</span>果断消除或最小化，将时间重新分配给 Q2 活动。</div>
+          <div class="desc"><span class="highlight">注意：</span>适度的放松有益，但需警惕无意识的消耗性习惯。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="axis">
+    <span class="left">紧 急</span>
+    <span class="center">不 紧 急</span>
+  </div>
+</div>
+</body>
+</html>

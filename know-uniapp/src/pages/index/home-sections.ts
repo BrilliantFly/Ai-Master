@@ -501,11 +501,26 @@ export const normalizeHomeMenuItems = (menus: RawHomeMenu[] = []): HomeDisplayIt
 export const buildHomeSections = (items: HomeDisplayItem[]) => {
     const quick = items.filter((item) => item.sections.includes('quick'))
     const recommend = items.filter((item) => item.sections.includes('recommend')).slice(0, 6)
-    const tools = items.filter((item) => item.sections.includes('tool')).slice(0, 6)
+    const dynamicTools = items.filter((item) => item.sections.includes('tool'))
+    const mergedTools = [...dynamicTools]
+
+    REFERENCE_TOOL_ITEMS.forEach((preset) => {
+        const exists = mergedTools.some(
+            (item) =>
+                item.code === preset.code ||
+                item.path === preset.path ||
+                item.title === preset.title
+        )
+        if (!exists) {
+            mergedTools.push(preset)
+        }
+    })
+
+    const tools = mergedTools.sort((a, b) => a.sort - b.sort).slice(0, 6)
 
     return {
         quick,
         recommend,
-        tools: tools.length ? tools : REFERENCE_TOOL_ITEMS
+        tools
     }
 }

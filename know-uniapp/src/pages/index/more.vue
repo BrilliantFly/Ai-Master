@@ -14,7 +14,13 @@
                 class="more-card premium-card"
                 @tap="goLink(item.path)"
             >
-                <view class="more-icon" :class="[item.iconIsImage ? 'more-icon-image-wrap' : item.iconClass, !item.iconIsImage ? 'premium-icon-gw' : '']">
+                <view
+                    class="more-icon"
+                    :class="[
+                        item.iconIsImage ? 'more-icon-image-wrap' : item.iconClass,
+                        !item.iconIsImage ? 'premium-icon-gw' : ''
+                    ]"
+                >
                     <image
                         v-if="item.iconIsImage"
                         class="more-image"

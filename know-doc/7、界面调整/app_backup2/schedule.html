@@ -1,0 +1,1285 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="white">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>日程计划</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.schedule-top{padding:4px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+.schedule-top h1{font-size:24px;font-weight:700;letter-spacing:-.03em;color:var(--text);margin:0}
+.schedule-top .sub{font-size:13px;color:var(--text-secondary);font-weight:400;margin-top:1px}
+.view-switcher{display:flex;gap:4px;padding:0 20px 14px}
+.view-btn{padding:6px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;border:none;background:var(--surface-soft);color:var(--text-secondary);cursor:pointer;transition:color .25s ease,background .25s ease;font-family:inherit}
+.view-btn:hover{color:var(--primary)}
+.view-btn.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.cal-card{margin:0 20px 14px;border-radius:var(--radius-md);background:var(--surface);border:1px solid var(--border-light);padding:16px;box-shadow:var(--shadow-sm)}
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.month-nav .month{font-size:17px;font-weight:600;color:var(--text)}
+.month-nav .nav-group{display:flex;gap:4px}
+.month-nav .nav-btn{width:32px;height:32px;border-radius:var(--radius-sm);border:none;background:var(--surface-soft);cursor:pointer;font-size:14px;color:var(--text-secondary);transition:color .25s ease,background .25s ease,transform .25s ease;display:flex;align-items:center;justify-content:center}
+.month-nav .nav-btn:hover{background:var(--primary-soft);color:var(--primary)}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:var(--text-tertiary);font-weight:500;margin-bottom:6px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--radius-sm);font-size:13px;color:var(--text-secondary);cursor:pointer;transition:background .25s ease,color .25s ease;font-weight:400;border:none;background:none;font-family:inherit;position:relative}
+.cal-day:hover{background:var(--surface-soft)}
+.cal-day.today{font-weight:700;color:var(--primary)}
+.cal-day.today::after{content:'';position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:var(--primary)}
+.cal-day.selected{background:var(--primary);color:var(--text-inverse);font-weight:600}
+.cal-day.selected::after{background:#fff}
+.cal-day .dot{width:3px;height:3px;border-radius:50%;background:var(--primary);margin-top:2px}
+.cal-day .dot.multi{background:var(--warning)}
+.cal-day.other{opacity:.2;pointer-events:none}
+.stats-row{display:flex;gap:8px;padding:0 20px 16px}
+.stat-card{flex:1;border-radius:var(--radius-sm);padding:12px 8px;background:var(--surface-soft);text-align:center;cursor:pointer;border:1px solid transparent;transition:background .25s ease,border-color .25s ease,transform .25s ease}
+.stat-card:hover{background:var(--primary-mist)}
+.stat-card .num{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.03em}
+.stat-card .label{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.stat-card.accent{background:var(--primary-soft);border-color:var(--primary-mist)}
+.stat-card.accent .num{color:var(--primary)}
+.quadrant-wrap{margin:0 20px 14px}
+.quadrant-scroll{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.quadrant-scroll::-webkit-scrollbar{display:none}
+.q-tab{flex-shrink:0;padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;border:none;background:var(--surface-soft);color:var(--text-secondary);cursor:pointer;transition:color .25s ease,background .25s ease;font-family:inherit;white-space:nowrap}
+.q-tab:hover{color:var(--primary)}
+.q-tab.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.q-tab .badge{display:inline-block;font-size:10px;background:var(--border-light);color:var(--text-tertiary);padding:0 6px;border-radius:var(--radius-xs);margin-left:4px;font-weight:400}
+.q-tab.active .badge{background:var(--primary);color:var(--text-inverse)}
+.schedule-list{padding:0 20px 120px;display:flex;flex-direction:column;gap:8px}
+.day-timeline{padding:0 20px 120px}
+.hour-row{display:flex;min-height:52px;border-bottom:1px solid var(--border-light)}
+.hour-label{width:48px;flex-shrink:0;font-size:11px;color:var(--text-tertiary);padding:4px 6px 0 0;text-align:right;font-weight:500}
+.hour-tasks{flex:1;padding:2px 0 2px 8px}
+.hour-task{font-size:12px;padding:4px 8px;border-radius:var(--radius-sm);margin-bottom:2px;cursor:pointer;transition:background .25s ease,color .25s ease;display:flex;align-items:center;gap:4px}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 20px 120px}
+.week-day-header{text-align:center;font-size:12px;font-weight:600;color:var(--text);padding:4px 0}
+.week-day{min-height:80px;border-radius:var(--radius-sm);background:var(--surface-soft);padding:4px}
+.week-day.today{border:1.5px solid var(--primary)}
+.week-day .date-num{font-size:11px;color:var(--text-secondary);font-weight:500;margin-bottom:2px}
+.week-day .wk-task{font-size:10px;padding:2px 4px;border-radius:var(--radius-xs);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;color:var(--text-inverse)}
+.s-card{display:flex;gap:10px;padding:14px;border-radius:var(--radius-md);background:var(--surface);border:1px solid var(--border-light);cursor:pointer;transition:box-shadow .25s ease,border-color .25s ease}
+.s-card:hover{box-shadow:var(--shadow-md);border-color:transparent}
+.s-card .time-col{text-align:center;min-width:40px;flex-shrink:0}
+.s-card .time-col .t{font-size:14px;font-weight:700;color:var(--text)}
+.s-card .time-col .t.sub{font-size:10px;font-weight:400;color:var(--text-tertiary)}
+.s-card .content{flex:1;min-width:0}
+.s-card .content .ctitle{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.s-card .content .cdesc{font-size:12px;color:var(--text-secondary);line-height:1.4}
+.s-card .tag{font-size:10px;padding:1px 8px;border-radius:var(--radius-xs);flex-shrink:0}
+.s-card.done{opacity:.65;position:relative;overflow:hidden}
+.s-card.done .ctitle{text-decoration:line-through;color:var(--text-tertiary)}
+.s-card.done .ctitle .tag{opacity:.5}
+.s-card.done .time-col .t{color:var(--success)}
+.s-card.done::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(34,181,115,.06),rgba(34,181,115,.02));pointer-events:none}
+.s-card.done .s-card .quadrant-bar{opacity:.3}
+/* 左滑操作按钮由 shared.js + styles.css 共享实现 */
+.s-card .quadrant-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 2px 2px 0}
+.qb-1{background:var(--danger)}
+.qb-2{background:var(--warning)}
+.qb-3{background:var(--primary)}
+.qb-4{background:var(--text-tertiary)}
+.empty-state{text-align:center;padding:60px 20px}
+.empty-state .icon{font-size:48px;opacity:.4;margin-bottom:12px}
+.empty-state p{font-size:14px;color:var(--text-tertiary)}
+.modal-overlay{position:fixed;inset:0;background:var(--overlay-bg,rgba(0,0,0,.35));z-index:300;display:flex;opacity:0;visibility:hidden;transition:opacity .25s var(--ease),visibility .25s}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:420px;background:var(--bg-app);border-radius:var(--radius-lg) var(--radius-lg) 0 0;z-index:301;padding:24px 20px max(24px,env(safe-area-inset-bottom));transition:transform .3s cubic-bezier(.22,1,.36,1);max-height:85vh;overflow-y:auto}
+.modal-overlay.open .modal-sheet{transform:translateX(-50%) translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 20px}
+.modal-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:5px}
+/* ===== Form input wrap with focus bar ===== */
+.fg-input-wrap{position:relative;display:block}
+.fg-input-wrap .focus-bar{position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--primary);opacity:0;transition:opacity .25s;pointer-events:none}
+.fg-input-wrap:focus-within .focus-bar{opacity:1}
+/* ===== Form-preview 卡片样式 ===== */
+.form-card-header{font-size:13px;font-weight:600;color:var(--primary);margin-bottom:12px;letter-spacing:.3px;display:flex;align-items:center;gap:6px}
+.form-card-header::after{content:'';flex:1;height:1px;background:var(--border);margin-left:8px}
+.form-card-schedule{background:var(--bg-card,var(--card-bg,var(--surface)));border-radius:var(--radius-md);box-shadow:var(--card-shadow,var(--shadow-sm));padding:18px 18px 20px;margin-bottom:14px;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s cubic-bezier(.34,1.56,.64,1);animation:cardSlideIn .4s ease both}
+.form-card-schedule:hover{transform:translateY(-2px);box-shadow:0 4px 20px var(--card-hover-shadow,rgba(0,0,0,.1))}
+.form-card-schedule:active{transform:translateY(0)}
+.form-card-schedule:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.form-card-schedule:nth-child(1){animation-delay:0s}
+.form-card-schedule:nth-child(2){animation-delay:.06s}
+.form-card-schedule:nth-child(3){animation-delay:.12s}
+.form-card-schedule:nth-child(4){animation-delay:.18s}
+.form-card-schedule:nth-child(5){animation-delay:.24s}
+.form-card-schedule:nth-child(6){animation-delay:.30s}
+.fg-label{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:5px;letter-spacing:.2px}
+.fg-label .required{color:var(--danger);font-size:15px;line-height:1}
+.fgs-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fgs-full{margin-top:10px}
+.mt-10{margin-top:10px}
+.fgs-row.mt-10{margin-top:10px}
+/* select 自定义箭头 */
+.fg-input-wrap:has(.fg-select)::after{content:'';position:absolute;right:14px;top:50%;width:7px;height:7px;border:2px solid var(--text-tertiary);border-top:none;border-left:none;transform:translateY(-65%) rotate(45deg);pointer-events:none;transition:border-color .22s;z-index:1}
+.fg-input-wrap:has(.fg-select):focus-within::after{border-color:var(--primary)}
+.fg-input,.fg-select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--input-bg);color:var(--text-primary,var(--text));font-size:14px;transition:border-color .22s,box-shadow .22s,background .22s;outline:none;font-family:inherit}
+.fg-input:hover,.fg-select:hover{border-color:var(--input-border-hover,#c8ccd8);background:var(--input-bg-hover)}
+.fg-input:active,.fg-select:active{border-color:var(--text-primary,var(--text))}
+.fg-input:focus,.fg-select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-alpha,rgba(var(--primary-rgb),.12));background:var(--input-bg-focus)}
+.fg-input:focus-visible,.fg-select:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.fg-input::placeholder{color:var(--text-tertiary);font-style:italic;font-weight:400;font-size:13px}
+input[type="date"].fg-input,input[type="time"].fg-input{min-height:42px;-webkit-appearance:none;appearance:none;color-scheme:var(--date-color-scheme,light)}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{opacity:.3;height:24px}
+.fg-select{-webkit-appearance:none;-moz-appearance:none;appearance:none;padding-right:34px;cursor:pointer}
+.fg-select option{color:var(--text-primary,var(--text));background:var(--bg-card,var(--card-bg,var(--surface)))}
+/* 子任务 */
+.subtask-list{display:flex;flex-direction:column;gap:8px}
+.subtask-row{display:flex;gap:8px;align-items:center;animation:subFadeIn .25s ease}
+.subtask-row.removing{animation:subFadeOut .2s ease forwards;pointer-events:none}
+.subtask-row .fg-input{flex:1}
+.subtask-del{width:32px;height:32px;border:none;border-radius:var(--radius-sm);background:var(--bg-secondary,var(--surface-soft));color:var(--text-tertiary);font-size:16px;cursor:pointer;display:grid;place-items:center;transition:background .2s,color .2s,transform .2s;flex-shrink:0}
+.subtask-del:hover{background:var(--danger-soft);color:var(--danger)}
+.subtask-del:active{transform:scale(.88)}
+.subtask-del:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.btn-add-sub{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border:1.5px dashed var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-tertiary);font-size:12px;font-weight:500;cursor:pointer;transition:border-color .2s,color .2s,background .2s,gap .2s;margin-top:2px;width:fit-content}
+.btn-add-sub:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-alpha,rgba(var(--primary-rgb),.04));gap:7px}
+.btn-add-sub:active{transform:scale(.96)}
+.btn-add-sub:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.subtask-count{font-size:12px;color:var(--text-tertiary);font-weight:500;transition:opacity .2s}
+html[data-theme="dark"] .btn-add-sub,html[data-theme="purple"] .btn-add-sub,html[data-theme="glass"] .btn-add-sub{border-color:var(--text-tertiary)}
+html[data-theme="glass"] .form-card-schedule,html[data-theme="orangold"] .form-card-schedule,html[data-theme="glass"] .form-section-sch,html[data-theme="orangold"] .form-section-sch{border:1px solid var(--border-light)}
+/* 折叠卡片 */
+.form-section-sch{background:var(--bg-card,var(--card-bg,var(--surface)));border-radius:var(--radius-md);box-shadow:var(--card-shadow,var(--shadow-sm));overflow:hidden;margin-bottom:14px;animation:cardSlideIn .4s ease both;animation-delay:.24s}
+.form-section-sch details{interpolate-size:allow-keywords}
+.form-section-sch summary{display:flex;align-items:center;gap:8px;padding:14px 18px;cursor:pointer;color:var(--text-secondary);font-size:13px;font-weight:500;list-style:none;-webkit-user-select:none;user-select:none;transition:color .25s,background .25s}
+.form-section-sch summary:hover{background:var(--primary-alpha,rgba(var(--primary-rgb),.04))}
+.form-section-sch summary:active{transform:scale(.99)}
+.form-section-sch summary:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.form-section-sch summary::-webkit-details-marker{display:none}
+.form-section-sch summary .arrow{font-size:12px;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.form-section-sch details[open] summary{color:var(--primary);background:var(--primary-alpha,rgba(var(--primary-rgb),.04))}
+.form-section-sch details[open] summary .arrow{transform:rotate(180deg)}
+.form-section-sch details .section-body{padding:0 18px;opacity:0;transition:opacity .35s ease,padding .35s ease}
+.form-section-sch details[open] .section-body{opacity:1;padding:0 18px 18px}
+/* 按钮组（与 form-preview 一致） */
+.btn-row{display:flex;gap:12px;margin-top:24px;padding-top:14px;border-top:1px solid var(--border)}
+.btn-primary,.btn-secondary{flex:1;padding:13px 0;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s cubic-bezier(.34,1.56,.64,1),background .25s,color .25s;position:relative;overflow:hidden;font-family:inherit}
+.btn-primary{background:var(--accent-gradient);color:var(--text-inverse);box-shadow:0 4px 14px var(--primary-alpha,rgba(var(--primary-rgb),.3))}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--primary-alpha,rgba(var(--primary-rgb),.4))}
+.btn-primary:active{transform:scale(.97);box-shadow:0 2px 8px var(--primary-alpha,rgba(var(--primary-rgb),.2))}
+.btn-primary:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.btn-secondary{background:var(--bg-secondary,var(--surface-soft));color:var(--text-secondary)}
+.btn-secondary:hover{background:var(--border);color:var(--text-primary,var(--text))}
+.btn-secondary:active{transform:scale(.97)}
+.btn-secondary:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.btn-primary:disabled,.btn-secondary:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-primary::after,.btn-secondary::after{content:'';position:absolute;left:50%;top:50%;width:100%;padding-bottom:100%;border-radius:50%;background:rgba(255,255,255,.22);transform:translate(-50%,-50%) scale(0);transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .35s;opacity:0;pointer-events:none}
+.btn-primary:active::after,.btn-secondary:active::after{transform:translate(-50%,-50%) scale(2.5);opacity:1;transition-duration:0s}
+.btn-primary:disabled::after,.btn-secondary:disabled::after{display:none}
+/* 进度滑块 */
+.progress-slider{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:linear-gradient(to right,var(--primary) 0%,var(--primary) var(--progress,0%),var(--border) var(--progress,0%),var(--border) 100%);outline:none;transition:background .2s}
+.progress-slider::-webkit-slider-runnable-track{height:6px;border-radius:3px}
+.progress-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 2px 6px var(--primary-alpha,rgba(var(--primary-rgb),.35));transition:transform .2s;margin-top:-7px}
+.progress-slider::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.progress-slider:active::-webkit-slider-thumb{transform:scale(.92)}
+.progress-slider::-moz-range-track{height:6px;border-radius:3px;background:var(--border)}
+.progress-slider::-moz-range-progress{background:var(--primary);border-radius:3px;height:6px}
+.progress-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;border:none;box-shadow:0 2px 6px var(--primary-alpha,rgba(var(--primary-rgb),.35))}
+.progress-slider:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.progress-val{font-size:13px;font-weight:600;color:var(--primary);min-width:28px;text-align:right}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-actions{display:flex;gap:10px;margin-top:20px}
+.form-actions button{flex:1;padding:12px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:transform .25s ease,background .25s ease;border:none;position:relative;overflow:hidden}
+
+.btn-cancel{background:var(--surface-soft);color:var(--text-secondary)}
+.btn-cancel:hover{background:var(--border-light);color:var(--text)}
+.btn-save{background:var(--accent-gradient);color:var(--text-inverse);box-shadow:var(--shadow-glow)}
+.btn-save:hover{transform:translateY(-1px)}
+.btn-delete-form{background:var(--danger-soft);color:var(--danger)}
+.date-group{margin-top:8px}
+.date-group:first-child{margin-top:0}
+.dg-header{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.dg-header .count{font-size:11px;color:var(--text-tertiary);font-weight:400}
+
+/* ===== Quadrant visual selector (replaces select) ===== */
+.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.quad-option{padding:8px 6px;border:1.5px solid var(--border);border-radius:var(--radius-sm);text-align:center;font-size:12px;cursor:pointer;transition:border-color .2s,background .2s,color .2s,transform .2s;background:var(--input-bg);color:var(--text-secondary);font-weight:500;-webkit-user-select:none;user-select:none}
+.quad-option:hover{border-color:var(--primary);background:var(--primary-alpha,rgba(var(--primary-rgb),.06))}
+.quad-option.active{border-color:var(--primary);background:var(--primary);color:var(--text-inverse);font-weight:600}
+.quad-option .q-icon{display:block;font-size:16px;margin-bottom:2px}
+.quad-option:active{transform:scale(.95)}
+.quad-option:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+
+/* ===== Multi-reminder (check-chip) ===== */
+.check-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.check-chip{position:relative;display:flex;align-items:center;justify-content:center;padding:9px 4px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--input-bg);cursor:pointer;font-size:12px;color:var(--text-secondary);font-weight:500;transition:border-color .2s,background .2s,color .2s,transform .2s;-webkit-user-select:none;user-select:none}
+.check-chip:hover{border-color:var(--primary)}
+.check-chip input{position:absolute;opacity:0;pointer-events:none}
+.check-chip:has(input:checked){border-color:var(--primary);background:var(--primary-alpha,rgba(var(--primary-rgb),.1));color:var(--primary);font-weight:600}
+.check-chip:active{transform:scale(.93)}
+.check-chip:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.check-chip:has(input:checked)::after{content:'✓';position:absolute;top:1px;right:5px;font-size:9px;font-weight:700;color:var(--primary)}
+/* ===== Subtask ===== */
+.subtask-wrap textarea{font-size:13px;line-height:1.7;min-height:70px;resize:vertical}
+.subtask-preview{margin-top:6px;border-radius:var(--radius-sm);background:var(--surface-soft);padding:8px 12px}
+.subtask-preview .st-hint{font-size:11px;color:var(--text-tertiary)}
+.subtask-preview .st-line{font-size:12px;color:var(--text-secondary);padding:2px 0;display:flex;align-items:center;gap:4px}
+.subtask-preview .st-line::before{content:'□';color:var(--text-tertiary);font-size:10px}
+.s-card .st-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--border-light)}
+.s-card .st-row .st-item{font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:3px;padding:1px 8px;border-radius:var(--radius-xs);background:var(--surface-soft)}
+.s-card .st-row .st-item.done{color:var(--success);background:var(--success-soft)}
+.s-card .st-row .st-item::before{content:'○';font-size:9px}
+.s-card .st-row .st-item.done::before{content:'●';font-size:9px}
+/* ===== Reminder metadata on card ===== */
+.s-card .meta-row .m-item.remind{color:var(--primary);background:var(--primary-soft)}
+
+/* ===== Form extras ===== */
+.form-section{margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--border-light)}
+.form-section details{interpolate-size:allow-keywords}
+.form-section summary{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;padding:4px 0;outline:none;-webkit-user-select:none;user-select:none;transition:color .25s,background .25s;list-style:none}
+.form-section summary:hover{color:var(--text-primary,var(--text))}
+.form-section summary:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.form-section summary::-webkit-details-marker{display:none}
+.form-section summary .arrow{font-size:12px;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.form-section details[open] summary{color:var(--primary)}
+.form-section details[open] summary .arrow{transform:rotate(180deg)}
+.form-section[open] summary{margin-bottom:12px}
+
+.form-group .num-unit-wrap{display:flex;gap:6px;align-items:center}
+.form-group .num-unit-wrap input[type=number]{flex:2;min-width:0}
+.form-group .num-unit-wrap input:last-child{flex:1;min-width:0}
+.s-card .meta-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.s-card .meta-row .m-item{font-size:10px;color:var(--text-tertiary);display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:4px;background:var(--surface-soft)}
+.s-card .meta-row .m-item.p-high{color:var(--danger);background:var(--danger-soft)}
+.s-card .meta-row .m-item.p-low{color:var(--success);background:var(--success-soft)}
+.s-card .progress-micro{height:3px;background:var(--border-light);border-radius:2px;margin-top:6px;overflow:hidden}
+.s-card .progress-micro .pm-fill{height:100%;border-radius:2px;background:var(--accent-gradient);transition:width .3s ease}
+
+/* ===== Matrix Modal ===== */
+.matrix-overlay{position:fixed;inset:0;background:var(--overlay-bg,rgba(0,0,0,.4));z-index:400;display:flex;opacity:0;visibility:hidden;transition:opacity .25s var(--ease),visibility .25s}
+.matrix-overlay.open{opacity:1;visibility:visible}
+.matrix-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);width:92%;max-width:400px;max-height:88vh;overflow-y:auto;background:var(--bg-app);border-radius:var(--radius-lg);padding:24px 20px 20px;z-index:401;box-shadow:var(--shadow-lg);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.matrix-overlay.open .matrix-modal{transform:translate(-50%,-50%) scale(1)}
+.matrix-close{float:right;width:32px;height:32px;border-radius:50%;border:none;background:var(--surface-soft);font-size:16px;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;justify-content:center;transition:background .25s ease,color .25s ease,transform .25s ease}
+.matrix-close:hover{background:var(--danger-soft);color:var(--danger)}
+.matrix-title{text-align:center;font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px}
+.matrix-title span{color:var(--primary)}
+.matrix-sub{text-align:center;font-size:11px;color:var(--text-tertiary);margin-bottom:16px;font-weight:400}
+.matrix-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border-light);border:2px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden}
+.m-cell{background:var(--surface);padding:14px 12px 12px;min-height:120px;display:flex;flex-direction:column}
+.m-cell .mh{display:flex;align-items:center;gap:6px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--border-light)}
+.m-cell .mh .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.m-cell .mh .lbl{font-size:12px;font-weight:600;color:var(--text)}
+.m-cell .mh .tag{margin-left:auto;font-size:9px;font-weight:500;padding:1px 8px;border-radius:8px}
+.m-cell .mb{flex:1;font-size:11px;line-height:1.6;color:var(--text-secondary)}
+.m-cell .mb .hl{font-weight:600;color:var(--text)}
+/* Q1 */
+.mc1 .dot,.mc1 .mb li::before{background:var(--danger)}
+.mc1 .tag{background:var(--danger-soft);color:var(--danger)}
+.mc1{border-bottom:2px solid var(--danger)}
+/* Q2 */
+.mc2 .dot,.mc2 .mb li::before{background:var(--mc2, #3b82f6)}
+.mc2 .tag{background:var(--primary-soft);color:var(--primary)}
+.mc2{border-bottom:2px solid var(--mc2, #3b82f6)}
+/* Q3 */
+.mc3 .dot,.mc3 .mb li::before{background:var(--warning)}
+.mc3 .tag{background:var(--warning-soft);color:var(--warning)}
+.mc3{border-bottom:2px solid var(--warning)}
+/* Q4 */
+.mc4 .dot,.mc4 .mb li::before{background:var(--text-tertiary)}
+.mc4 .tag{background:var(--surface-soft);color:var(--text-tertiary)}
+.mc4{border-bottom:2px solid var(--text-tertiary)}
+.m-cell .mb li{list-style:none;padding:2px 0 2px 14px;position:relative}
+.m-cell .mb li::before{content:'';position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%}
+
+/* ===== Keyboard focus indicators ===== */
+.view-btn:focus-visible,
+.nav-btn:focus-visible,
+.cal-day:focus-visible,
+.stat-card:focus-visible,
+.q-tab:focus-visible,
+.s-card:focus-visible,
+.header-btn:focus-visible,
+.remind-opt:focus-visible,
+.form-actions button:focus-visible,
+.matrix-close:focus-visible,
+.btn-cancel:focus-visible,
+.btn-save:focus-visible,
+.btn-delete-form:focus-visible,
+.theme-trigger:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ===== Tap highlight ===== */
+.view-btn, .nav-btn, .cal-day, .stat-card, .q-tab, .s-card, .header-btn, .matrix-close, .quad-option, .check-chip, .theme-trigger { -webkit-tap-highlight-color: transparent; }
+
+/* ===== Button active states ===== */
+.view-btn:active,
+.nav-btn:active,
+.q-tab:active,
+.stat-card:active,
+.matrix-close:active,
+.header-btn:active { transform: scale(.96); }
+.btn-cancel:active,
+.btn-save:active,
+.btn-delete-form:active,
+.form-actions button:active { transform: scale(.97); }
+
+/* ===== Disabled states ===== */
+.form-actions button:disabled,
+.btn-save:disabled,
+.btn-cancel:disabled { opacity: .5; cursor: not-allowed; pointer-events: none; }
+
+/* ===== Custom scrollbar ===== */
+.modal-sheet::-webkit-scrollbar,
+.matrix-modal::-webkit-scrollbar { width: 4px; }
+.modal-sheet::-webkit-scrollbar-track,
+.matrix-modal::-webkit-scrollbar-track { background: transparent; }
+.modal-sheet::-webkit-scrollbar-thumb,
+.matrix-modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.modal-sheet::-webkit-scrollbar-thumb:hover,
+.matrix-modal::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* ===== Responsive ===== */
+
+/* 视口切换动画 */
+.view-panel { animation: viewFadeIn .3s var(--ease-out-expo); }
+
+/* 完成动画 */
+.s-card.done { animation: donePop .4s cubic-bezier(.34,1.56,.64,1); }
+/* 拖拽排序 */
+.s-card-wrap.dragging { opacity:.4; transform:scale(.95); }
+.s-card-wrap.drag-over { border-top:2px solid var(--primary); margin-top:-2px; }
+@keyframes donePop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.03); box-shadow: 0 0 0 4px rgba(var(--primary-rgb),.15); }
+  100% { transform: scale(1); }
+}
+
+/* Glass/orangold 主题补偿 */
+/* Glass/orangold 主题卡片样式覆盖移至 styles.css 共享 */
+
+/* 日历圆点动画 */
+.cal-day .dot { animation: dotPop .3s var(--ease-spring); }
+
+/* 粗指针触摸目标放大 */
+@media (pointer: coarse) {
+  .nav-btn, .matrix-close { min-width: 44px; min-height: 44px; }
+}
+
+/* 平板断点 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .s-grid, .schedule-list, .day-timeline, .week-grid { max-width: 700px; margin-left: auto; margin-right: auto; }
+  .cal-card { max-width: 500px; margin-left: auto; margin-right: auto; }
+  .stats-row { max-width: 700px; margin-left: auto; margin-right: auto; }
+  .quadrant-wrap { max-width: 700px; margin-left: auto; margin-right: auto; }
+}
+@media (min-width: 1024px) {
+  .schedule-top { max-width: 1000px; margin-left: auto; margin-right: auto; }
+  .view-switcher { max-width: 1000px; margin-left: auto; margin-right: auto; }
+  .cal-card { max-width: 500px; margin-left: auto; margin-right: auto; }
+  .stats-row { max-width: 1000px; margin-left: auto; margin-right: auto; }
+  .quadrant-wrap { max-width: 1000px; margin-left: auto; margin-right: auto; }
+  .schedule-list, .day-timeline, .week-grid { max-width: 1000px; margin-left: auto; margin-right: auto; }
+}
+
+/* 横屏 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .schedule-top { padding: 4px 14px 8px; }
+  .cal-card { padding: 10px; margin-bottom: 8px; }
+  .stats-row { padding: 0 14px 8px; }
+}
+
+/* 骨架屏 */
+.skeleton-card { height:100px; border-radius:var(--radius-sm); background:linear-gradient(90deg,var(--surface-soft) 25%,var(--surface) 50%,var(--surface-soft) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; margin-bottom:8px; }
+
+@media (max-width: 420px) {
+  .schedule-top { padding: 4px 14px 10px; flex-wrap: wrap; }
+  .schedule-top h1 { font-size: 20px; }
+  .view-switcher { padding: 0 14px 10px; gap: 3px; }
+  .day-timeline { padding: 0 14px 100px; }
+  .week-grid { padding: 0 14px 100px; gap: 3px; }
+  .hour-label { width: 40px; font-size: 10px; }
+  .cal-card { margin: 0 14px 12px; padding: 12px; }
+  .stats-row { padding: 0 14px 12px; }
+  .schedule-list { padding: 0 14px 100px; }
+  .modal-sheet { padding: 20px 16px max(20px, env(safe-area-inset-bottom)); }
+  .matrix-modal { width: 96%; padding: 20px 14px; }
+  .quadrant-wrap { margin: 0 14px 12px; }
+  .s-card { padding: 12px; }
+  .check-grid { grid-template-columns: repeat(2, 1fr); }
+  .fgs-row { grid-template-columns: 1fr; gap: 8px; }
+  .form-section-sch .section-body { padding: 0 14px 14px; }
+  .form-card-schedule { padding: 14px 14px 16px; }
+  .form-card-header { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="icons">
+      <span class="theme-trigger" tabindex="0" role="button" onclick="toggleThemePanel(event)" title="切换主题">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </span> 📶 🔋
+    </span>
+    <div class="theme-panel" id="themePanel">
+      <div class="theme-option" tabindex="0" role="button" data-theme="white" onclick="setTheme('white')"><span class="swatch sw-white"></span><span>纯白</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="dark" onclick="setTheme('dark')"><span class="swatch sw-dark"></span><span>深空</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="warm" onclick="setTheme('warm')"><span class="swatch sw-warm"></span><span>暖阳</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="aurora" onclick="setTheme('aurora')"><span class="swatch sw-aurora"></span><span>极光</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="purple" onclick="setTheme('purple')"><span class="swatch sw-purple"></span><span>暗紫</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="glass" onclick="setTheme('glass')"><span class="swatch sw-glass"></span><span>玻璃</span><span class="check">✓</span></div>
+      <div class="theme-option" tabindex="0" role="button" data-theme="orangold" onclick="setTheme('orangold')"><span class="swatch sw-orangold"></span><span>橘金</span><span class="check">✓</span></div>
+      <div class="theme-divider"></div>
+      <div class="theme-option" onclick="cycleHaptic()" style="justify-content:space-between"><span>📳 触感</span><span id="hapticLabel" style="font-size:11px;color:var(--text-tertiary)">中</span></div>
+      <div class="theme-option" onclick="document.getElementById('customColorInput').click()" style="justify-content:space-between"><span>🎨 主题色</span><span style="width:20px;height:20px;border-radius:50%;background:var(--primary);border:2px solid var(--border);flex-shrink:0"></span></div>
+      <input type="color" id="customColorInput" style="position:fixed;opacity:0;pointer-events:none" onchange="setCustomColor(this.value)">
+      <div class="theme-option" onclick="document.getElementById('bgImageInput').click()" style="justify-content:space-between"><span>🖼️ 背景图</span><span id="bgImageLabel" style="font-size:11px;color:var(--text-tertiary)">无</span></div>
+      <input type="file" id="bgImageInput" accept="image/*" style="position:fixed;opacity:0;pointer-events:none" onchange="setBgImage(event)">
+      <div class="theme-option" onclick="clearBgImage()" style="justify-content:space-between"><span>🗑️ 清除背景</span></div>
+    </div>
+  </div>
+
+  <div class="schedule-top">
+    <div><h1>📅 日程计划</h1><div class="sub" id="todayLabel">高效管理每一天</div></div>
+    <div style="display:flex;gap:6px">
+      <button type="button" class="header-btn" onclick="toggleSearch()" title="搜索" id="searchToggle" style="font-size:16px">🔍</button>
+      <button type="button" class="header-btn" onclick="toggleMatrix()" title="艾森豪威尔矩阵" style="font-size:16px">⊞</button>
+      <button type="button" class="header-btn" onclick="exportScheduleData()" title="导出数据" style="font-size:14px">📥</button>
+      <button type="button" class="header-btn" onclick="openForm()" title="添加日程">+</button>
+    </div>
+  </div>
+  <div id="searchBar" style="display:none;padding:0 20px 10px">
+    <div class="search-bar" style="height:42px;border-radius:var(--radius-sm)">
+      <span class="icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="搜索日程标题、分类、标签…" oninput="filterSearch()" onkeydown="if(event.key==='Escape')toggleSearch()">
+      <button type="button" class="btn-scan" onclick="toggleSearch()" style="width:32px;height:32px;font-size:14px">✕</button>
+    </div>
+  </div>
+
+  <div class="view-switcher">
+    <button type="button" class="view-btn" data-view="day" onclick="switchView('day')">日</button>
+    <button type="button" class="view-btn" data-view="week" onclick="switchView('week')">周</button>
+    <button type="button" class="view-btn active" data-view="month" onclick="switchView('month')">月</button>
+  </div>
+
+  <div class="cal-card">
+    <div class="month-nav">
+      <span class="month" id="monthLabel">2026 年 6 月</span>
+      <div class="nav-group">
+        <button type="button" class="nav-btn" onclick="navMonth(-1)">◀</button>
+        <button type="button" class="nav-btn" onclick="navMonth(1)">▶</button>
+        <button type="button" class="nav-btn" onclick="goToday()" style="font-size:11px">今天</button>
+      </div>
+    </div>
+    <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+    <div class="days" id="daysGrid"></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card accent"><div class="num" id="statDone">0</div><div class="label">已完成</div></div>
+    <div class="stat-card"><div class="num" id="statPending">0</div><div class="label">待处理</div></div>
+    <div class="stat-card"><div class="num" id="statTotal">0</div><div class="label">总任务</div></div>
+    <div class="stat-card" onclick="toggleBatch()" style="cursor:pointer;flex:0.5;min-width:48px" title="批量操作">
+      <div class="num" style="font-size:20px" id="batchIcon">☑</div>
+      <div class="label">批量</div>
+    </div>
+  </div>
+  <div id="batchBar" style="display:none;padding:0 20px 10px;gap:6px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--text-secondary);align-self:center" id="batchCount">已选 0 项</span>
+    <button type="button" class="q-tab" onclick="batchAction('done')" style="font-size:12px">✅ 完成</button>
+    <button type="button" class="q-tab" onclick="batchAction('undone')" style="font-size:12px">↩ 取消完成</button>
+    <button type="button" class="q-tab" onclick="batchAction('delete')" style="font-size:12px;color:var(--danger)">🗑 删除</button>
+    <button type="button" class="q-tab" onclick="batchAction('clear')" style="font-size:12px">✕ 清除选择</button>
+  </div>
+
+  <div class="quadrant-wrap">
+    <div class="quadrant-scroll" id="quadrantFilter">
+      <button type="button" class="q-tab active" data-q="" onclick="filterQuadrant('')">全部 <span class="badge" id="qAllBadge">0</span></button>
+      <button type="button" class="q-tab" data-q="1" onclick="filterQuadrant('1')">🔴 重要紧急 <span class="badge" id="q1Badge">0</span></button>
+      <button type="button" class="q-tab" data-q="2" onclick="filterQuadrant('2')">🟡 重要不紧急 <span class="badge" id="q2Badge">0</span></button>
+      <button type="button" class="q-tab" data-q="3" onclick="filterQuadrant('3')">🔵 不重要紧急 <span class="badge" id="q3Badge">0</span></button>
+      <button type="button" class="q-tab" data-q="4" onclick="filterQuadrant('4')">⚪ 不重要不紧急 <span class="badge" id="q4Badge">0</span></button>
+    </div>
+  </div>
+
+  <div class="day-timeline view-panel" id="dayView" style="display:none"></div>
+  <div class="week-grid view-panel" id="weekView" style="display:none"></div>
+  <div id="monthView" class="view-panel"><div class="schedule-list" id="scheduleList"></div></div>
+
+  <!-- 时光足迹按钮 -->
+  <div id="timeTrackBtn" onclick="toggleTimeTrack()" style="position:fixed;bottom:200px;right:20px;width:50px;height:50px;border-radius:50%;background:var(--accent-gradient);color:var(--text-inverse);border:none;font-size:20px;cursor:pointer;box-shadow:var(--shadow-lg);z-index:50;display:flex;align-items:center;justify-content:center;font-family:inherit" title="时光足迹">📊</div>
+
+  <!-- 时光足迹面板 -->
+  <div id="timeTrackPanel" style="display:none;position:fixed;bottom:260px;right:20px;width:280px;max-height:360px;background:var(--bg-app);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:52;padding:16px;border:1px solid var(--border-light);overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:14px;font-weight:600;color:var(--text)">📊 时光足迹</span>
+      <button type="button" onclick="toggleTimeTrack()" style="width:24px;height:24px;border:none;border-radius:50%;background:var(--surface-soft);cursor:pointer;font-size:12px;color:var(--text-tertiary)">✕</button>
+    </div>
+    <div style="display:flex;gap:4px;margin-bottom:10px">
+      <button type="button" class="q-tab active" data-tt="7" onclick="switchTimeTrack('7')">本周</button>
+      <button type="button" class="q-tab" data-tt="30" onclick="switchTimeTrack('30')">本月</button>
+    </div>
+    <div id="timeTrackChart" style="min-height:120px"></div>
+    <div id="timeTrackList" style="margin-top:8px;border-top:1px solid var(--border-light);padding-top:8px;font-size:12px;color:var(--text-secondary);max-height:180px;overflow-y:auto"></div>
+  </div>
+
+  <!-- Pomodoro Timer -->
+  <div id="pomodoroBtn" onclick="togglePomodoro()" style="position:fixed;bottom:80px;right:20px;width:50px;height:50px;border-radius:50%;background:var(--accent-gradient);color:var(--text-inverse);border:none;font-size:20px;cursor:pointer;box-shadow:var(--shadow-lg);z-index:50;display:flex;align-items:center;justify-content:center;font-family:inherit" title="番茄钟">🍅</div>
+  <div id="pomodoroPanel" style="display:none;position:fixed;bottom:140px;right:20px;width:220px;background:var(--bg-app);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:51;padding:16px;border:1px solid var(--border-light)">
+    <div style="text-align:center;margin-bottom:10px">
+      <div style="font-size:32px;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums" id="pomodoroTime">25:00</div>
+      <div style="font-size:11px;color:var(--text-tertiary)" id="pomodoroState">🍅 专注中</div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center">
+      <button type="button" onclick="startPomodoro()" style="padding:6px 14px;border:none;border-radius:var(--radius-sm);background:var(--primary);color:var(--text-inverse);font-size:12px;cursor:pointer;font-family:inherit">开始</button>
+      <button type="button" onclick="pausePomodoro()" style="padding:6px 14px;border:none;border-radius:var(--radius-sm);background:var(--surface-soft);color:var(--text-secondary);font-size:12px;cursor:pointer;font-family:inherit">暂停</button>
+      <button type="button" onclick="resetPomodoro()" style="padding:6px 14px;border:none;border-radius:var(--radius-sm);background:var(--danger-soft);color:var(--danger);font-size:12px;cursor:pointer;font-family:inherit">重置</button>
+    </div>
+  </div>
+
+  <div class="bottom-tab">
+    <a class="tab-item" href="home.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span><span>首页</span></a>
+    <a class="tab-item" href="devices.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></span><span>设备</span></a>
+    <a class="tab-item active" href="schedule.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>计划</span></a>
+    <a class="tab-item" href="checkin.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span><span>打卡</span></a>
+    <a class="tab-item" href="customer.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span>客户</span></a>
+    <a class="tab-item" href="profile.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>我的</span></a>
+  </div>
+</div>
+
+<!-- Matrix Modal -->
+<div class="matrix-overlay" id="matrixOverlay" role="dialog" aria-modal="true" onclick="closeMatrix(event)">
+  <div class="matrix-modal" onclick="event.stopPropagation()">
+    <button type="button" class="matrix-close" onclick="closeMatrix()">✕</button>
+    <h2 class="matrix-title">艾森豪威尔 <span>矩阵</span></h2>
+    <div class="matrix-sub">Eisenhower Matrix · 四象限法则</div>
+    <div class="matrix-grid">
+      <div class="m-cell mc1">
+        <div class="mh"><span class="dot"></span><span class="lbl">重要且紧急</span><span class="tag">Do First</span></div>
+        <div class="mb"><span class="hl">危机驱动：</span>需立即响应，通常与紧急问题、截止日期或突发事件相关。<br><span class="hl">核心策略：</span>优先处理但应控制占比，通过前置规划将任务向 Q2 迁移。<br><span class="hl">注意：</span>长期停留此象限会导致疲劳与决策质量下降。</div>
+      </div>
+      <div class="m-cell mc2">
+        <div class="mh"><span class="dot"></span><span class="lbl">重要不紧急</span><span class="tag">Schedule</span></div>
+        <div class="mb"><span class="hl">战略核心：</span>关乎长期目标、自我提升与深度工作，是高杠杆活动所在。<br><span class="hl">核心策略：</span>主动规划、预留整块时间，是高效能人士最应投入的象限。<br><span class="hl">注意：</span>容易被 Q1 和 Q3 挤压，需刻意保护时间预算。</div>
+      </div>
+      <div class="m-cell mc3">
+        <div class="mh"><span class="dot"></span><span class="lbl">紧急不重要</span><span class="tag">Delegate</span></div>
+        <div class="mb"><span class="hl">虚假紧迫：</span>看似需要快速响应，但对核心目标贡献有限。<br><span class="hl">核心策略：</span>委派、标准化处理或批量集中处理，减少注意力碎片化。<br><span class="hl">注意：</span>识别并抵制"忙碌感"的诱惑，区分真伪紧急。</div>
+      </div>
+      <div class="m-cell mc4">
+        <div class="mh"><span class="dot"></span><span class="lbl">不重要不紧急</span><span class="tag">Eliminate</span></div>
+        <div class="mb"><span class="hl">纯粹干扰：</span>既不重要也不紧急，对目标无贡献，占用时间资源。<br><span class="hl">核心策略：</span>果断消除或最小化，将时间重新分配给 Q2 活动。<br><span class="hl">注意：</span>适度的放松有益，但需警惕无意识的消耗性习惯。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Form Modal -->
+<div class="modal-overlay" id="formOverlay" role="dialog" aria-modal="true" onclick="closeForm(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()" role="presentation">
+    <div class="modal-handle"></div>
+    <h2 class="modal-title" id="formTitle">新建日程</h2>
+    <input type="hidden" id="editId" value="">
+
+    <!-- 卡1：基本信息 -->
+    <div class="form-card-schedule">
+      <h3 class="form-card-header">基本信息</h3>
+      <div class="fgs-full">
+        <label class="fg-label" for="fTitle">📝 标题 <span class="required">*</span></label>
+        <div class="fg-input-wrap">
+          <input type="text" class="fg-input" id="fTitle" placeholder="输入日程标题…" maxlength="50">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+      <div class="fgs-row mt-10">
+        <div>
+          <label class="fg-label" for="fDate">📅 日期 <span class="required">*</span></label>
+          <div class="fg-input-wrap">
+            <input type="date" class="fg-input" id="fDate">
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+        <div>
+          <label class="fg-label" for="fCategory">🏷️ 分类</label>
+          <div class="fg-input-wrap">
+            <select class="fg-select" id="fCategory">
+              <option value="工作">工作</option><option value="个人">个人</option><option value="学习">学习</option><option value="健康">健康</option>
+            </select>
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+      </div>
+      <div class="fgs-row mt-10">
+        <div>
+          <label class="fg-label" for="fStart">🕐 开始时间</label>
+          <div class="fg-input-wrap">
+            <input type="time" class="fg-input" id="fStart">
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+        <div>
+          <label class="fg-label" for="fEnd">🕐 结束时间</label>
+          <div class="fg-input-wrap">
+            <input type="time" class="fg-input" id="fEnd">
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+      </div>
+      <div class="fgs-full">
+        <label class="fg-label" for="fLocation">📍 地点</label>
+        <div class="fg-input-wrap">
+          <input type="text" class="fg-input" id="fLocation" placeholder="添加地点（可选）…" maxlength="50">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡2：优先级设置 -->
+    <div class="form-card-schedule">
+      <h3 class="form-card-header">优先级设置</h3>
+      <div class="fgs-full">
+        <label class="fg-label">🎯 四象限</label>
+        <div class="quad-grid" id="quadGrid">
+          <div class="quad-option" tabindex="0" role="button" aria-label="重要紧急" data-quad="1"><span class="q-icon">🔴</span>重要紧急</div>
+          <div class="quad-option" tabindex="0" role="button" aria-label="重要不紧急" data-quad="2"><span class="q-icon">🟡</span>重要不紧急</div>
+          <div class="quad-option" tabindex="0" role="button" aria-label="紧急不重要" data-quad="3"><span class="q-icon">🔵</span>紧急不重要</div>
+          <div class="quad-option" tabindex="0" role="button" aria-label="不重要不紧急" data-quad="4"><span class="q-icon">⚪</span>不重要不紧急</div>
+        </div>
+        <input type="hidden" id="fQuadrant" value="2">
+      </div>
+      <div class="fgs-full">
+        <label class="fg-label" for="fPriority">⚡ 优先级</label>
+        <div class="fg-input-wrap">
+          <select class="fg-select" id="fPriority">
+            <option value="p0">P0 — 最高</option><option value="high">P1 — 高</option><option value="medium" selected>P2 — 中</option><option value="low">P3 — 低</option>
+          </select>
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡3：时间与提醒 -->
+    <div class="form-card-schedule">
+      <h3 class="form-card-header">时间与提醒</h3>
+      <div class="fgs-full">
+        <label class="fg-label" for="fRepeat">🔄 重复</label>
+        <div class="fg-input-wrap">
+          <select class="fg-select" id="fRepeat">
+            <option value="none">不重复</option><option value="daily">每天</option><option value="weekly">每周</option><option value="monthly">每月</option><option value="yearly">每年</option><option value="custom">自定义</option>
+          </select>
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+      <div class="fgs-full">
+        <label class="fg-label">🔔 提醒</label>
+        <div class="check-grid" id="remindGrid">
+          <label class="check-chip"><input type="checkbox" value="0"><span>准时</span></label>
+          <label class="check-chip"><input type="checkbox" value="5"><span>提前5分钟</span></label>
+          <label class="check-chip"><input type="checkbox" value="15"><span>提前15分钟</span></label>
+          <label class="check-chip"><input type="checkbox" value="30"><span>提前30分钟</span></label>
+          <label class="check-chip"><input type="checkbox" value="60"><span>提前1小时</span></label>
+          <label class="check-chip"><input type="checkbox" value="120"><span>提前2小时</span></label>
+          <label class="check-chip"><input type="checkbox" value="1440"><span>提前1天</span></label>
+          <label class="check-chip"><input type="checkbox" value="10080"><span>提前1周</span></label>
+        </div>
+      </div>
+      <div class="fgs-full">
+        <label class="fg-label" for="fProgress">📊 进度</label>
+        <div class="flex-gap-12">
+          <input type="range" class="progress-slider" min="0" max="100" value="0" id="fProgress">
+          <span class="progress-val" id="progressVal">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 更多设置（折叠） -->
+    <div class="form-section-sch">
+      <details>
+        <summary><span class="arrow">▼</span> 更多设置</summary>
+        <div class="section-body">
+          <div class="fgs-full">
+            <label class="fg-label" for="fTags">🏷️ 标签</label>
+            <div class="fg-input-wrap">
+              <input type="text" class="fg-input" id="fTags" placeholder="多个标签用逗号分隔…" maxlength="100">
+              <span class="focus-bar"></span>
+            </div>
+          </div>
+          <div class="fgs-full">
+            <label class="fg-label">📋 子任务</label>
+            <div class="subtask-list" id="subtaskList"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+              <button class="btn-add-sub" id="addSubtask" type="button">＋ 添加子任务</button>
+              <span class="subtask-count" id="subtaskCount">0 项</span>
+            </div>
+          </div>
+          <div class="fgs-full">
+            <label class="fg-label" for="fNote">💬 备注</label>
+            <div class="fg-input-wrap">
+              <textarea class="fg-input ta-vert" id="fNote" placeholder="输入备注…" rows="3" maxlength="200"></textarea>
+              <span class="focus-bar"></span>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeForm()" type="button">取消</button>
+      <button class="btn-primary" onclick="saveSchedule()" type="button">保存日程</button>
+    </div>
+    <div style="text-align:center;margin-top:12px;display:none" id="deleteFormWrap">
+      <button class="btn-delete-form" onclick="deleteSchedule()" type="button" style="padding:10px 24px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500">删除此日程</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script src="theme.js"></script>
+<script>
+function toggleMatrix(){document.getElementById('matrixOverlay').classList.toggle('open')}
+function closeMatrix(e){if(!e||e.target===document.getElementById('matrixOverlay'))document.getElementById('matrixOverlay').classList.remove('open')}
+(function(){
+  var STORAGE_KEY='know_schedule_data';
+  var T=new Date(),CY=T.getFullYear(),CM=T.getMonth(),CD=T.getDate(),CV='month',SD=fm(T),QF='',CAT_COLORS={'工作':'var(--cat-work)','个人':'var(--cat-personal)','学习':'var(--cat-study)','健康':'var(--cat-health)'},CAT_COLORS_RGB={'工作':'var(--cat-work-rgb)','个人':'var(--cat-personal-rgb)','学习':'var(--cat-study-rgb)','健康':'var(--cat-health-rgb)'};
+  function fc(d){return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日'}
+  function gd(y,m){return new Date(y,m+1,0).getDate()}
+  function it(d){return fm(d)===fm(T)}
+  function isd(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
+  function pd(s){var p=s.split('-');return new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]))}
+  function ke(e,id,fn){if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();fn(id)}}
+  /* 重复日程展开：获取指定日期应显示的日程列表 */
+  function getExpandedSchedules(data,ds){
+    var result=[];
+    data.forEach(function(item){
+      if(item.date===ds){result.push(item)}
+      if(item.repeat&&item.repeat!=='none'&&item.date){
+        var id=item._originalId||item.id;
+        /* 检查重复日程是否在此日期出现 */
+        var baseDate=new Date(item.date),targetDate=new Date(ds),itemDate=new Date(item.date);
+        if(targetDate<baseDate)return;
+        var occurs=false;
+        if(item.repeat==='daily'){occurs=true}
+        else if(item.repeat==='weekly'){var diffDays=Math.floor((targetDate-baseDate)/86400000);occurs=diffDays%7===0}
+        else if(item.repeat==='monthly'){occurs=targetDate.getDate()===baseDate.getDate()}
+        else if(item.repeat==='yearly'){occurs=targetDate.getMonth()===baseDate.getMonth()&&targetDate.getDate()===baseDate.getDate()}
+        if(occurs){
+          var clone=Object.assign({},item);
+          clone._repeatOrigId=item.id;
+          clone.id=item.id+'_'+ds;
+          clone.date=ds;
+          clone.title=item.title+(item._repeatCount?'':' 🔄');
+          if(!item._repeatCount)item._repeatCount=1;
+          result.push(clone);
+        }
+      }
+    });
+    return result;
+  }
+
+  function rc(){
+    var g=document.getElementById('daysGrid'),lb=document.getElementById('monthLabel');
+    lb.textContent=CY+'年'+(CM+1)+'月';
+    var data=ld(STORAGE_KEY)||[],dim=gd(CY,CM),fd=new Date(CY,CM,1).getDay();fd=fd===0?6:fd-1;
+    g.innerHTML='';
+    var pM=CM===0?11:CM-1,pY=CM===0?CY-1:CY,pDim=gd(pY,pM);
+    for(var i=fd-1;i>=0;i--){var b=document.createElement('button');b.className='cal-day other';b.textContent=pDim-i;g.appendChild(b)}
+    for(var d=1;d<=dim;d++){
+      var b=document.createElement('button'),ds=CY+'-'+String(CM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      b.className='cal-day';if(it(new Date(CY,CM,d)))b.classList.add('today');if(ds===SD)b.classList.add('selected');
+      var expanded=getExpandedSchedules(data,ds);var dc=expanded.length;
+      var titleSpan=document.createElement('span');titleSpan.textContent=d;
+      b.appendChild(titleSpan);
+      if(dc>0){
+        var dot=document.createElement('span');dot.className='dot'+(dc>3?' multi':'');
+        dot.style.setProperty('--dot-count',Math.min(dc,9).toString());
+        b.appendChild(dot);
+        /* 有任务的日期添加背景色调 */
+        var doneCount=expanded.filter(function(e){return e.done}).length;
+        var intensity=Math.min(dc/5,1);
+        if(doneCount===dc&&dc>0)b.style.background='rgba(34,181,115,'+(.06+intensity*.06)+')';
+        else b.style.background='rgba(var(--primary-rgb),'+(.03+intensity*.05)+')';
+      }
+      b.onclick=function(x){return function(){SD=x;rc();rl()}}(ds);g.appendChild(b)
+    }
+    var tc=fd+dim,rm=7-(tc%7);if(rm<7){for(var i=1;i<=rm;i++){var b=document.createElement('button');b.className='cal-day other';b.textContent=i;g.appendChild(b)}}
+  }
+  /* ===== 搜索功能 ===== */
+  var searchTerm='';
+  function toggleSearch(){
+    var bar=document.getElementById('searchBar'),input=document.getElementById('searchInput');
+    if(bar.style.display==='none'||!bar.style.display){
+      bar.style.display='block';input.focus();
+    }else{
+      bar.style.display='none';searchTerm='';input.value='';rl();
+    }
+  }
+  window.toggleSearch=toggleSearch;
+  function filterSearch(){
+    searchTerm=document.getElementById('searchInput').value.trim().toLowerCase();
+    rl();
+  }
+  window.filterSearch=filterSearch;
+
+  /* ===== 批量操作 ===== */
+  var batchMode=false,batchSelected={};
+  function toggleBatch(){
+    batchMode=!batchMode;
+    document.getElementById('batchIcon').textContent=batchMode?'☑':'☐';
+    document.getElementById('batchBar').style.display=batchMode?'flex':'none';
+    if(!batchMode)batchSelected={};
+    rl();
+  }
+  window.toggleBatch=toggleBatch;
+  function toggleBatchSelect(id){
+    if(batchSelected[id]){delete batchSelected[id]}else{batchSelected[id]=true}
+    var count=Object.keys(batchSelected).length;
+    document.getElementById('batchCount').textContent='已选 '+count+' 项';
+  }
+  window.toggleBatchSelect=toggleBatchSelect;
+  function batchAction(action){
+    var data=ld(STORAGE_KEY)||[];
+    var ids=Object.keys(batchSelected);
+    if(ids.length===0){showToast('请先选择任务','warning');return}
+    if(action==='delete'){
+      var count=ids.length;
+      data=data.filter(function(i){return ids.indexOf(i.id)===-1});
+      sd(STORAGE_KEY,data);
+      showToast('已删除 '+count+' 项','info');
+    }else if(action==='done'||action==='undone'){
+      data.forEach(function(i){
+        if(ids.indexOf(i.id)>-1)i.done=(action==='done');
+      });
+      sd(STORAGE_KEY,data);
+      showToast(action==='done'?'已标记完成':'已取消完成','success');
+    }
+    batchSelected={};
+    document.getElementById('batchCount').textContent='已选 0 项';
+    ra();
+  }
+  window.batchAction=batchAction;
+
+  /* ===== 拖拽排序 ===== */
+  var dragSrcId=null;
+  function onDragStart(e,id){
+    dragSrcId=id;
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain',id);
+    setTimeout(function(){e.target.classList.add('dragging')},0);
+  }
+  window.onDragStart=onDragStart;
+  function onDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.target.closest('.s-card-wrap')?.classList.add('drag-over')}
+  window.onDragOver=onDragOver;
+  function onDrop(e,targetId){
+    e.preventDefault();
+    if(dragSrcId&&dragSrcId!==targetId){
+      var data=ld(STORAGE_KEY)||[];
+      var srcIdx=-1,tgtIdx=-1;
+      for(var i=0;i<data.length;i++){if(data[i].id===dragSrcId)srcIdx=i;if(data[i].id===targetId)tgtIdx=i}
+      if(srcIdx>-1&&tgtIdx>-1){
+        var moved=data.splice(srcIdx,1)[0];
+        data.splice(tgtIdx,0,moved);
+        sd(STORAGE_KEY,data);
+        ra();
+      }
+    }
+    dragSrcId=null;
+    document.querySelectorAll('.drag-over').forEach(function(el){el.classList.remove('drag-over')});
+  }
+  window.onDrop=onDrop;
+  function onDragEnd(e){e.target.classList.remove('dragging');dragSrcId=null;document.querySelectorAll('.drag-over').forEach(function(el){el.classList.remove('drag-over')})}
+  window.onDragEnd=onDragEnd;
+
+  function fq(q){QF=q;document.querySelectorAll('.q-tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-q')===q)});rl()}
+  window.filterQuadrant=fq;
+  function rl(){
+    var data=ld(STORAGE_KEY)||[],list=document.getElementById('scheduleList');
+    /* 使用展开的重复日程 */
+    var expandedMap={};
+    data.forEach(function(i){getExpandedSchedules(data,i.date).forEach(function(e){if(!expandedMap[e.id])expandedMap[e.id]=e})});
+    var expandedData=[];for(var k in expandedMap)expandedData.push(expandedMap[k]);
+    var f=expandedData;
+    if(searchTerm)f=f.filter(function(i){return(i.title&&i.title.toLowerCase().indexOf(searchTerm)>-1)||(i.category&&i.category.toLowerCase().indexOf(searchTerm)>-1)||(i.tags&&i.tags.toLowerCase().indexOf(searchTerm)>-1)||(i.note&&i.note.toLowerCase().indexOf(searchTerm)>-1)||(i.location&&i.location.toLowerCase().indexOf(searchTerm)>-1)});
+    if(QF)f=f.filter(function(i){return i.quadrant==QF});
+    document.getElementById('statDone').textContent=f.filter(function(i){return i.done}).length;
+    document.getElementById('statPending').textContent=f.filter(function(i){return !i.done}).length;
+    document.getElementById('statTotal').textContent=f.length;
+    document.getElementById('qAllBadge').textContent=expandedData.length;
+    [1,2,3,4].forEach(function(q){document.getElementById('q'+q+'Badge').textContent=expandedData.filter(function(i){return i.quadrant==q}).length});
+    var grp={};f.forEach(function(i){if(!grp[i.date])grp[i.date]=[];grp[i.date].push(i)});
+    var sd=Object.keys(grp).sort();
+    if(sd.length===0){list.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>暂无日程<br>点击右上角+添加</p></div>';return}
+    var cc=CAT_COLORS,cr=CAT_COLORS_RGB,html='';    sd.forEach(function(ds){
+      var d=pd(ds),lb=isd(d,T)?'今天':(isd(d,new Date(T.getTime()+86400000))?'明天':''),dl=lb?lb+'·'+fc(d):fc(d);
+      html+='<div class="date-group"><div class="dg-header">'+dl+'<span class="count">'+grp[ds].length+'项</span></div>';
+      grp[ds].forEach(function(i){
+        var dc=i.done?' done':'';
+        html+='<div class="s-card-wrap" data-id="'+i.id+'" draggable="true" ondragstart="onDragStart(event,\''+i.id+'\')" ondragover="onDragOver(event)" ondrop="onDrop(event,\''+i.id+'\')" ondragend="onDragEnd(event)"><div class="s-card'+dc+'" role="button" tabindex="0">';
+        if(batchMode)html+='<div style="display:flex;align-items:center;padding-right:8px"><input type="checkbox" onclick="event.stopPropagation();toggleBatchSelect(\''+i.id+'\')" '+(batchSelected[i.id]?'checked':'')+' style="width:18px;height:18px;cursor:pointer;accent-color:var(--primary)"></div>';
+        html+='<div class="quadrant-bar qb-'+i.quadrant+'"></div><div class="time-col">';
+        if(i.startTime){html+='<div class="t">'+i.startTime+'</div>';if(i.endTime)html+='<div class="t sub">'+i.endTime+'</div>'}
+        else{html+='<div class="t" style="font-size:16px">◷</div>'}
+	  html+='</div><div class="content"><div class="ctitle">'+(i.done?'✓ ':'')+htmlEscape(i.title)+'<span class="tag" style="background:rgba('+cr[i.category||'其他']+',.13);color:'+(cc[i.category||'其他'])+'">'+htmlEscape(i.category)+'</span></div>';
+        var meta=[];
+        if(i.priority&&i.priority!=='medium')meta.push('<span class="m-item p-'+(i.priority==='high'?'high':'low')+'">'+(i.priority==='high'?'🔴 高':'🟢 低')+'</span>');
+          if(i.location)meta.push('<span class="m-item">📍 '+htmlEscape(i.location)+'</span>');
+        if(i.duration)meta.push('<span class="m-item">⏱ '+i.duration+'分钟</span>');
+        if(i.remind&&i.remind.length)meta.push('<span class="m-item remind">🔔 '+(i.remind.length>1?i.remind.length+'次提醒':'1次提醒')+'</span>');
+        if(i.tags){i.tags.split(',').forEach(function(t){var s=t.trim();if(s)meta.push('<span class="m-item"># '+htmlEscape(s)+'</span>')})}
+        if(meta.length)html+='<div class="meta-row">'+meta.join('')+'</div>';
+        if(i.subtasks&&i.subtasks.length){var sd=i.subtasks.filter(function(s){return s.done}).length;html+='<div class="st-row">';i.subtasks.forEach(function(s){html+='<span class="st-item'+(s.done?' done':'')+'">'+htmlEscape(s.name)+'</span>'});if(sd<i.subtasks.length)html+='<span class="st-item" style="background:transparent;font-size:10px;color:var(--text-tertiary)">'+sd+'/'+i.subtasks.length+'</span>';html+='</div>'}
+        if(i.note)html+='<div class="cdesc">'+htmlEscape(i.note)+'</div>';
+        if(i.progress>0&&i.progress<100)html+='<div class="progress-micro"><div class="pm-fill" style="width:'+i.progress+'%"></div></div>';
+        else if(i.progress>=100)html+='<div class="progress-micro"><div class="pm-fill" style="width:100%;background:var(--success)"></div></div>';
+        html+='</div></div><div class="swipe-actions">';
+        html+='<button class="swipe-action action-done" onclick="event.stopPropagation();td(\''+i.id+'\')" aria-label="标记完成" tabindex="0"><span class="sa-content"><span class="sa-icon">'+(i.done?'↩':'✓')+'</span><span class="sa-label">'+(i.done?'取消完成':'完成')+'</span></span></button>';
+        html+='<button class="swipe-action action-edit" onclick="event.stopPropagation();es(\''+i.id+'\')" aria-label="编辑" tabindex="0"><span class="sa-content"><span class="sa-icon">✏️</span><span class="sa-label">编辑</span></span></button>';
+        html+='<button class="swipe-action action-delete" onclick="event.stopPropagation();dsi(\''+i.id+'\')" aria-label="删除" tabindex="0"><span class="sa-content"><span class="sa-icon">🗑</span><span class="sa-label">删除</span></span></button>';
+        html+='</div></div>'
+      });
+      html+='</div>'
+    });
+    list.innerHTML=html;
+  }
+  function dsi(id){
+    var data=ld(STORAGE_KEY)||[];
+    var item=null;for(var i=0;i<data.length;i++){if(data[i].id===id){item=data[i];break}}
+    if(!item)return;
+    var removed=[item];
+    sd(STORAGE_KEY,data.filter(function(i){return i.id!==id}));
+    ra();
+    showUndoToast('已删除日程',function(){
+      /* 撤销：恢复删除的数据 */
+      var cur=ld(STORAGE_KEY)||[];
+      removed.forEach(function(r){cur.push(r)});
+      sd(STORAGE_KEY,cur);
+      ra();
+    });
+  }
+  window.dsi=dsi;
+  function td(id){
+    var data=ld(STORAGE_KEY)||[];
+    for(var i=0;i<data.length;i++){if(data[i].id===id){data[i].done=!data[i].done;break}}
+    sd(STORAGE_KEY,data);
+    ra();
+    var item=null;for(var i=0;i<data.length;i++){if(data[i].id===id){item=data[i];break}}
+    showToast(item&&item.done?'✓ 已标记完成':'已取消完成',item&&item.done?'success':'');
+  }
+  window.td=td;
+  function rd(){
+    var c=document.getElementById('dayView'),data=ld(STORAGE_KEY)||[],di=getExpandedSchedules(data,SD);if(QF)di=di.filter(function(i){return i.quadrant==QF});
+    var cc=CAT_COLORS,cr=CAT_COLORS_RGB;
+    /* 时间块可视化：使用绝对高度模拟时间长度 */
+    var blockScale=2.5; /* 每分钟对应像素 */
+    var firstHour=23,lastHour=0;
+    di.forEach(function(i){if(i.startTime){var h=parseInt(i.startTime.split(':')[0]);if(h<firstHour)firstHour=h;if(i.endTime){var eh=parseInt(i.endTime.split(':')[0]);if(eh>lastHour)lastHour=eh}else{if(h>lastHour)lastHour=h}}});
+    if(di.length===0){c.innerHTML='<div class="empty-state" style="padding:40px 20px"><div class="icon">📋</div><p>当日暂无日程</p></div>';return}
+    if(firstHour>lastHour){var tmp=firstHour;firstHour=lastHour;lastHour=tmp}
+    firstHour=Math.max(0,firstHour-1);lastHour=Math.min(23,lastHour+1);
+    var totalMinutes=(lastHour-firstHour+1)*60;
+    var html='<div style="position:relative;min-height:'+(totalMinutes*blockScale)+'px;padding-left:52px">';
+    /* 背景小时线 */
+    for(var h=firstHour;h<=lastHour;h++){
+      var top=(h-firstHour)*60*blockScale;
+      html+='<div style="position:absolute;left:52px;right:0;top:'+top+'px;border-top:1px solid var(--border-light);pointer-events:none;z-index:0"></div>';
+      html+='<div style="position:absolute;left:0;top:'+top+'px;width:46px;text-align:right;font-size:10px;color:var(--text-tertiary);padding-right:6px;line-height:0">'+String(h).padStart(2,'0')+':00</div>';
+    }
+    /* 任务时间块 */
+    di.forEach(function(i){
+      var startMin=0,endMin=60;
+      if(i.startTime){var sp=i.startTime.split(':');startMin=parseInt(sp[0])*60+parseInt(sp[1])}
+      else{startMin=firstHour*60}
+      if(i.endTime){var ep=i.endTime.split(':');endMin=parseInt(ep[0])*60+parseInt(ep[1])}
+      else{endMin=startMin+60}
+      var top=(startMin-firstHour*60)*blockScale;
+      var height=Math.max((endMin-startMin)*blockScale,24);
+      var col=cc[i.category||'其他']||'var(--cat-other)',rgb=cr[i.category||'其他']||'var(--cat-other-rgb)';
+      html+='<div class="hour-task" style="position:absolute;left:54px;right:8px;top:'+top+'px;height:'+height+'px;background:rgba('+rgb+',.13);border-left:3px solid '+col+';border-radius:var(--radius-xs);padding:4px 8px;overflow:hidden;cursor:pointer;z-index:1;transition:box-shadow .2s" onclick="es(\''+i.id+'\')" onmouseover="this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.08)\'" onmouseout="this.style.boxShadow=\'none\'">';
+      html+='<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(i.done?'✓ ':'')+htmlEscape(i.title)+'</div>';
+      if(height>30)html+='<div style="font-size:10px;color:var(--text-secondary);margin-top:2px">'+htmlEscape(i.startTime||'')+(i.endTime?' - '+htmlEscape(i.endTime):'')+(i.location?' · 📍'+htmlEscape(i.location):'')+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+    c.innerHTML=html;
+  }
+  function rw(){
+    var c=document.getElementById('weekView'),data=ld(STORAGE_KEY)||[],ws=new Date(T);var d2=ws.getDay();ws.setDate(ws.getDate()-d2+(d2===0?-6:1));
+    var wd=['一','二','三','四','五','六','日'],cc=CAT_COLORS,html='';
+    for(var i=0;i<7;i++){var d3=new Date(ws);d3.setDate(ws.getDate()+i);html+='<div class="week-day-header'+(isd(d3,T)?' today':'')+'">'+wd[i]+'</div>'}
+    for(var i=0;i<7;i++){var d3=new Date(ws);d3.setDate(ws.getDate()+i);var ds=fm(d3);html+='<div class="week-day'+(isd(d3,T)?' today':'')+'"><div class="date-num">'+d3.getDate()+'</div>';
+      var items=getExpandedSchedules(data,ds);if(QF)items=items.filter(function(it){return it.quadrant==QF});
+      items.forEach(function(it){var col=cc[it.category||'其他']||'var(--cat-other)';html+='<div class="wk-task" role="button" tabindex="0" style="background:'+col+'" onclick="es(\''+it.id+'\')" onkeydown="ke(event,\''+it.id+'\',es)">'+htmlEscape(it.title)+'</div>'});
+      html+='</div>'
+    }
+    c.innerHTML=html
+  }
+  function sv(v){CV=v;document.querySelectorAll('.view-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-view')===v)});
+    var dv=document.getElementById('dayView'),wv=document.getElementById('weekView'),mv=document.getElementById('monthView');
+    dv.style.display=v==='day'?'block':'none';
+    wv.style.display=v==='week'?'grid':'none';
+    mv.style.display=v==='month'?'block':'none';
+    var p=v==='day'?dv:(v==='week'?wv:mv);
+    if(p){void p.offsetWidth;p.style.animation='none';void p.offsetWidth;p.style.animation='';}
+    if(v==='day')rd();else if(v==='week')rw();else rl()}
+  window.switchView=sv;
+  function nm(d){CM+=d;if(CM>11){CM=0;CY++}else if(CM<0){CM=11;CY--}rc();if(CV==='month')rl()}
+  window.navMonth=nm;
+  function gt(){CY=T.getFullYear();CM=T.getMonth();SD=fm(T);rc();ra()}
+  window.goToday=gt;
+  function of(ed){document.getElementById('editId').value=ed?ed.id:'';document.getElementById('formTitle').textContent=ed?'编辑日程':'新建日程';
+    document.getElementById('fTitle').value=ed?ed.title:'';document.getElementById('fDate').value=ed?ed.date:SD;
+    document.getElementById('fStart').value=ed?ed.startTime:'';document.getElementById('fEnd').value=ed?ed.endTime:'';
+    document.getElementById('fCategory').value=ed?ed.category:'工作';
+    var qv=ed?String(ed.quadrant):'2';document.getElementById('fQuadrant').value=qv;
+    document.querySelectorAll('#quadGrid .quad-option').forEach(function(o){o.classList.toggle('active',o.getAttribute('data-quad')===qv)});
+    document.getElementById('fPriority').value=ed?ed.priority:'medium';
+    document.getElementById('fRepeat').value=ed?ed.repeat:'none';
+    var rms=ed&&ed.remind?ed.remind:[];if(typeof rms==='number')rms=[rms];
+    document.querySelectorAll('#remindGrid input[type=checkbox]').forEach(function(cb){cb.checked=rms.indexOf(parseInt(cb.value))>-1});
+    document.getElementById('fLocation').value=ed?ed.location||'':'';
+    var p=ed?ed.progress||0:0;document.getElementById('fProgress').value=p;document.getElementById('progressVal').textContent=p+'%';document.getElementById('fProgress').style.setProperty('--progress',p+'%');
+    document.getElementById('fTags').value=ed?ed.tags||'':'';document.getElementById('fNote').value=ed?ed.note:'';
+    /* 填充子任务交互列表 */
+    var subList=document.getElementById('subtaskList');
+    subList.innerHTML='';
+    var subs=ed&&ed.subtasks?ed.subtasks:(ed?[]:[{name:''},{name:''}]);
+    subs.forEach(function(s){
+      var wrap=document.createElement('div');wrap.className='fg-input-wrap';wrap.style.flex='1';
+      wrap.innerHTML='<input type="text" class="fg-input" placeholder="输入子任务…" value="'+htmlEscape(s.name)+'"><span class="focus-bar"></span>';
+      var row=document.createElement('div');row.className='subtask-row';
+      /* 保持已完成状态以便保存时恢复 */
+      if(s.done)row.dataset.done='true';
+      var del=document.createElement('button');del.className='subtask-del';del.textContent='✕';
+      del.onclick=function(){removeSubtask(this)};
+      row.append(wrap,del);subList.appendChild(row);
+    });
+    updateSubtaskCount();
+    document.getElementById('deleteFormWrap').style.display=ed?'block':'none';
+    document.getElementById('formOverlay').classList.add('open')}
+  window.openForm=of;
+  function es(id){var data=ld(STORAGE_KEY)||[],item=null;for(var i=0;i<data.length;i++){if(data[i].id===id){item=data[i];break}}if(item)of(item)}
+  window.es=es;
+  function cf(e){if(e&&e.target!==document.getElementById('formOverlay'))return;document.getElementById('formOverlay').classList.remove('open')}
+  window.closeForm=cf;
+  function ss(){
+    var idEl=document.getElementById('editId'),tiEl=document.getElementById('fTitle'),daEl=document.getElementById('fDate');
+    var stEl=document.getElementById('fStart'),etEl=document.getElementById('fEnd'),caEl=document.getElementById('fCategory');
+    var quEl=document.getElementById('fQuadrant'),prEl=document.getElementById('fPriority'),rpEl=document.getElementById('fRepeat');
+    var id=idEl?idEl.value:'',ti=tiEl?tiEl.value.trim():'',da=daEl?daEl.value:'';
+    var st=stEl?stEl.value:'',et=etEl?etEl.value:'',ca=caEl?caEl.value:'工作';
+    var qu=parseInt(quEl?quEl.value:'2')||2,pr=prEl?prEl.value:'medium';
+    var rp=rpEl?rpEl.value:'none';
+    var rm=[];document.querySelectorAll('#remindGrid input:checked').forEach(function(cb){rm.push(parseInt(cb.value))});
+    var loEl=document.getElementById('fLocation'),pgEl=document.getElementById('fProgress'),tgEl=document.getElementById('fTags');
+    var lo=loEl?loEl.value.trim():'';
+    var pg=parseInt(pgEl?pgEl.value:'0')||0,tg=tgEl?tgEl.value.trim():'';
+    /* 从交互式子任务列表收集（保留完成状态） */
+    var subs=[];document.querySelectorAll('#subtaskList .subtask-row').forEach(function(row){
+      var val=row.querySelector('.fg-input').value.trim();
+      if(val)subs.push({name:val,done:row.dataset.done==='true'});
+    });
+    var noEl=document.getElementById('fNote');
+    var no=noEl?noEl.value.trim():'';
+    if(!ti){showToast('请输入标题','warning');return}if(!da){showToast('请选择日期','warning');return}
+    /* 自动计算时长 */
+    var duration=null;
+    if(st&&et){var sh=parseInt(st.split(':')[0]),sm=parseInt(st.split(':')[1]),eh=parseInt(et.split(':')[0]),em=parseInt(et.split(':')[1]);if(!isNaN(sh)&&!isNaN(sm)&&!isNaN(eh)&&!isNaN(em)){var diff=(eh*60+em)-(sh*60+sm);if(diff>0)duration=diff}}
+    var data=ld(STORAGE_KEY)||[],obj={id:id||gid(),title:ti,date:da,startTime:st,endTime:et,category:ca,quadrant:qu,priority:pr,repeat:rp,remind:rm.length?rm:null,location:lo,duration:duration,progress:pg,tags:tg,note:no,subtasks:subs.length?subs:null};
+    if(id){for(var i=0;i<data.length;i++){if(data[i].id===id){Object.assign(data[i],obj);data[i].id=id;break}}}
+    else{data.push(obj);data[data.length-1].done=false}
+    sd(STORAGE_KEY,data);cf();ra()}
+  window.saveSchedule=ss;
+  function dls(){var id=document.getElementById('editId').value;if(!id)return;showConfirm('确定删除？',function(c){if(!c)return;var data=ld(STORAGE_KEY)||[],nd=[];for(var i=0;i<data.length;i++){if(data[i].id!==id)nd.push(data[i])}sd(STORAGE_KEY,nd);cf();ra()})}
+  window.deleteSchedule=dls;
+
+  /* ===== 数据导出 ===== */
+  function exportScheduleData(){
+    var data=ld(STORAGE_KEY)||[];
+    var blob=new Blob([JSON.stringify({schedules:data,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download='schedule_data_'+fm(T)+'.json';
+    a.click();URL.revokeObjectURL(url);
+    showToast('✅ 数据已导出','success');
+  }
+  window.exportScheduleData=exportScheduleData;
+
+  /* ===== 番茄钟 ===== */
+  var pomodoroTime=25*60,pomodoroRunning=false,pomodoroPaused=false,pomodoroTimer=null;
+  var pomodoroWork=25*60,pomodoroBreak=5*60;
+  function updatePomodoroDisplay(){
+    var m=Math.floor(pomodoroTime/60),s=pomodoroTime%60;
+    document.getElementById('pomodoroTime').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+  function togglePomodoro(){
+    var p=document.getElementById('pomodoroPanel');
+    p.style.display=p.style.display==='none'?'block':'none';
+  }
+  window.togglePomodoro=togglePomodoro;
+  function startPomodoro(){
+    if(pomodoroPaused){pomodoroPaused=false;return}
+    if(pomodoroRunning)return;
+    pomodoroRunning=true;document.getElementById('pomodoroState').textContent='🍅 专注中';
+    pomodoroTimer=setInterval(function(){
+      if(pomodoroPaused)return;
+      pomodoroTime--;
+      updatePomodoroDisplay();
+      if(pomodoroTime<=0){
+        clearInterval(pomodoroTimer);pomodoroRunning=false;
+        document.getElementById('pomodoroState').textContent='🎉 休息一下！';
+        try{var n=new Notification('🍅 番茄钟',{body:'专注时间结束，休息一下吧！'});n.onclick=function(){window.focus();this.close()}}catch(e){}
+        pomodoroTime=pomodoroBreak;
+        updatePomodoroDisplay();
+      }
+    },1000);
+  }
+  window.startPomodoro=startPomodoro;
+  function pausePomodoro(){pomodoroPaused=!pomodoroPaused;document.getElementById('pomodoroState').textContent=pomodoroPaused?'⏸ 已暂停':'🍅 专注中'}
+  window.pausePomodoro=pausePomodoro;
+  function resetPomodoro(){clearInterval(pomodoroTimer);pomodoroRunning=false;pomodoroPaused=false;pomodoroTime=pomodoroWork;updatePomodoroDisplay();document.getElementById('pomodoroState').textContent='🍅 专注中'}
+  window.resetPomodoro=resetPomodoro;
+  /* ===== 时光足迹 ===== */
+  var timeTrackDays=7;
+  function toggleTimeTrack(){
+    var p=document.getElementById('timeTrackPanel');
+    if(p.style.display==='none'||!p.style.display){p.style.display='block';renderTimeTrack()}else{p.style.display='none'}
+  }
+  window.toggleTimeTrack=toggleTimeTrack;
+  function switchTimeTrack(days){
+    timeTrackDays=parseInt(days);
+    document.querySelectorAll('[data-tt]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tt')===days)});
+    renderTimeTrack();
+  }
+  window.switchTimeTrack=switchTimeTrack;
+  function renderTimeTrack(){
+    var data=ld(STORAGE_KEY)||[],chart=document.getElementById('timeTrackChart'),list=document.getElementById('timeTrackList');
+    if(!chart)return;
+    var now=new Date();var startDate=new Date(now);startDate.setDate(startDate.getDate()-timeTrackDays);
+    var catData={},catTime={},catColors={'工作':'var(--cat-work)','个人':'var(--cat-personal)','学习':'var(--cat-study)','健康':'var(--cat-health)'};
+    data.forEach(function(item){
+      if(!item.date||item.date<fm(startDate))return;
+      var cat=item.category||'其他';
+      if(!catData[cat]){catData[cat]={count:0,done:0};catTime[cat]=0}
+      catData[cat].count++;
+      if(item.done)catData[cat].done++;
+      if(item.duration)catTime[cat]+=item.duration;
+      else if(item.startTime&&item.endTime){
+        var sh=parseInt(item.startTime.split(':')[0]),sm=parseInt(item.startTime.split(':')[1]),eh=parseInt(item.endTime.split(':')[0]),em=parseInt(item.endTime.split(':')[1]);
+        if(!isNaN(sh)&&!isNaN(sm)&&!isNaN(eh)&&!isNaN(em)){var diff=(eh*60+em)-(sh*60+sm);if(diff>0)catTime[cat]+=diff}
+      }
+    });
+    var cats=Object.keys(catData);
+    if(cats.length===0){chart.innerHTML='<div style="text-align:center;padding:30px 0;color:var(--text-tertiary);font-size:13px">暂无数据</div>';list.innerHTML='';return}
+    /* 分类数量柱状图（SVG） */
+    var maxCount=0;cats.forEach(function(c){if(catData[c].count>maxCount)maxCount=catData[c].count});
+    if(maxCount<1)maxCount=1;
+    var w=248,barH=20,gap=10,topPad=10,leftPad=60,rightPad=10;
+    var h=cats.length*(barH+gap)+topPad+10;
+    var svg='<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" style="display:block;margin:0 auto">';
+    cats.forEach(function(cat,i){
+      var y=topPad+i*(barH+gap),d=catData[cat],barW=Math.max(4,(d.count/maxCount)*(w-leftPad-rightPad));
+      svg+='<rect x="'+leftPad+'" y="'+y+'" width="'+barW+'" height="'+barH+'" rx="4" fill="'+(catColors[cat]||'var(--text-tertiary)')+'" opacity=".8"/>';
+      /* 已完成部分 */
+      if(d.done>0){var doneW=Math.max(2,(d.done/maxCount)*(w-leftPad-rightPad));svg+='<rect x="'+leftPad+'" y="'+y+'" width="'+doneW+'" height="'+barH+'" rx="4" fill="'+(catColors[cat]||'var(--text-tertiary)')+'" opacity="1"/>'}
+      svg+='<text x="'+(leftPad-4)+'" y="'+(y+barH/2+4)+'" text-anchor="end" font-size="11" fill="var(--text-secondary)">'+cat+'</text>';
+      svg+='<text x="'+(leftPad+barW+4)+'" y="'+(y+barH/2+4)+'" font-size="10" fill="var(--text-tertiary)">'+d.count+'项'+(catTime[cat]?' · '+catTime[cat]+'分钟':'')+'</text>';
+    });
+    svg+='</svg>';
+    chart.innerHTML=svg;
+    /* 详细列表（带时长统计） */
+    var totalTime=0;cats.forEach(function(c){totalTime+=catTime[c]||0});
+    var listHtml='<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px">近'+timeTrackDays+'天 · 共'+totalTime+'分钟</div>';
+    cats.forEach(function(cat){
+      var d=catData[cat],rate=d.count>0?Math.round(d.done/d.count*100):0;
+      listHtml+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-light)"><span>'+cat+'</span><span>'+d.done+'/'+d.count+' ('+rate+'%)'+(catTime[cat]?' · '+catTime[cat]+'分钟':'')+'</span></div>';
+    });
+    list.innerHTML=listHtml;
+  }
+  function ra(){rc();if(CV==='day')rd();else if(CV==='week')rw();else rl();document.getElementById('todayLabel').textContent=fc(T);scheduleNotifications(ld(STORAGE_KEY)||[])}
+  var init=ld(STORAGE_KEY)||[];
+  if(init.length===0){
+    var samples=[{title:'客户演示',category:'工作',q:1,start:'09:00',end:'10:00',note:'演示v2.4新功能·腾讯会议',priority:'high',location:'3F会议室A',duration:60,progress:0,tags:'客户,演示',remind:[15,60],subtasks:[{name:'准备演示素材',done:true},{name:'预约会议室',done:true},{name:'发送邀请链接',done:false}]},{title:'代码审查',category:'工作',q:1,start:'14:00',end:'15:00',note:'PR#234安全补丁',priority:'high',location:'',duration:60,progress:0,tags:'紧急',remind:[5]},{title:'产品路线图评审',category:'工作',q:2,start:'10:30',end:'12:00',note:'Q3优先级讨论',priority:'medium',location:'线上',duration:90,progress:30,tags:'规划,Q3',remind:[30,1440],subtasks:[{name:'收集各部门需求',done:true},{name:'整理优先级列表',done:false},{name:'准备PPT',done:false}]},{title:'晨跑',category:'健康',q:2,start:'06:30',end:'07:00',note:'5km有氧',priority:'medium',location:'滨江跑道',duration:30,progress:0,tags:'',remind:[5]},{title:'回复客户邮件',category:'工作',q:3,start:'11:00',end:'11:30',note:'确认报价细节',priority:'low',location:'',duration:30,progress:0,tags:'客户',remind:[15]},{title:'阅读《设计模式》',category:'学习',q:4,start:'20:00',end:'21:00',note:'第7章',priority:'low',location:'',duration:60,progress:75,tags:'读书'}];
+    var ts=fm(T);samples.forEach(function(s,idx){init.push({id:gid(),title:s.title,date:ts,startTime:s.start||'',endTime:s.end||'',category:s.category,quadrant:s.q,priority:s.priority||'medium',repeat:'none',remind:s.remind||null,location:s.location||'',duration:s.duration||null,progress:s.progress||0,tags:s.tags||'',subtasks:s.subtasks||null,note:s.note||'',done:false})});
+    /* 跨日示例 */
+    var crossDays=[{offset:1,title:'周会',category:'工作',q:2,start:'09:00',end:'10:30',note:'本周重点工作部署'},{offset:2,title:'瑜伽课',category:'健康',q:2,start:'18:30',end:'19:30',note:'带上瑜伽垫'},{offset:3,title:'客户晚宴',category:'工作',q:1,start:'18:00',end:'20:00',note:'商务休闲装',location:'希尔顿酒店'},{offset:5,title:'周末徒步',category:'健康',q:4,start:'08:00',end:'12:00',note:'准备路餐和水',location:'西山森林公园'},{offset:0,title:'每日复盘',category:'个人',q:2,start:'21:00',end:'21:30',note:'回顾当天，规划明天',repeat:'daily'}];
+    crossDays.forEach(function(s){
+      var d=new Date(T);d.setDate(d.getDate()+s.offset);
+      init.push({id:gid(),title:s.title,date:fm(d),startTime:s.start,endTime:s.end,category:s.category,quadrant:s.q,priority:'medium',repeat:s.repeat||'none',remind:[15],location:s.location||'',duration:null,progress:0,tags:'',note:s.note||'',done:false});
+    });
+    sd(STORAGE_KEY,init)}
+  (function(){var p=document.getElementById('fProgress'),pv=document.getElementById('progressVal');if(p&&pv){var u=function(){pv.textContent=p.value+'%';p.style.setProperty('--progress',p.value+'%')};p.addEventListener('input',u);u()}})();
+  /* Add-subtask handler */
+  document.getElementById('addSubtask')?.addEventListener('click',function(){
+    var list=document.getElementById('subtaskList');if(!list)return;
+    var wrap=document.createElement('div');wrap.className='fg-input-wrap';wrap.style.flex='1';
+    wrap.innerHTML='<input type="text" class="fg-input" placeholder="输入子任务…"><span class="focus-bar"></span>';
+    var row=document.createElement('div');row.className='subtask-row';
+    var del=document.createElement('button');del.className='subtask-del';del.textContent='✕';
+    del.onclick=function(){removeSubtask(this)};
+    row.append(wrap,del);list.appendChild(row);
+    updateSubtaskCount();
+    row.querySelector('.fg-input').focus();
+  });
+  /* Quad-option click handler */
+  document.querySelectorAll('#quadGrid .quad-option').forEach(function(el){
+    el.addEventListener('click',function(){
+      el.parentElement.querySelectorAll('.quad-option').forEach(function(o){o.classList.remove('active')});
+      el.classList.add('active');
+      document.getElementById('fQuadrant').value=el.getAttribute('data-quad');
+    });
+    el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click()}});
+  });
+  /* 真实系统通知 */
+  function requestNotifyPermission(){
+    if(!('Notification' in window))return;
+    if(Notification.permission==='default')Notification.requestPermission();
+  }
+  function scheduleNotifications(data){
+    if(!('Notification' in window)||Notification.permission!=='granted')return;
+    data.forEach(function(item){
+      if(item.done||!item.remind||!item.remind.length||!item.startTime)return;
+      item.remind.forEach(function(min){
+        var parts=item.startTime.split(':');
+        var taskTime=new Date(item.date+'T'+item.startTime);
+        var notifyTime=taskTime.getTime()-min*60000;
+        if(notifyTime>Date.now()&&notifyTime<Date.now()+86400000*7){
+          var delay=notifyTime-Date.now();
+          setTimeout(function(){
+            var n=new Notification('📅 日程提醒',{
+              body:item.title+(item.location?' · '+item.location:'')+(min>0?' (提前'+min+'分钟)':''),
+              tag:item.id+'_'+min,
+              requireInteraction:true
+            });
+            n.onclick=function(){window.focus();this.close()};
+          },delay);
+        }
+      });
+    });
+  }
+  requestNotifyPermission();
+
+  /* 骨架屏入场（首次加载短暂展示后渲染真实数据） */
+  (function(){
+    var grid=document.getElementById('scheduleList');
+    if(!grid)return;
+    var hasData=ld(STORAGE_KEY)&&ld(STORAGE_KEY).length>0;
+    if(hasData){
+      for(var i=0;i<3;i++){var sk=document.createElement('div');sk.className='skeleton-card';grid.prepend(sk)}
+      setTimeout(function(){
+        grid.querySelectorAll('.skeleton-card').forEach(function(el){el.style.opacity='0';el.style.transition='opacity .2s ease';setTimeout(function(){el.remove()},200)});
+        ra();
+      },500)
+    } else { ra() }
+  })();
+})();
+/* 指尖时光风格左滑（一次初始化，自动检测操作区宽度，事件代理处理动态DOM） */
+initSwipe('.s-card-wrap', {
+  onClick: function(wrap) {
+    var id = wrap.getAttribute('data-id');
+    es(id);
+  }
+});
+/* 长按菜单 */
+initLongPress('.s-card-wrap', function(wrap) {
+  var id = wrap.getAttribute('data-id');
+  return [
+    {icon:'✏️', label:'编辑', action: function() { es(id); }},
+    {icon:'✅', label:'标记完成', action: function() { td(id); }},
+    {icon:'🗑', label:'删除', action: function() { dsi(id); }}
+  ];
+});
+</script>
+</body>
+</html>

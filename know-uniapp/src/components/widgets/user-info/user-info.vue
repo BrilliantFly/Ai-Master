@@ -13,17 +13,15 @@
                 :title-color="navColor"
             >
                 <template #title>
-                    <image
-                        class="!h-[54rpx]"
-                        :src="metaData.title_img"
-                        mode="widthFix"
-                    ></image>
+                    <image class="!h-[54rpx]" :src="metaData.title_img" mode="widthFix"></image>
                 </template>
             </u-navbar>
         </u-sticky>
         <!-- #endif -->
 
-        <view class="profile-section flex items-center justify-between px-[50rpx] pb-[60rpx] pt-[50rpx]">
+        <view
+            class="profile-section flex items-center justify-between px-[50rpx] pb-[60rpx] pt-[50rpx]"
+        >
             <view
                 v-if="isLogin"
                 class="flex items-center"
@@ -126,11 +124,24 @@ const { copy } = useCopy()
 const metaData: any = computed(() => props.pageMeta[0]?.content || {})
 
 const displayName = computed(() => {
-    return props.user?.nickname || props.user?.realName || props.user?.realname || props.user?.name || props.user?.username || '用户'
+    return (
+        props.user?.nickname ||
+        props.user?.realName ||
+        props.user?.realname ||
+        props.user?.name ||
+        props.user?.username ||
+        '用户'
+    )
 })
 
 const displayAccount = computed(() => {
-    return props.user?.account || props.user?.username || props.user?.mobile || props.user?.phone || '未设置'
+    return (
+        props.user?.account ||
+        props.user?.username ||
+        props.user?.mobile ||
+        props.user?.phone ||
+        '未设置'
+    )
 })
 
 const displayAvatar = computed(() => {
@@ -210,7 +221,8 @@ watch(
         left: 0;
         right: 0;
         bottom: 0;
-        background: url(../../../static/images/user/my_topbg.png), linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: url(../../../static/images/user/my_topbg.png),
+            linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         background-repeat: no-repeat;
         background-position: bottom;
         background-size: 100%;
@@ -228,7 +240,7 @@ watch(
         position: absolute;
         inset: -6rpx;
         border-radius: 50%;
-        background: linear-gradient(135deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, .1));
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1));
         z-index: -1;
     }
 }
@@ -238,22 +250,22 @@ watch(
     font-weight: 700;
     color: #fff;
     letter-spacing: 1rpx;
-    text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, .15);
+    text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
 }
 
 .profile-account {
     font-size: 24rpx;
-    color: rgba(255, 255, 255, .75);
+    color: rgba(255, 255, 255, 0.75);
     margin-top: 10rpx;
     display: flex;
     align-items: center;
     gap: 6rpx;
-    background: rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, 0.12);
     padding: 6rpx 16rpx;
     border-radius: 20rpx;
     backdrop-filter: blur(10rpx);
     -webkit-backdrop-filter: blur(10rpx);
-    border: 1rpx solid rgba(255, 255, 255, .1);
+    border: 1rpx solid rgba(255, 255, 255, 0.1);
     width: fit-content;
 }
 
@@ -265,19 +277,19 @@ watch(
     width: 80rpx;
     height: 80rpx;
     border-radius: 40rpx;
-    background: rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(10rpx);
     -webkit-backdrop-filter: blur(10rpx);
-    border: 1rpx solid rgba(255, 255, 255, .15);
+    border: 1rpx solid rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all .25s;
+    transition: all 0.25s;
 }
 
 .settings-btn:active {
-    background: rgba(255, 255, 255, .2);
-    transform: scale(.92);
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.92);
 }
 
 .stats-card {
@@ -287,11 +299,11 @@ watch(
     padding: 30rpx 8rpx;
     background: var(--color-surface);
     border-radius: 24rpx;
-    box-shadow: 0 8rpx 48rpx rgba(0, 0, 0, .08);
+    box-shadow: 0 8rpx 48rpx rgba(0, 0, 0, 0.08);
     position: relative;
     z-index: 10;
-    border: 1rpx solid rgba(0, 0, 0, .04);
-    transition: all .3s;
+    border: 1rpx solid rgba(0, 0, 0, 0.04);
+    transition: all 0.3s;
 }
 
 .stat-item {
@@ -299,11 +311,11 @@ watch(
     text-align: center;
     padding: 8rpx 0;
     position: relative;
-    transition: all .2s;
+    transition: all 0.2s;
 }
 
 .stat-item:active {
-    transform: scale(.92);
+    transform: scale(0.92);
 }
 
 .stat-item + .stat-item::before {

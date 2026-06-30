@@ -25,12 +25,14 @@
                         class="tab-item"
                         :class="{ active: formData.scene === LoginWayEnum.ACCOUNT }"
                         @tap="changeLoginWay(LoginWayEnum.ACCOUNT)"
-                    >密码登录</view>
+                        >密码登录</view
+                    >
                     <view
                         class="tab-item"
                         :class="{ active: formData.scene === LoginWayEnum.MOBILE }"
                         @tap="changeLoginWay(LoginWayEnum.MOBILE)"
-                    >短信登录</view>
+                        >短信登录</view
+                    >
                 </view>
 
                 <view v-if="formData.scene === LoginWayEnum.ACCOUNT">
@@ -57,7 +59,9 @@
                                 :type="showPassword ? 'text' : 'password'"
                                 placeholder="输入密码"
                             />
-                            <button class="toggle-pass" @tap="showPassword = !showPassword">{{ showPassword ? '🙈' : '👁️' }}</button>
+                            <button class="toggle-pass" @tap="showPassword = !showPassword">
+                                {{ showPassword ? '🙈' : '👁️' }}
+                            </button>
                         </view>
                     </view>
 
@@ -66,7 +70,12 @@
                             <checkbox :checked="rememberLogin" color="var(--color-primary)" />
                             <text>记住登录</text>
                         </label>
-                        <navigator url="/pages/forget_pwd/forget_pwd" hover-class="none" class="forgot">忘记密码?</navigator>
+                        <navigator
+                            url="/pages/forget_pwd/forget_pwd"
+                            hover-class="none"
+                            class="forgot"
+                            >忘记密码?</navigator
+                        >
                     </view>
                 </view>
 
@@ -95,9 +104,24 @@
                                     placeholder="6位验证码"
                                 />
                             </view>
-                            <view class="btn-code-send" @tap="formData.account ? sendSms() : undefined">
-                                <u-verification-code ref="uCodeRef" :seconds="60" @change="codeChange" change-text="x秒" />
-                                <text :style="{ color: formData.account ? 'var(--color-primary)' : 'var(--color-text-tertiary)' }">{{ codeTips }}</text>
+                            <view
+                                class="btn-code-send"
+                                @tap="formData.account ? sendSms() : undefined"
+                            >
+                                <u-verification-code
+                                    ref="uCodeRef"
+                                    :seconds="60"
+                                    @change="codeChange"
+                                    change-text="x秒"
+                                />
+                                <text
+                                    :style="{
+                                        color: formData.account
+                                            ? 'var(--color-primary)'
+                                            : 'var(--color-text-tertiary)'
+                                    }"
+                                    >{{ codeTips }}</text
+                                >
                             </view>
                         </view>
                     </view>
@@ -105,14 +129,28 @@
 
                 <view class="agreement-row" v-if="isOpenAgreement">
                     <label class="agree-check">
-                        <u-checkbox v-model="isCheckAgreement" shape="circle" :active-color="themeStore.primaryColor || '#6366f1'">
+                        <u-checkbox
+                            v-model="isCheckAgreement"
+                            shape="circle"
+                            :active-color="themeStore.primaryColor || '#6366f1'"
+                        >
                             <text class="agree-text">已阅读并同意</text>
                         </u-checkbox>
                     </label>
                     <view class="agree-links">
-                        <navigator hover-class="none" url="/pages/agreement/agreement?type=service" class="agree-link">《服务协议》</navigator>
+                        <navigator
+                            hover-class="none"
+                            url="/pages/agreement/agreement?type=service"
+                            class="agree-link"
+                            >《服务协议》</navigator
+                        >
                         <text class="agree-and">和</text>
-                        <navigator hover-class="none" url="/pages/agreement/agreement?type=privacy" class="agree-link">《隐私协议》</navigator>
+                        <navigator
+                            hover-class="none"
+                            url="/pages/agreement/agreement?type=privacy"
+                            class="agree-link"
+                            >《隐私协议》</navigator
+                        >
                     </view>
                 </view>
 
@@ -120,7 +158,8 @@
                     class="btn-primary btn-login"
                     @tap="handleLogin(formData.scene)"
                     :style="{ opacity: DisableStyle ? '1' : '0.5' }"
-                >登录</view>
+                    >登录</view
+                >
 
                 <view class="social-divider">
                     <text>其他登录方式</text>
@@ -133,14 +172,23 @@
                     <view class="social-btn qq" title="QQ登录" @tap="showToast('QQ 登录暂未开放')">
                         <view class="social-svg" v-html="qqIcon"></view>
                     </view>
-                    <view class="social-btn phone" title="本机号码登录" @tap="showToast('本机号码登录暂未开放')">
+                    <view
+                        class="social-btn phone"
+                        title="本机号码登录"
+                        @tap="showToast('本机号码登录暂未开放')"
+                    >
                         <view class="social-svg" v-html="phoneIcon"></view>
                     </view>
                 </view>
 
                 <view class="signup-link">
                     <text>还没有账号？</text>
-                    <navigator url="/pages/register/register" hover-class="none" class="signup-link-text">立即注册</navigator>
+                    <navigator
+                        url="/pages/register/register"
+                        hover-class="none"
+                        class="signup-link-text"
+                        >立即注册</navigator
+                    >
                 </view>
             </view>
         </view>
@@ -154,15 +202,21 @@
             @cancel="showModel = false"
         >
             <view class="text-center px-[35px] py-[30px]">
-                <view class="text-3xl mb-[10px]" style="color:var(--color-text)">📋</view>
-                <view class="text-[15px] mb-[8px]" style="color:var(--color-text)">请先阅读并同意</view>
+                <view class="text-3xl mb-[10px]" style="color: var(--color-text)">📋</view>
+                <view class="text-[15px] mb-[8px]" style="color: var(--color-text)"
+                    >请先阅读并同意</view
+                >
                 <view class="flex justify-center items-center gap-[4px]">
-                    <navigator data-theme="" url="/pages/agreement/agreement?type=service" hover-class="none">
-                        <text style="color:var(--color-primary)">《服务协议》</text>
+                    <navigator
+                        data-theme=""
+                        url="/pages/agreement/agreement?type=service"
+                        hover-class="none"
+                    >
+                        <text style="color: var(--color-primary)">《服务协议》</text>
                     </navigator>
-                    <text style="color:var(--color-text-tertiary)">和</text>
+                    <text style="color: var(--color-text-tertiary)">和</text>
                     <navigator url="/pages/agreement/agreement?type=privacy" hover-class="none">
-                        <text style="color:var(--color-primary)">《隐私协议》</text>
+                        <text style="color: var(--color-primary)">《隐私协议》</text>
                     </navigator>
                 </view>
             </view>
@@ -505,7 +559,11 @@ onLoad(async () => {
 .bg-orbs::before {
     width: 550px;
     height: 550px;
-    background: radial-gradient(circle, rgba(var(--color-primary-rgb), .35), var(--color-bg-app) 70%);
+    background: radial-gradient(
+        circle,
+        rgba(var(--color-primary-rgb), 0.35),
+        var(--color-bg-app) 70%
+    );
     top: -15%;
     left: -12%;
 }
@@ -513,15 +571,23 @@ onLoad(async () => {
 .bg-orbs::after {
     width: 450px;
     height: 450px;
-    background: radial-gradient(circle, rgba(var(--color-primary-rgb), .25), var(--color-bg-app) 70%);
+    background: radial-gradient(
+        circle,
+        rgba(var(--color-primary-rgb), 0.25),
+        var(--color-bg-app) 70%
+    );
     bottom: -12%;
     right: -12%;
     animation-delay: -5s;
 }
 
 @keyframes drifting {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(50px, 40px) scale(1.12); }
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        transform: translate(50px, 40px) scale(1.12);
+    }
 }
 
 .toast {
@@ -537,7 +603,7 @@ onLoad(async () => {
     font-size: 14px;
     z-index: 100;
     opacity: 0;
-    transition: all .5s var(--ease);
+    transition: all 0.5s var(--ease);
     pointer-events: none;
     font-weight: 500;
 }
@@ -583,7 +649,7 @@ onLoad(async () => {
     color: #fff;
     font-weight: 700;
     margin-bottom: 18px;
-    box-shadow: 0 10px 36px rgba(var(--color-primary-rgb), .25);
+    box-shadow: 0 10px 36px rgba(var(--color-primary-rgb), 0.25);
 }
 
 .logo-name {
@@ -609,7 +675,7 @@ onLoad(async () => {
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-border);
     padding: 36px 28px 32px;
-    box-shadow: 0 24px 80px rgba(0,0,0,.5);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
 }
 
 .login-tabs {
@@ -656,7 +722,7 @@ onLoad(async () => {
     color: var(--color-text-tertiary);
     margin-bottom: 8px;
     font-weight: 500;
-    letter-spacing: .04em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
@@ -673,7 +739,7 @@ onLoad(async () => {
 .input-wrap:focus-within {
     border-color: var(--color-primary);
     background: var(--color-primary-mist);
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), .08);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.08);
 }
 
 .input-prefix {
@@ -771,7 +837,7 @@ onLoad(async () => {
 
 .forgot {
     font-size: 13px;
-    color: rgba(var(--color-primary-rgb), .6);
+    color: rgba(var(--color-primary-rgb), 0.6);
     font-weight: 500;
 }
 
@@ -796,7 +862,7 @@ onLoad(async () => {
 
 .agree-link {
     font-size: 12px;
-    color: rgba(var(--color-primary-rgb), .8);
+    color: rgba(var(--color-primary-rgb), 0.8);
 }
 
 .agree-and {
@@ -816,8 +882,8 @@ onLoad(async () => {
     font-weight: 600;
     color: #fff;
     background: linear-gradient(135deg, var(--color-primary), #8980f0);
-    box-shadow: 0 10px 28px rgba(var(--color-primary-rgb), .3);
-    letter-spacing: .04em;
+    box-shadow: 0 10px 28px rgba(var(--color-primary-rgb), 0.3);
+    letter-spacing: 0.04em;
 }
 
 .social-divider {
@@ -872,9 +938,15 @@ onLoad(async () => {
     height: 24px;
 }
 
-.social-btn.wechat { color: #07c160; }
-.social-btn.qq { color: #12b7f5; }
-.social-btn.phone { color: var(--color-primary); }
+.social-btn.wechat {
+    color: #07c160;
+}
+.social-btn.qq {
+    color: #12b7f5;
+}
+.social-btn.phone {
+    color: var(--color-primary);
+}
 
 .signup-link {
     display: flex;
@@ -888,7 +960,7 @@ onLoad(async () => {
 
 .signup-link-text {
     display: inline-flex;
-    color: rgba(var(--color-primary-rgb), .7);
+    color: rgba(var(--color-primary-rgb), 0.7);
     font-weight: 500;
 }
 

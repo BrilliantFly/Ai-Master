@@ -1,0 +1,576 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="white">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>习惯打卡</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.checkin-top{padding:20px 20px 16px;background:var(--primary-soft);margin:0 0 16px;border-radius:0 0 var(--radius-lg) var(--radius-lg);text-align:center}
+.checkin-top h1{font-size:22px;font-weight:700;color:var(--text);margin:0}
+.checkin-top .sub{font-size:13px;color:var(--text-secondary);margin-top:4px}
+.streak-row{display:flex;gap:10px;padding:0 20px;margin-top:-8px;margin-bottom:16px}
+.streak-card{flex:1;border-radius:var(--radius-md);padding:14px 10px;background:var(--surface);border:1px solid var(--border-light);text-align:center;box-shadow:var(--shadow-sm)}
+.streak-card .num{font-size:24px;font-weight:700;color:var(--text)}
+.streak-card .label{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.streak-card.accent .num{color:var(--primary)}
+.tab-bar{display:flex;gap:0;padding:0 20px 14px;border-bottom:1px solid var(--border-light);margin-bottom:16px}
+.tab-item2{flex:1;text-align:center;padding:8px 0;font-size:14px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all .25s ease;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.tab-item2.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.tab-item2 .badge{font-size:11px;color:var(--text-tertiary);margin-left:4px}
+.goal-list{padding:0 20px 140px;display:flex;flex-direction:column;gap:12px}
+.goal-card{border-radius:var(--radius-md);background:var(--surface);border:1px solid var(--border-light);padding:16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:all .25s ease}
+.goal-card:hover{box-shadow:var(--shadow-md)}
+.goal-card .g-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.goal-card .g-icon{font-size:32px;line-height:1}
+.goal-card .g-name{font-size:16px;font-weight:600;color:var(--text);flex:1;margin-left:10px}
+.goal-card .g-badge{font-size:10px;padding:2px 10px;border-radius:6px;background:var(--primary-soft);color:var(--primary);font-weight:500}
+.goal-card .g-streak{font-size:12px;color:var(--warning);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:4px}
+.goal-card .g-progress{margin-bottom:10px}
+.goal-card .g-progress-bar{height:6px;border-radius:3px;background:var(--border-light);overflow:hidden}
+.goal-card .g-progress-fill{height:100%;border-radius:3px;background:var(--accent-gradient);transition:width .5s ease;width:0%}
+.goal-card .g-progress-label{font-size:10px;color:var(--text-tertiary);margin-top:3px;display:flex;justify-content:space-between}
+.goal-card .g-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border-light)}
+.goal-card .g-week{display:flex;gap:3px}
+.goal-card .g-week-day{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;background:var(--surface-soft);color:var(--text-tertiary)}
+.goal-card .g-week-day.done{background:var(--success-soft);color:var(--success)}
+.goal-card .g-week-day.today{border:1.5px solid var(--primary)}
+.checkin-btn{width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--text-tertiary);transition:all .25s ease;flex-shrink:0}
+.checkin-btn:hover{transform:scale(1.05)}
+.checkin-btn.checked{background:var(--success);border-color:var(--success);color:#fff;box-shadow:0 4px 12px rgba(34,181,115,.3)}
+.checkin-btn:active{transform:scale(.9)}
+.goal-card .delete-overlay{position:absolute;top:0;right:-80px;width:80px;height:100%;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;transition:right .2s ease;border-radius:0 var(--radius-md) var(--radius-md) 0;cursor:pointer}
+.goal-card.swiping .delete-overlay{right:0}
+
+.fab{position:fixed;bottom:90px;right:calc(50% - 190px);width:56px;height:56px;border-radius:50%;background:var(--accent-gradient);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:var(--shadow-lg);z-index:50;display:flex;align-items:center;justify-content:center;transition:all .25s ease;font-family:inherit}
+.fab:hover{transform:scale(1.08);box-shadow:0 12px 40px rgba(var(--primary-rgb),.3)}
+.fab:active{transform:scale(.95)}
+@media(min-width:420px){.fab{right:calc(50% - 190px)}}
+
+.week-chart{padding:0 20px 20px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.wc-day{font-size:11px;color:var(--text-tertiary);margin-bottom:4px}
+.wc-bar{height:60px;border-radius:var(--radius-sm);background:var(--surface-soft);position:relative;overflow:hidden;margin-bottom:4px}
+.wc-fill{position:absolute;bottom:0;left:0;right:0;border-radius:var(--radius-sm) var(--radius-sm) 0 0;background:var(--accent-gradient);transition:height .5s ease}
+.wc-val{font-size:10px;color:var(--text-secondary);font-weight:500}
+.manage-item{display:flex;align-items:center;padding:14px 16px;border-radius:var(--radius-md);background:var(--surface);border:1px solid var(--border-light);margin-bottom:8px;cursor:pointer;transition:all .25s ease}
+.manage-item:hover{box-shadow:var(--shadow-sm)}
+.manage-item .mi-icon{font-size:24px;margin-right:12px}
+.manage-item .mi-info{flex:1}
+.manage-item .mi-name{font-size:14px;font-weight:600;color:var(--text)}
+.manage-item .mi-sub{font-size:11px;color:var(--text-tertiary)}
+.manage-item .mi-action{font-size:12px;color:var(--danger);padding:6px 12px;border-radius:var(--radius-sm);border:none;background:var(--danger-soft);cursor:pointer;font-family:inherit}
+.manage-item.archived{opacity:.5}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;display:none;animation:fadeIn .2s ease}
+.modal-overlay.open{display:block}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:420px;background:var(--bg-app);border-radius:var(--radius-lg) var(--radius-lg) 0 0;z-index:301;padding:24px 20px max(24px,env(safe-area-inset-bottom));transition:transform .3s cubic-bezier(.22,1,.36,1);max-height:85vh;overflow-y:auto}
+.modal-overlay.open .modal-sheet{transform:translateX(-50%) translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 20px}
+.modal-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;transition:all .25s ease}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(var(--primary-rgb),.1)}
+.form-group textarea{resize:none;min-height:60px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.icon-picker{display:flex;gap:8px;flex-wrap:wrap}
+.icon-opt{width:40px;height:40px;border-radius:var(--radius-sm);border:2px solid var(--border-light);background:none;font-size:20px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}
+.icon-opt:hover{border-color:var(--primary)}
+.icon-opt.active{border-color:var(--primary);background:var(--primary-soft)}
+.form-section{margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--border-light)}
+.form-section summary{font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;padding:4px 0;outline:none;-webkit-user-select:none;user-select:none}
+.form-section summary::-webkit-details-marker{color:var(--text-tertiary)}
+.form-section[open] summary{margin-bottom:12px;color:var(--primary)}
+.color-picker{display:flex;gap:8px;flex-wrap:wrap}
+.color-opt{width:32px;height:32px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s ease;flex-shrink:0}
+.color-opt:hover{transform:scale(1.15)}
+.color-opt.active{border-color:var(--text);box-shadow:0 0 0 2px var(--bg-app)}
+.range-wrap{display:flex;align-items:center;gap:10px}
+.range-wrap input[type=range]{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--border-light);border-radius:2px;outline:none;border:none;padding:0}
+.range-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent-gradient);cursor:pointer;box-shadow:var(--shadow-sm)}
+.range-val{min-width:32px;text-align:center;font-size:14px;font-weight:700;color:var(--primary)}
+.form-group .num-unit-wrap{display:flex;gap:6px;align-items:center}
+.form-group .num-unit-wrap input[type=number]{flex:2;min-width:0}
+.form-group .num-unit-wrap select{flex:1;min-width:0}
+.goal-card.color-border{border-left:4px solid var(--primary)}
+.checkin-note{font-size:10px;color:var(--text-tertiary);margin:4px 0 0;padding:3px 6px;background:var(--surface-soft);border-radius:4px;line-height:1.4}
+.form-actions{display:flex;gap:10px;margin-top:20px}
+.form-actions button{flex:1;padding:12px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .25s ease;border:none}
+.btn-cancel{background:var(--surface-soft);color:var(--text-secondary)}
+.btn-save{background:var(--accent-gradient);color:#fff;box-shadow:var(--shadow-glow)}
+.btn-save:hover{transform:translateY(-1px)}
+.empty-state{text-align:center;padding:60px 20px}
+.empty-state .icon{font-size:48px;opacity:.4;margin-bottom:12px}
+.empty-state p{font-size:14px;color:var(--text-tertiary)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="icons">
+      <span class="theme-trigger" onclick="toggleThemePanel(event)" title="切换主题">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </span> 📶 🔋
+    </span>
+    <div class="theme-panel" id="themePanel">
+      <div class="theme-option" data-theme="white" onclick="setTheme('white')"><span class="swatch sw-white"></span><span>纯白</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="dark" onclick="setTheme('dark')"><span class="swatch sw-dark"></span><span>深空</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="warm" onclick="setTheme('warm')"><span class="swatch sw-warm"></span><span>暖阳</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="aurora" onclick="setTheme('aurora')"><span class="swatch sw-aurora"></span><span>极光</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="purple" onclick="setTheme('purple')"><span class="swatch sw-purple"></span><span>暗紫</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="glass" onclick="setTheme('glass')"><span class="swatch sw-glass"></span><span>玻璃</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="orangold" onclick="setTheme('orangold')"><span class="swatch sw-orangold"></span><span>橘金</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="macaron" onclick="setTheme('macaron')"><span class="swatch sw-macaron"></span><span>马卡龙</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="mint" onclick="setTheme('mint')"><span class="swatch sw-mint"></span><span>薄荷</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="lavender" onclick="setTheme('lavender')"><span class="swatch sw-lavender"></span><span>薰衣草</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="milky" onclick="setTheme('milky')"><span class="swatch sw-milky"></span><span>奶白</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="matcha" onclick="setTheme('matcha')"><span class="swatch sw-matcha"></span><span>抹茶</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="berry" onclick="setTheme('berry')"><span class="swatch sw-berry"></span><span>浆果</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="ocean" onclick="setTheme('ocean')"><span class="swatch sw-ocean"></span><span>海洋</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="cream" onclick="setTheme('cream')"><span class="swatch sw-cream"></span><span>奶油</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="chocolate" onclick="setTheme('chocolate')"><span class="swatch sw-chocolate"></span><span>巧克力</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="neon" onclick="setTheme('neon')"><span class="swatch sw-neon"></span><span>霓虹</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="sakura" onclick="setTheme('sakura')"><span class="swatch sw-sakura"></span><span>樱花</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="forest" onclick="setTheme('forest')"><span class="swatch sw-forest"></span><span>森林</span><span class="check">✓</span></div>
+      <div class="theme-option" data-theme="sunset" onclick="setTheme('sunset')"><span class="swatch sw-sunset"></span><span>日落</span><span class="check">✓</span></div>
+    </div>
+  </div>
+
+  <div class="checkin-top">
+    <h1>🎯 习惯打卡</h1>
+    <div class="sub" id="todaySummary">今日打卡 0/0</div>
+  </div>
+
+  <div class="streak-row">
+    <div class="streak-card accent"><div class="num" id="todayCount">0</div><div class="label">今日已打卡</div></div>
+    <div class="streak-card"><div class="num" id="bestStreak">0</div><div class="label">最长连续</div></div>
+    <div class="streak-card"><div class="num" id="monthRate">0%</div><div class="label">本月完成率</div></div>
+  </div>
+
+  <div class="tab-bar" id="mainTabs">
+    <button class="tab-item2 active" data-tab="checkin" onclick="switchTab('checkin')">打卡</button>
+    <button class="tab-item2" data-tab="stats" onclick="switchTab('stats')">统计</button>
+    <button class="tab-item2" data-tab="manage" onclick="switchTab('manage')">管理</button>
+  </div>
+
+  <div id="checkinView">
+    <div class="goal-list" id="goalList"></div>
+  </div>
+
+  <div id="statsView" style="display:none">
+    <div style="padding:0 20px 140px">
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px">本周打卡</div>
+      <div class="week-chart" id="weekChart"></div>
+      <div id="monthCal" style="margin-top:20px">
+        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px">本月打卡日历</div>
+        <div style="border-radius:var(--radius-md);background:var(--surface);border:1px solid var(--border-light);padding:12px;box-shadow:var(--shadow-sm)">
+          <div class="weekdays" style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:var(--text-tertiary);font-weight:500;margin-bottom:6px"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+          <div class="days" id="monthCalGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="manageView" style="display:none">
+    <div style="padding:0 20px 140px">
+      <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:10px;font-weight:500">进行中的目标</div>
+      <div id="activeGoals"></div>
+      <div style="font-size:12px;color:var(--text-tertiary);margin:16px 0 10px;font-weight:500">已结束的目标</div>
+      <div id="archivedGoals"></div>
+    </div>
+  </div>
+
+  <button class="fab" onclick="openGoalForm()" title="新建目标">+</button>
+
+  <div class="bottom-tab" style="margin-top:0">
+    <a class="tab-item" href="home.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span><span>首页</span></a>
+    <a class="tab-item" href="schedule.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>计划</span></a>
+    <a class="tab-item active" href="checkin.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span><span>打卡</span></a>
+    <a class="tab-item" href="customer.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span>客户</span></a>
+    <a class="tab-item" href="profile.html"><span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>我的</span></a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="formOverlay" onclick="closeGoalForm(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="formTitle">新建目标</div>
+    <input type="hidden" id="editGoalId" value="">
+    <div class="form-group"><label>图标</label>
+      <div class="icon-picker" id="iconPicker">
+        <button class="icon-opt" data-icon="📖" onclick="pickIcon(this)">📖</button>
+        <button class="icon-opt" data-icon="🏃" onclick="pickIcon(this)">🏃</button>
+        <button class="icon-opt" data-icon="💧" onclick="pickIcon(this)">💧</button>
+        <button class="icon-opt" data-icon="🥦" onclick="pickIcon(this)">🥦</button>
+        <button class="icon-opt" data-icon="🧘" onclick="pickIcon(this)">🧘</button>
+        <button class="icon-opt" data-icon="🎯" onclick="pickIcon(this)">🎯</button>
+        <button class="icon-opt" data-icon="✍️" onclick="pickIcon(this)">✍️</button>
+        <button class="icon-opt" data-icon="🎨" onclick="pickIcon(this)">🎨</button>
+        <button class="icon-opt" data-icon="💪" onclick="pickIcon(this)">💪</button>
+        <button class="icon-opt" data-icon="🧠" onclick="pickIcon(this)">🧠</button>
+        <button class="icon-opt" data-icon="📝" onclick="pickIcon(this)">📝</button>
+        <button class="icon-opt" data-icon="☕" onclick="pickIcon(this)">☕</button>
+        <button class="icon-opt" data-icon="🌅" onclick="pickIcon(this)">🌅</button>
+        <button class="icon-opt" data-icon="🌙" onclick="pickIcon(this)">🌙</button>
+        <button class="icon-opt" data-icon="🎵" onclick="pickIcon(this)">🎵</button>
+        <button class="icon-opt" data-icon="🧹" onclick="pickIcon(this)">🧹</button>
+        <button class="icon-opt" data-icon="💰" onclick="pickIcon(this)">💰</button>
+        <button class="icon-opt active" data-icon="🎯" onclick="pickIcon(this)">🎯</button>
+      </div>
+    </div>
+    <div class="form-group"><label>目标名称</label><input type="text" id="gName" placeholder="习惯名称" maxlength="20"></div>
+    <div class="form-row">
+      <div class="form-group"><label>目标值</label>
+        <div class="num-unit-wrap">
+          <input type="number" id="gTarget" placeholder="次数" min="1" value="1">
+          <select id="gUnit"><option value="次">次</option><option value="杯">杯</option><option value="分钟">分钟</option><option value="公里">公里</option><option value="页">页</option><option value="个">个</option><option value="组">组</option><option value="自定义">自定义</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>分类</label>
+        <select id="gCategory"><option value="健康">健康</option><option value="学习">学习</option><option value="生活">生活</option><option value="工作">工作</option><option value="兴趣">兴趣</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>打卡频率</label>
+        <div class="num-unit-wrap">
+          <input type="number" id="gFreqTarget" placeholder="次数" min="1" value="1" style="flex:1">
+          <select id="gFreqPeriod" style="flex:1.5">
+            <option value="daily">/每天</option>
+            <option value="weekly">/每周</option>
+            <option value="monthly">/每月</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>提醒时间</label><input type="time" id="gRemind" value="09:00"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>时间段</label>
+        <select id="gTimePeriod"><option value="all">全天</option><option value="morning">早上</option><option value="noon">中午</option><option value="afternoon">下午</option><option value="evening">晚上</option></select>
+      </div>
+      <div class="form-group"><label>开始日期</label><input type="date" id="gStartDate"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>结束日期</label><input type="date" id="gEndDate" placeholder="可选"></div>
+      <div class="form-group"><label>颜色标识</label>
+        <div class="color-picker" id="colorPicker">
+          <button class="color-opt" data-color="#5b5bd6" style="background:#5b5bd6" onclick="pickColor(this)"></button>
+          <button class="color-opt" data-color="#22b573" style="background:#22b573" onclick="pickColor(this)"></button>
+          <button class="color-opt" data-color="#f0a020" style="background:#f0a020" onclick="pickColor(this)"></button>
+          <button class="color-opt" data-color="#e85a5a" style="background:#e85a5a" onclick="pickColor(this)"></button>
+          <button class="color-opt" data-color="#f97316" style="background:#f97316" onclick="pickColor(this)"></button>
+          <button class="color-opt" data-color="#a855f7" style="background:#a855f7" onclick="pickColor(this)"></button>
+          <button class="color-opt active" data-color="#5b5bd6" style="background:#5b5bd6" onclick="pickColor(this)"></button>
+          <button class="color-opt" data-color="#06b6d4" style="background:#06b6d4" onclick="pickColor(this)"></button>
+        </div>
+      </div>
+    </div>
+    <div class="form-group"><label>目标描述</label><textarea id="gDesc" placeholder="详细描述这个目标，为什么要坚持？计划怎么做？" maxlength="200" style="min-height:50px"></textarea></div>
+    <details class="form-section">
+      <summary>更多设置</summary>
+      <div class="form-group"><label>激励语</label><textarea id="gMotto" placeholder="给自己打气的一句话..." maxlength="50"></textarea></div>
+      <div class="form-group" style="display:flex;align-items:center;gap:10px">
+        <label style="margin-bottom:0;cursor:pointer">允许补卡</label>
+        <input type="checkbox" id="gAllowBackfill" checked style="width:auto;margin:0;accent-color:var(--primary)">
+      </div>
+    </details>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeGoalForm()" type="button">取消</button>
+      <button class="btn-save" onclick="saveGoal()" type="button">保存</button>
+    </div>
+  </div>
+</div>
+
+<script src="theme.js"></script>
+<script>
+(function(){
+  var GK='know_checkin_goals',RK='know_checkin_records';
+  function ld(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+  function sd(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  function goals(){return ld(GK)||[]}
+  function saveGoals(g){sd(GK,g)}
+  function records(){return ld(RK)||{}}
+  function saveRecords(r){sd(RK,r)}
+
+  var T=new Date(),icons=['📖','🏃','💧','🥦','🧘','🎯','✍️','🎨','💪','🧠','📝','☕','🌅','🌙','🎵','🧹','💰','🗓️'];
+  function fm(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+  var today=fm(T);
+
+  function getStreak(goalId,recs){
+    var days=recs[goalId]||[],s=0,c=new Date(T);
+    while(true){
+      var ds=fm(c);
+      if(days.indexOf(ds)>-1){s++;c.setDate(c.getDate()-1)}
+      else break;
+    }
+    return s;
+  }
+
+  function getWeekDays(goalId,recs){
+    var days=recs[goalId]||[],result=[];
+    var m=new Date(T);m.setDate(m.getDate()-m.getDay()+1);
+    for(var i=0;i<7;i++){
+      var d=new Date(m);d.setDate(m.getDate()+i);
+      result.push({date:fm(d),done:days.indexOf(fm(d))>-1,isToday:fm(d)===today});
+    }
+    return result;
+  }
+
+  function renderCheckin(){
+    var list=document.getElementById('goalList'),gs=goals(),recs=records();
+    var active=gs.filter(function(g){return !g.archived});
+    if(active.length===0){
+      list.innerHTML='<div class="empty-state"><div class="icon">🎯</div><p>还没有目标<br>点击右下角+新建</p></div>';
+      updateStats();
+      return;
+    }
+    var html='';
+    active.forEach(function(g){
+      var streak=getStreak(g.id,recs),wk=getWeekDays(g.id,recs);
+      var checkedToday=(recs[g.id]||[]).indexOf(today)>-1;
+      var weekDone=wk.filter(function(w){return w.done}).length;
+      var pct=Math.round((weekDone/7)*100);
+      var borderCol=g.color||'#5b5bd6';
+      var nk='know_checkin_notes',notes=ld(nk)||{};
+      var todayNote=notes[g.id]&&notes[g.id][today]||'';
+      html+='<div class="goal-card color-border" data-id="'+g.id+'" style="border-left-color:'+borderCol+'">';
+      html+='<div class="g-header"><span class="g-icon">'+g.icon+'</span><span class="g-name">'+g.name+'</span><span class="g-badge" style="background:'+borderCol+'22;color:'+borderCol+'">';
+      if(g.freqPeriod&&g.freqTarget>1){html+=g.freqTarget+'/'+({daily:'天',weekly:'周',monthly:'月'}[g.freqPeriod]||'天')}
+      else if(g.freqPeriod){html+=g.freqPeriod==='daily'?'每天':(g.freqPeriod==='weekly'?'每周':'每月')}
+      else{html+=g.repeat==='weekday'?'工作日':'每天'}
+      html+='</span></div>';
+      var targetStr='';if(g.target&&g.unit)targetStr='<span style="font-size:12px;color:var(--text-secondary);margin-left:6px;font-weight:400">目标 '+g.target+g.unit+'</span>';
+      html+='<div class="g-streak">🔥 连续 '+streak+' 天'+targetStr+'</div>';
+      if(g.desc)html+='<div style="font-size:11px;color:var(--text-tertiary);margin:-2px 0 6px;line-height:1.4">📌 '+g.desc+'</div>';
+      if(g.motto)html+='<div style="font-size:11px;color:var(--text-tertiary);margin:-4px 0 8px">💬 '+g.motto+'</div>';
+      if(g.endDate)html+='<div style="font-size:10px;color:var(--warning);margin:-2px 0 6px">⏳ 截止 '+g.endDate+'</div>';
+      html+='<div class="g-progress"><div class="g-progress-bar"><div class="g-progress-fill" style="width:'+pct+'%"></div></div><div class="g-progress-label"><span>本周 '+weekDone+'/7</span><span>'+pct+'%</span></div></div>';
+      if(todayNote)html+='<div class="checkin-note">📝 '+todayNote+'</div>';
+      html+='<div class="g-footer">';
+      html+='<div class="g-week">';
+      wk.forEach(function(w){
+        html+='<div class="g-week-day'+(w.done?' done':'')+(w.isToday?' today':'')+'">'+(w.isToday?'今':['日','一','二','三','四','五','六'][new Date(w.date).getDay()])+'</div>';
+      });
+      html+='</div>';
+      html+='<button class="checkin-btn'+(checkedToday?' checked':'')+'" onclick="toggleCheckin(\''+g.id+'\')">'+(checkedToday?'✓':'○')+'</button>';
+      html+='</div></div>';
+    });
+    list.innerHTML=html;
+    updateStats();
+  }
+
+  function toggleCheckin(id){
+    var recs=records(),gs=goals(),nk='know_checkin_notes';
+    var notes=ld(nk)||{};
+    var g=null;for(var i=0;i<gs.length;i++){if(gs[i].id===id){g=gs[i];break}}
+    if(!g)return;
+    if(!recs[id])recs[id]=[];
+    var idx=recs[id].indexOf(today);
+    if(idx>-1){
+      recs[id].splice(idx,1);
+      if(notes[id])delete notes[id][today];
+    } else {
+      recs[id].push(today);
+      var note=prompt('✏️ 打卡备注（可选，直接确定可跳过）','');
+      if(note!==null&&note.trim()){if(!notes[id])notes[id]={};notes[id][today]=note.trim()}
+    }
+    saveRecords(recs);
+    sd(nk,notes);
+    var curTab=document.querySelector('.tab-item2.active');
+    if(curTab&&curTab.getAttribute('data-tab')==='checkin')renderCheckin();
+    else{switchTab('checkin')}
+    if(curTab&&curTab.getAttribute('data-tab')==='stats')renderStats();
+  }
+  window.toggleCheckin=toggleCheckin;
+
+  function updateStats(){
+    var gs=goals(),recs=records(),active=gs.filter(function(g){return !g.archived});
+    var checked=0;active.forEach(function(g){if((recs[g.id]||[]).indexOf(today)>-1)checked++});
+    document.getElementById('todayCount').textContent=checked+'/'+active.length;
+    document.getElementById('todaySummary').textContent='今日打卡 '+checked+'/'+active.length;
+
+    var best=0;active.forEach(function(g){var s=getStreak(g.id,recs);if(s>best)best=s});
+    document.getElementById('bestStreak').textContent=best+'天';
+
+    var totalDays=new Date(T.getFullYear(),T.getMonth()+1,0).getDate();
+    var totalChecks=0,totalPossible=0;
+    active.forEach(function(g){
+      var days=recs[g.id]||[];
+      for(var d=1;d<=T.getDate();d++){
+        var ds=T.getFullYear()+'-'+String(T.getMonth()+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        if(days.indexOf(ds)>-1)totalChecks++;
+        totalPossible++;
+      }
+    });
+    var rate=totalPossible>0?Math.round((totalChecks/totalPossible)*100):0;
+    document.getElementById('monthRate').textContent=rate+'%';
+  }
+
+  function renderStats(){
+    var gs=goals(),recs=records(),active=gs.filter(function(g){return !g.archived});
+    var chart=document.getElementById('weekChart');
+    var m=new Date(T);m.setDate(m.getDate()-m.getDay()+1);
+    var wd=['一','二','三','四','五','六','日'];
+    var html='';
+    for(var i=0;i<7;i++){
+      var d=new Date(m);d.setDate(m.getDate()+i);var ds=fm(d);
+      var done=0;active.forEach(function(g){if((recs[g.id]||[]).indexOf(ds)>-1)done++});
+      var pct=active.length>0?Math.round((done/active.length)*100):0;
+      html+='<div><div class="wc-day">'+wd[i]+'</div><div class="wc-bar"><div class="wc-fill" style="height:'+pct+'%"></div></div><div class="wc-val">'+done+'/'+active.length+'</div></div>';
+    }
+    chart.innerHTML=html;
+
+    var cal=document.getElementById('monthCalGrid');
+    var dim=new Date(T.getFullYear(),T.getMonth()+1,0).getDate();
+    var fd=new Date(T.getFullYear(),T.getMonth(),1).getDay();fd=fd===0?6:fd-1;
+    cal.innerHTML='';
+    for(var i=fd-1;i>=0;i--){var b=document.createElement('div');b.className='cal-day other';b.textContent='';cal.appendChild(b)}
+    for(var d=1;d<=dim;d++){
+      var b=document.createElement('div'),ds=T.getFullYear()+'-'+String(T.getMonth()+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      b.className='cal-day';if(d===T.getDate())b.classList.add('today');
+      b.textContent=d;
+      var hasCheck=false;active.forEach(function(g){if((recs[g.id]||[]).indexOf(ds)>-1)hasCheck=true});
+      if(hasCheck){var dot=document.createElement('span');dot.className='dot';dot.style.background='var(--success)';b.appendChild(dot)}
+      cal.appendChild(b);
+    }
+  }
+
+  function renderManage(){
+    var gs=goals(),active=gs.filter(function(g){return !g.archived}),archived=gs.filter(function(g){return g.archived});
+    var aDiv=document.getElementById('activeGoals'),arDiv=document.getElementById('archivedGoals');
+
+    function renderList(arr,isArchived){
+      if(arr.length===0)return '<div style="text-align:center;padding:30px;color:var(--text-tertiary);font-size:13px">暂无</div>';
+      var h='';arr.forEach(function(g){
+        h+='<div class="manage-item'+(isArchived?' archived':'')+'" onclick="editGoal(\''+g.id+'\')">';
+        h+='<span class="mi-icon">'+g.icon+'</span><div class="mi-info"><div class="mi-name">'+g.name+'</div><div class="mi-sub">'+(g.freqPeriod?({daily:'每天',weekly:'每周',monthly:'每月'}[g.freqPeriod]||'每天'):(g.repeat==='weekday'?'工作日':'每天'))+' · '+(g.category||'健康')+' · '+(g.target||1)+(g.unit||'次')+'/天'+(g.endDate?' · 截止'+g.endDate:'')+' · 创建于'+g.created+'</div></div>';
+        if(!isArchived)h+='<button class="mi-action" onclick="event.stopPropagation();archiveGoal(\''+g.id+'\')">结束</button>';
+        else h+='<button class="mi-action" onclick="event.stopPropagation();archiveGoal(\''+g.id+'\')" style="background:var(--primary-soft);color:var(--primary)">恢复</button>';
+        h+='</div>';
+      });
+      return h;
+    }
+    aDiv.innerHTML=renderList(active,false);
+    arDiv.innerHTML=renderList(archived,true);
+  }
+
+  function archiveGoal(id){
+    var gs=goals();
+    for(var i=0;i<gs.length;i++){if(gs[i].id===id){gs[i].archived=!gs[i].archived;break}}
+    saveGoals(gs);renderManage();
+  }
+  window.archiveGoal=archiveGoal;
+
+  function switchTab(tab){
+    document.querySelectorAll('.tab-item2').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tab')===tab)});
+    document.getElementById('checkinView').style.display=tab==='checkin'?'block':'none';
+    document.getElementById('statsView').style.display=tab==='stats'?'block':'none';
+    document.getElementById('manageView').style.display=tab==='manage'?'block':'none';
+    if(tab==='stats')renderStats();
+    if(tab==='manage')renderManage();
+  }
+  window.switchTab=switchTab;
+
+  function openGoalForm(editData){
+    document.getElementById('editGoalId').value=editData?editData.id:'';
+    document.getElementById('formTitle').textContent=editData?'编辑目标':'新建目标';
+    document.getElementById('gName').value=editData?editData.name:'';
+    document.getElementById('gTarget').value=editData?editData.target||1:'';
+    document.getElementById('gUnit').value=editData?editData.unit||'次':'次';
+    document.getElementById('gCategory').value=editData?editData.category||'健康':'健康';
+    document.getElementById('gFreqTarget').value=editData?editData.freqTarget||1:'';
+    document.getElementById('gFreqPeriod').value=editData?editData.freqPeriod||'daily':'daily';
+    document.getElementById('gRemind').value=editData?editData.remindTime:'09:00';
+    document.getElementById('gTimePeriod').value=editData?editData.timePeriod||'all':'all';
+    document.getElementById('gStartDate').value=editData?editData.startDate:fm(new Date());
+    document.getElementById('gEndDate').value=editData?editData.endDate||'':'';
+    document.getElementById('gDesc').value=editData?editData.desc||'':'';
+    document.getElementById('gMotto').value=editData?editData.motto:'';
+    document.getElementById('gAllowBackfill').checked=editData?editData.allowBackfill!==false:true;
+    document.querySelectorAll('.icon-opt').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-icon')===(editData?editData.icon:'🎯'))});
+    document.querySelectorAll('.color-opt').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-color')===(editData?editData.color||'#5b5bd6':'#5b5bd6'))});
+    document.getElementById('formOverlay').classList.add('open');
+  }
+  window.openGoalForm=openGoalForm;
+
+  function pickIcon(el){
+    document.querySelectorAll('.icon-opt').forEach(function(b){b.classList.remove('active')});
+    el.classList.add('active');
+  }
+  window.pickIcon=pickIcon;
+  function pickColor(el){
+    document.querySelectorAll('.color-opt').forEach(function(b){b.classList.remove('active')});
+    el.classList.add('active');
+  }
+  window.pickColor=pickColor;
+
+  function editGoal(id){
+    var gs=goals();for(var i=0;i<gs.length;i++){if(gs[i].id===id){openGoalForm(gs[i]);return}}
+  }
+  window.editGoal=editGoal;
+
+  function closeGoalForm(e){
+    if(e&&e.target!==document.getElementById('formOverlay'))return;
+    document.getElementById('formOverlay').classList.remove('open');
+  }
+  window.closeGoalForm=closeGoalForm;
+
+  function saveGoal(){
+    var id=document.getElementById('editGoalId').value;
+    var name=document.getElementById('gName').value.trim();
+    var target=parseInt(document.getElementById('gTarget').value)||1;
+    var unit=document.getElementById('gUnit').value;
+    var category=document.getElementById('gCategory').value;
+    var freqTarget=parseInt(document.getElementById('gFreqTarget').value)||1;
+    var freqPeriod=document.getElementById('gFreqPeriod').value;
+    var remindTime=document.getElementById('gRemind').value;
+    var timePeriod=document.getElementById('gTimePeriod').value;
+    var startDate=document.getElementById('gStartDate').value;
+    var endDate=document.getElementById('gEndDate').value||'';
+    var desc=document.getElementById('gDesc').value.trim();
+    var motto=document.getElementById('gMotto').value.trim();
+    var allowBackfill=document.getElementById('gAllowBackfill').checked;
+    var iconEl=document.querySelector('.icon-opt.active');
+    var icon=iconEl?iconEl.getAttribute('data-icon'):'🎯';
+    var colorEl=document.querySelector('.color-opt.active');
+    var color=colorEl?colorEl.getAttribute('data-color'):'#5b5bd6';
+    if(!name){alert('请输入目标名称');return}
+    if(!startDate){startDate=today}
+    var gs=goals();
+    if(id){
+      for(var i=0;i<gs.length;i++){if(gs[i].id===id){gs[i].name=name;gs[i].icon=icon;gs[i].color=color;gs[i].target=target;gs[i].unit=unit;gs[i].category=category;gs[i].freqTarget=freqTarget;gs[i].freqPeriod=freqPeriod;gs[i].remindTime=remindTime;gs[i].timePeriod=timePeriod;gs[i].startDate=startDate;gs[i].endDate=endDate;gs[i].desc=desc;gs[i].allowBackfill=allowBackfill;gs[i].motto=motto;break}}
+    } else {
+      gs.push({id:gid(),name:name,icon:icon,color:color,target:target,unit:unit,category:category,freqTarget:freqTarget,freqPeriod:freqPeriod,remindTime:remindTime,timePeriod:timePeriod,startDate:startDate,endDate:endDate,desc:desc,allowBackfill:allowBackfill,motto:motto,created:today,archived:false});
+    }
+    saveGoals(gs);closeGoalForm();renderCheckin();
+  }
+  window.saveGoal=saveGoal;
+
+  function init(){
+    var gs=goals();
+    if(gs.length===0){
+      var fd=new Date(T);fd.setDate(fd.getDate()+30);var futureDate=fm(fd);
+      gs.push({id:gid(),name:'每日阅读',icon:'📖',color:'#5b5bd6',target:30,unit:'分钟',category:'学习',freqTarget:1,freqPeriod:'daily',remindTime:'21:00',timePeriod:'evening',startDate:today,endDate:'',desc:'每天至少读30分钟，提升认知',allowBackfill:true,motto:'知识改变命运',created:today,archived:false});
+      gs.push({id:gid(),name:'晨跑',icon:'🏃',color:'#f97316',target:5,unit:'公里',category:'健康',freqTarget:3,freqPeriod:'weekly',remindTime:'06:30',timePeriod:'morning',startDate:today,endDate:'',desc:'每周跑3次，保持体能',allowBackfill:true,motto:'跑出好身材',created:today,archived:false});
+      gs.push({id:gid(),name:'喝水',icon:'💧',color:'#06b6d4',target:8,unit:'杯',category:'健康',freqTarget:1,freqPeriod:'daily',remindTime:'09:00',timePeriod:'all',startDate:today,endDate:'',desc:'每天8杯水，设置整点提醒',allowBackfill:true,motto:'多喝水皮肤好',created:today,archived:false});
+      gs.push({id:gid(),name:'冥想',icon:'🧘',color:'#a855f7',target:15,unit:'分钟',category:'健康',freqTarget:5,freqPeriod:'weekly',remindTime:'22:00',timePeriod:'evening',startDate:today,endDate:futureDate,desc:'每周冥想5天，缓解焦虑',allowBackfill:true,motto:'静心养神',created:today,archived:false});
+      saveGoals(gs);
+      var recs={};
+      for(var i=0;i<gs.length;i++){
+        recs[gs[i].id]=[];
+        for(var b=4;b>=0;b--){
+          var d=new Date(T);d.setDate(d.getDate()-b);
+          if(Math.random()>0.3)recs[gs[i].id].push(fm(d));
+        }
+      }
+      saveRecords(recs);
+    }
+    renderCheckin();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>四象限 · 指尖时光风格对比</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #c53d43;
+      --primary-dark: #a62e34;
+      --primary-light: #e85a60;
+      --gold: #d4a853;
+      --gold-light: #f0d68a;
+      --bg: #f2f3f7;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+
+      /* Quadrant Colors - inspired by 指尖时光 */
+      --q1-bg: #fef2f2;
+      --q1-border: #ef4444;
+      --q1-text: #b91c1c;
+      --q2-bg: #eff6ff;
+      --q2-border: #3b82f6;
+      --q2-text: #1d4ed8;
+      --q3-bg: #fff7ed;
+      --q3-border: #f97316;
+      --q3-text: #c2410c;
+      --q4-bg: #f9fafb;
+      --q4-border: #9ca3af;
+      --q4-text: #6b7280;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      width: 100%; max-width: 420px;
+      margin-bottom: 20px;
+    }
+    .page-header h1 {
+      font-size: 20px; font-weight: 800;
+      color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .page-header h1 span { color: var(--primary); }
+    .page-header .sub {
+      font-size: 13px; color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ── Phone Frame ── */
+    .phone-frame {
+      width: 375px;
+      background: var(--bg);
+      border-radius: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Status Bar ── */
+    .status-bar {
+      height: 44px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      color: rgba(255,255,255,0.9);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ── Hero ── */
+    .hero-bar {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: 18px 20px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bar::after {
+      content: '';
+      position: absolute; right: -20px; top: -20px;
+      width: 90px; height: 90px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .hero-top {
+      display: flex; justify-content: space-between; align-items: center;
+      position: relative; z-index: 1;
+    }
+    .hero-greeting { color: #fff; }
+    .hero-greeting .name { font-size: 17px; font-weight: 700; display: block; }
+    .hero-greeting .sub {
+      font-size: 11px; opacity: 0.7; margin-top: 2px; display: block;
+    }
+    .hero-actions { display: flex; gap: 10px; }
+    .hero-icon {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; cursor: pointer;
+    }
+
+    /* ── Tab Bar ── */
+    .tab-bar {
+      display: flex;
+      background: #fff;
+      padding: 0 16px;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .tab-item {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-item.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* ── Four Quadrant Grid ── */
+    .quadrant-wrap { padding: 12px 12px 80px; }
+
+    .quadrant-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .quadrant-header .title {
+      font-size: 16px; font-weight: 700; color: var(--text);
+    }
+    .quadrant-header .badge {
+      font-size: 11px; padding: 3px 10px; border-radius: 999px;
+      background: #fef2f2; color: var(--primary); font-weight: 600;
+    }
+
+    .quadrant-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .quadrant {
+      border-radius: 14px;
+      padding: 14px 12px 12px;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Q1: 重要紧急 - Red */
+    .quadrant.q1 {
+      background: var(--q1-bg);
+      border-left: 3px solid var(--q1-border);
+    }
+    .quadrant.q1 .q-label {
+      color: var(--q1-text);
+    }
+    .quadrant.q1 .q-count {
+      background: var(--q1-border); color: #fff;
+    }
+    .quadrant.q1 .task-item {
+      background: #fff;
+      border-left: 3px solid var(--q1-border);
+    }
+
+    /* Q2: 重要不紧急 - Blue */
+    .quadrant.q2 {
+      background: var(--q2-bg);
+      border-left: 3px solid var(--q2-border);
+    }
+    .quadrant.q2 .q-label {
+      color: var(--q2-text);
+    }
+    .quadrant.q2 .q-count {
+      background: var(--q2-border); color: #fff;
+    }
+    .quadrant.q2 .task-item {
+      background: #fff;
+      border-left: 3px solid var(--q2-border);
+    }
+
+    /* Q3: 不重要紧急 - Orange */
+    .quadrant.q3 {
+      background: var(--q3-bg);
+      border-left: 3px solid var(--q3-border);
+    }
+    .quadrant.q3 .q-label {
+      color: var(--q3-text);
+    }
+    .quadrant.q3 .q-count {
+      background: var(--q3-border); color: #fff;
+    }
+    .quadrant.q3 .task-item {
+      background: #fff;
+      border-left: 3px solid var(--q3-border);
+    }
+
+    /* Q4: 不重要不紧急 - Gray */
+    .quadrant.q4 {
+      background: var(--q4-bg);
+      border-left: 3px solid var(--q4-border);
+    }
+    .quadrant.q4 .q-label {
+      color: var(--q4-text);
+    }
+    .quadrant.q4 .q-count {
+      background: var(--q4-border); color: #fff;
+    }
+    .quadrant.q4 .task-item {
+      background: #fff;
+      border-left: 3px solid var(--q4-border);
+    }
+
+    .q-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .q-label {
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .q-count {
+      font-size: 10px; font-weight: 700;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .task-item {
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .task-item:last-child { margin-bottom: 0; }
+    .task-item:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
+    .task-item:active { transform: scale(0.97); }
+
+    .task-item .t-title {
+      font-size: 12px; font-weight: 600; color: var(--text);
+      display: block;
+    }
+    .task-item .t-meta {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 4px;
+    }
+    .task-item .t-tag {
+      font-size: 9px; padding: 1px 6px; border-radius: 4px;
+      font-weight: 600;
+    }
+    .task-item .t-date {
+      font-size: 10px; color: var(--text-muted);
+    }
+    .task-item .t-check {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .task-item .t-check:hover {
+      border-color: var(--primary);
+      background: var(--primary);
+      opacity: 0.3;
+    }
+    .task-item.done { opacity: 0.5; }
+    .task-item.done .t-title { text-decoration: line-through; }
+    .task-item .t-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .add-btn {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px; color: var(--text-muted);
+      padding: 6px 0; cursor: pointer;
+      transition: color 0.2s;
+    }
+    .add-btn:hover { color: var(--primary); }
+
+    /* ── Add Task FAB ── */
+    .fab {
+      position: absolute; bottom: 24px; right: 20px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff; font-size: 24px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(197,61,67,0.35);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(197,61,67,0.45); }
+    .fab:active { transform: scale(0.92); }
+
+    /* ── Bottom Tab ── */
+    .bottom-tab {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 6px 0 env(safe-area-inset-bottom, 0);
+    }
+    .bt-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      cursor: pointer; padding: 0 18px;
+    }
+    .bt-item .bt-icon {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--text-muted);
+    }
+    .bt-item.active .bt-icon { color: var(--primary); }
+    .bt-item .bt-label {
+      font-size: 10px; color: var(--text-muted); font-weight: 500;
+    }
+    .bt-item.active .bt-label { color: var(--primary); font-weight: 600; }
+
+    /* ============================
+       ── Comparison / Note Section
+       ============================ */
+    .note-section {
+      width: 100%; max-width: 420px;
+      margin-top: 32px;
+    }
+    .note-section h2 {
+      font-size: 16px; font-weight: 700; color: var(--text);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .note-section h2::after {
+      content: ''; flex: 1; height: 1px;
+      background: var(--border);
+    }
+    .note-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom: 12px;
+    }
+    .note-card h3 {
+      font-size: 14px; font-weight: 700; color: var(--text);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .note-card h3 .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block;
+    }
+    .note-card p, .note-card li {
+      font-size: 13px; line-height: 1.7;
+      color: var(--text-secondary);
+    }
+    .note-card ul { padding-left: 18px; }
+    .note-card li { margin-bottom: 4px; }
+    .note-card code {
+      font-size: 12px; padding: 2px 6px; border-radius: 4px;
+      background: var(--bg); color: var(--primary); font-weight: 600;
+    }
+
+    .code-block {
+      background: #1a1a2e;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+    .code-block pre {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #e2e8f0;
+    }
+    .code-block .kw { color: #f472b6; }
+    .code-block .str { color: #34d399; }
+    .code-block .cm { color: #64748b; }
+    .code-block .fn { color: #60a5fa; }
+    .code-block .num { color: #fbbf24; }
+
+    /* ── 指尖时光 vs 我们 ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .compare-col {
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .compare-col.left {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+    }
+    .compare-col.right {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+    .compare-col .c-title {
+      font-size: 13px; font-weight: 700;
+      margin-bottom: 8px; display: block;
+    }
+    .compare-col.left .c-title { color: #c2410c; }
+    .compare-col.right .c-title { color: var(--primary); }
+    .compare-col ul { padding-left: 16px; }
+    .compare-col li {
+      font-size: 12px; line-height: 1.6;
+      margin-bottom: 3px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>📋 <span>四象限</span> 任务视图</h1>
+  <div class="sub">指尖时光风格 · 适配 know-uniapp 红金主题</div>
+</div>
+
+<!-- ── Phone Preview ── -->
+<div class="phone-frame">
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>📶 🔋</span>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero-bar">
+    <div class="hero-top">
+      <div class="hero-greeting">
+        <span class="name">王工，下午好 ☀️</span>
+        <span class="sub">今日待办 5 项 · 已完成 2 项</span>
+      </div>
+      <div class="hero-actions">
+        <div class="hero-icon">🔔</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab-item">全部</div>
+    <div class="tab-item active">四象限</div>
+    <div class="tab-item">列表</div>
+    <div class="tab-item">日历</div>
+  </div>
+
+  <!-- Quadrants -->
+  <div class="quadrant-wrap">
+    <div class="quadrant-header">
+      <span class="title">我的任务</span>
+      <span class="badge">已完成 2/7</span>
+    </div>
+
+    <div class="quadrant-grid">
+
+      <!-- Q1: 重要紧急 -->
+      <div class="quadrant q1">
+        <div class="q-top">
+          <span class="q-label">🔴 重要紧急</span>
+          <span class="q-count">2</span>
+        </div>
+        <div class="task-item">
+          <div class="t-row">
+            <div class="t-check"></div>
+            <div>
+              <span class="t-title">服务器迁移部署</span>
+              <div class="t-meta">
+                <span class="t-tag" style="background:#fef2f2;color:#ef4444;">紧急</span>
+                <span class="t-date">今天 18:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="task-item">
+          <div class="t-row">
+            <div class="t-check"></div>
+            <div>
+              <span class="t-title">客户投诉跟进</span>
+              <div class="t-meta">
+                <span class="t-tag" style="background:#fef2f2;color:#ef4444;">紧急</span>
+                <span class="t-date">今天 15:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="add-btn">+ 添加任务</div>
+      </div>
+
+      <!-- Q2: 重要不紧急 -->
+      <div class="quadrant q2">
+        <div class="q-top">
+          <span class="q-label">🔵 重要不紧急</span>
+          <span class="q-count">3</span>
+        </div>
+        <div class="task-item">
+          <div class="t-row">
+            <div class="t-check"></div>
+            <div>
+              <span class="t-title">Q3 项目规划评审</span>
+              <div class="t-meta">
+                <span class="t-tag" style="background:#eff6ff;color:#3b82f6;">计划</span>
+                <span class="t-date">6月25日</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="task-item">
+          <div class="t-row">
+            <div class="t-check"></div>
+            <div>
+              <span class="t-title">团队技能培训方案</span>
+              <div class="t-meta">
+                <span class="t-tag" style="background:#eff6ff;color:#3b82f6;">成长</span>
+                <span class="t-date">6月28日</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="add-btn">+ 添加任务</div>
+      </div>
+
+      <!-- Q3: 不重要紧急 -->
+      <div class="quadrant q3">
+        <div class="q-top">
+          <span class="q-label">🟠 不重要紧急</span>
+          <span class="q-count">1</span>
+        </div>
+        <div class="task-item">
+          <div class="t-row">
+            <div class="t-check"></div>
+            <div>
+              <span class="t-title">部门周报汇总</span>
+              <div class="t-meta">
+                <span class="t-tag" style="background:#fff7ed;color:#f97316;">琐事</span>
+                <span class="t-date">明天 10:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="add-btn">+ 添加任务</div>
+      </div>
+
+      <!-- Q4: 不重要不紧急 -->
+      <div class="quadrant q4">
+        <div class="q-top">
+          <span class="q-label">⚪ 不重要不紧急</span>
+          <span class="q-count">1</span>
+        </div>
+        <div class="task-item done">
+          <div class="t-row">
+            <div class="t-check" style="background:var(--primary);border-color:var(--primary);opacity:0.3;"></div>
+            <div>
+              <span class="t-title">整理技术文档</span>
+              <div class="t-meta">
+                <span class="t-tag" style="background:#f3f4f6;color:#6b7280;">归档</span>
+                <span class="t-date">已完成</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="add-btn">+ 添加任务</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <div class="fab" onclick="alert('新建任务')">+</div>
+
+  <!-- Bottom Tab -->
+  <div class="bottom-tab">
+    <div class="bt-item">
+      <div class="bt-icon">🏠</div>
+      <span class="bt-label">首页</span>
+    </div>
+    <div class="bt-item active">
+      <div class="bt-icon">📋</div>
+      <span class="bt-label">任务</span>
+    </div>
+    <div class="bt-item">
+      <div class="bt-icon">💬</div>
+      <span class="bt-label">消息</span>
+    </div>
+    <div class="bt-item">
+      <div class="bt-icon">👤</div>
+      <span class="bt-label">我的</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Comparison Note ── -->
+<div class="note-section">
+
+  <h2>📐 对比分析</h2>
+
+  <div class="compare-grid">
+    <div class="compare-col left">
+      <span class="c-title">🕐 指尖时光 风格</span>
+      <ul>
+        <li>柔和四色背景区分象限</li>
+        <li>左侧色条 + 任务卡独立</li>
+        <li>圆形数量 badge</li>
+        <li>"+ 添加" 行内按钮</li>
+        <li>已完成任务划线+置灰</li>
+      </ul>
+    </div>
+    <div class="compare-col right">
+      <span class="c-title">🎨 know-uniapp 适配</span>
+      <ul>
+        <li>沿用红金品牌色系</li>
+        <li>边框/标签色匹配主题</li>
+        <li>Status Bar / Hero 统一</li>
+        <li>底部 Tab 保持一致</li>
+        <li>FAB 使用 primary 渐变</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note-card" style="margin-top:12px;">
+    <h3><span class="dot" style="background:var(--primary);"></span> uniapp 集成要点</h3>
+    <ul>
+      <li>页面路径：<code>pages/task/quadrant.vue</code></li>
+      <li>数据使用 <code>ref()</code> 管理任务列表，按 <code>type: 1|2|3|4</code> 分组渲染</li>
+      <li>拖拽改变象限：<code>@touchmove</code> + <code>uni.createSelectorQuery</code> 判断落区</li>
+      <li>已完成任务 <code>done: true</code> 自动划入 Q4 或隐藏</li>
+      <li>本地持久化：<code>uni.setStorageSync('tasks', data)</code></li>
+      <li>首页入口：首页 今日概要 下方增加 <code>"四象限" →</code> 快捷入口</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <h3><span class="dot" style="background:var(--gold);"></span> 首页集成示意</h3>
+    <p style="margin-bottom:10px;">在首页 <strong>快捷功能</strong> 或 <strong>今日概要</strong> 区域增加四象限入口：</p>
+    <div class="code-block">
+<pre><span class="cm">&lt;!-- 今日概要卡片增加四象限入口 --&gt;</span>
+&lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"asset-card"</span>&gt;
+  &lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"asset-left"</span>&gt;
+    &lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"asset-label"</span>&gt;今日概要&lt;/<span class="kw">div</span>&gt;
+    &lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"asset-amount"</span>&gt;
+      📋 <span class="num">5</span>&lt;<span class="kw">small</span>&gt;今日待办&lt;/<span class="kw">small</span>&gt;
+    &lt;/<span class="kw">div</span>&gt;
+  &lt;/<span class="kw">div</span>&gt;
+  &lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"asset-right"</span>&gt;
+    &lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"asset-item"</span> <span class="fn">@click</span>=<span class="str">"goQuadrant"</span>&gt;
+      &lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"num"</span>&gt;🧩 四象限&lt;/<span class="kw">div</span>&gt;
+      &lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"lbl"</span>&gt;优先级视图&lt;/<span class="kw">div</span>&gt;
+    &lt;/<span class="kw">div</span>&gt;
+  &lt;/<span class="kw">div</span>&gt;
+&lt;/<span class="kw">div</span>&gt;</pre>
+    </div>
+  </div>
+
+  <div class="note-card">
+    <h3><span class="dot" style="background:#3b82f6;"></span> 四象限数据结构</h3>
+    <div class="code-block">
+<pre><span class="kw">interface</span> <span class="fn">TaskItem</span> {
+  <span class="fn">id</span>: <span class="kw">string</span>;
+  <span class="fn">title</span>: <span class="kw">string</span>;
+  <span class="fn">type</span>: <span class="num">1</span> | <span class="num">2</span> | <span class="num">3</span> | <span class="num">4</span>;  <span class="cm">// 1=Q1 ... 4=Q4</span>
+  <span class="fn">done</span>: <span class="kw">boolean</span>;
+  <span class="fn">tag</span>: <span class="kw">string</span>;             <span class="cm">// 标签文案</span>
+  <span class="fn">tagColor</span>: <span class="kw">string</span>;
+  <span class="fn">dueDate</span>: <span class="kw">string</span>;
+  <span class="fn">createdAt</span>: <span class="kw">number</span>;
+}
+
+<span class="cm">// 按 type 分组渲染</span>
+<span class="kw">const</span> quadrants = [
+  { type: <span class="num">1</span>, label: <span class="str">'重要紧急'</span>, color: <span class="str">'#ef4444'</span> },
+  { type: <span class="num">2</span>, label: <span class="str">'重要不紧急'</span>, color: <span class="str">'#3b82f6'</span> },
+  { type: <span class="num">3</span>, label: <span class="str">'不重要紧急'</span>, color: <span class="str">'#f97316'</span> },
+  { type: <span class="num">4</span>, label: <span class="str">'不重要不紧急'</span>, color: <span class="str">'#9ca3af'</span> },
+];</pre>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Checkbox toggle
+  document.querySelectorAll('.t-check').forEach(el => {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const task = this.closest('.task-item');
+      task.classList.toggle('done');
+      if (task.classList.contains('done')) {
+        this.style.background = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#c53d43';
+        this.style.borderColor = this.style.background;
+      } else {
+        this.style.background = 'transparent';
+        this.style.borderColor = '';
+      }
+    });
+  });
+
+  // Tab switching
+  document.querySelectorAll('.tab-item').forEach(el => {
+    el.addEventListener('click', function() {
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Add task buttons
+  document.querySelectorAll('.add-btn').forEach(el => {
+    el.addEventListener('click', function() {
+      const quadrant = this.closest('.quadrant');
+      const label = quadrant.querySelector('.q-label').textContent.trim();
+      alert(`新建任务 → ${label}`);
+    });
+  });
+</script>
+
+</body>
+</html>

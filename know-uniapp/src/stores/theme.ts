@@ -3,13 +3,13 @@ import { generateVars } from '@/utils/theme'
 import { defineStore } from 'pinia'
 
 export const VISUAL_THEMES = [
-    { key: 'white',    name: '纯白',   icon: '☀️' },
-    { key: 'dark',     name: '深空',   icon: '🌙' },
-    { key: 'warm',     name: '暖阳',   icon: '🌅' },
-    { key: 'aurora',   name: '极光',   icon: '🌌' },
-    { key: 'purple',   name: '暗紫',   icon: '🔮' },
-    { key: 'glass',    name: '玻璃',   icon: '🪟' },
-    { key: 'orangold', name: '橘金',   icon: '✨' },
+    { key: 'white', name: '纯白', icon: '☀️' },
+    { key: 'dark', name: '深空', icon: '🌙' },
+    { key: 'warm', name: '暖阳', icon: '🌅' },
+    { key: 'aurora', name: '极光', icon: '🌌' },
+    { key: 'purple', name: '暗紫', icon: '🔮' },
+    { key: 'glass', name: '玻璃', icon: '🪟' },
+    { key: 'orangold', name: '橘金', icon: '✨' }
 ] as const
 
 const THEME_STORAGE_KEY = 'know-theme'
@@ -37,7 +37,7 @@ export const useThemeStore = defineStore({
     getters: {
         /** 当前视觉主题对象 */
         currentThemeConfig: (state) => {
-            return VISUAL_THEMES.find(t => t.key === state.currentVisualTheme) || VISUAL_THEMES[0]
+            return VISUAL_THEMES.find((t) => t.key === state.currentVisualTheme) || VISUAL_THEMES[0]
         }
     },
     actions: {
@@ -45,13 +45,7 @@ export const useThemeStore = defineStore({
             const data = await getDecorate({
                 id: 5
             })
-            const {
-                themeColor1,
-                themeColor2,
-                buttonColor,
-                navigationBarColor,
-                topTextColor
-            } = data
+            const { themeColor1, themeColor2, buttonColor, navigationBarColor, topTextColor } = data
             this.primaryColor = themeColor1
             this.minorColor = themeColor2
             this.btnColor = buttonColor

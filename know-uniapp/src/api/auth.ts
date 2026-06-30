@@ -7,23 +7,29 @@ import { client } from '@/utils/client'
  * 登录
  */
 export function login(username: string, password: string) {
-    return request.post({
-        url: '/login/account',
-        data: {
-            username,
-            password
-        }
-    }, { isAuth: false })
+    return request.post(
+        {
+            url: '/login/account',
+            data: {
+                username,
+                password
+            }
+        },
+        { isAuth: false }
+    )
 }
 
 /**
  * 刷新Token
  */
 export function refreshToken() {
-    return request.post({
-        url: '/login/refreshToken',
-        data: {}
-    }, { isAuth: true })
+    return request.post(
+        {
+            url: '/login/refreshToken',
+            data: {}
+        },
+        { isAuth: true }
+    )
 }
 
 /**
@@ -57,7 +63,7 @@ export function getTokenName(): string {
 /**
  * 设置Token
  */
-export function setToken(token: string, tokenName: string = 'satoken') {
+export function setToken(token: string, tokenName = 'satoken') {
     cache.set(TOKEN_KEY, token)
     cache.set(TOKEN_NAME, tokenName)
 }

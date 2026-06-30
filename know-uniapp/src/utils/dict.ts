@@ -29,7 +29,7 @@ export function getDictOptions(dictType: string): { label: string; value: string
  * @param value 字典值
  * @param defaultValue 默认值（当找不到时返回）
  */
-export function formatDict(dictType: string, value: string, defaultValue: string = '-'): string {
+export function formatDict(dictType: string, value: string, defaultValue = '-'): string {
     if (value === undefined || value === null || value === '') {
         return defaultValue
     }

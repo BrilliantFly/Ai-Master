@@ -28,18 +28,22 @@ export const useDictStore = defineStore({
         /**
          * 根据字典类型获取字典列表
          */
-        getDictList: (state) => (dictType: string): DictItem[] => {
-            return state.dictData[dictType] || []
-        },
-        
+        getDictList:
+            (state) =>
+            (dictType: string): DictItem[] => {
+                return state.dictData[dictType] || []
+            },
+
         /**
          * 根据字典类型和值获取标签
          */
-        getDictLabel: (state) => (dictType: string, value: string): string => {
-            const list = state.dictData[dictType] || []
-            const item = list.find(i => i.dictValue === value || i.dictValue == value)
-            return item?.dictLabel || value
-        }
+        getDictLabel:
+            (state) =>
+            (dictType: string, value: string): string => {
+                const list = state.dictData[dictType] || []
+                const item = list.find((i) => i.dictValue === value || i.dictValue == value)
+                return item?.dictLabel || value
+            }
     },
     actions: {
         /**
@@ -50,7 +54,7 @@ export const useDictStore = defineStore({
                 // 获取字典类型列表
                 const typeList = await getDictTypeList()
                 this.dictTypeList = typeList || []
-                
+
                 // 加载每个类型的字典数据
                 for (const type of this.dictTypeList) {
                     try {
@@ -62,13 +66,13 @@ export const useDictStore = defineStore({
                         console.error(`加载字典[${type.dictType}]失败:`, e)
                     }
                 }
-                
+
                 this.loaded = true
             } catch (e) {
                 console.error('加载字典数据失败:', e)
             }
         },
-        
+
         /**
          * 刷新字典数据
          */
@@ -78,14 +82,14 @@ export const useDictStore = defineStore({
             this.loaded = false
             await this.loadDictData()
         },
-        
+
         /**
          * 获取字典选项列表（用于picker等组件）
          * return: [{ label, value, ... }]
          */
         getDictOptions(dictType: string): DictItem[] {
             const list = this.dictData[dictType] || []
-            return list.map(item => ({
+            return list.map((item) => ({
                 label: item.dictLabel,
                 value: item.dictValue,
                 ...item

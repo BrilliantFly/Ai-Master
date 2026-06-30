@@ -74,6 +74,6 @@ page {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.45;
-    letter-spacing: .01em;
+    letter-spacing: 0.01em;
 }
 </style>

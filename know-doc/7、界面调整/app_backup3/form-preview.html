@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="white">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>表单视觉升级预览</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* =============================================
+   表单预览样式（基于 styles.css 主题变量）
+   ============================================= */
+
+/* ========== 重置 ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+/* 仅给可交互元素 tap-highlight（保留键盘聚焦可见性） */
+a, button, label, input, select, textarea, summary,
+.quad-option, .check-chip, .color-dot, .slider-toggle,
+.icon-preview-row, .ip-item, .btn-add-sub, .subtask-del {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  background: var(--bg);
+  color: var(--text-primary, var(--text));
+  transition: background 0.3s, color 0.3s;
+}
+body {
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
+  overscroll-behavior: contain;
+}
+
+/* ========== 顶栏 + Tab ========== */
+.preview-header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg-card, var(--card-bg, var(--surface)));
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.preview-header h1 { font-size: 17px; font-weight: 600; }
+.preview-header .hdr-actions { display: flex; gap: 8px; }
+.preview-header button {
+  width: 36px; height: 36px; border: none; border-radius: 50%;
+  background: var(--bg-secondary, var(--surface-soft));
+  color: var(--text-secondary); font-size: 18px; cursor: pointer;
+  display: grid; place-items: center; transition: background 0.2s, transform 0.2s;
+}
+.preview-header button:hover { background: var(--primary); color: var(--text-inverse); transform: scale(1.05); }
+.preview-header button:active { transform: scale(.92); }
+.preview-header button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tab-bar {
+  display: flex;
+  background: var(--bg-secondary, var(--surface-soft));
+  margin: 0 20px 8px; border-radius: var(--radius-sm); padding: 3px;
+  position: sticky; top: 60px; z-index: 99;
+}
+.tab-bar button {
+  flex: 1; padding: 9px 0; border: none; border-radius: var(--radius-sm);
+  background: transparent; color: var(--text-secondary);
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.25s, background 0.25s;
+}
+.tab-bar button:hover { color: var(--primary); }
+.tab-bar button.active {
+  background: var(--bg-card, var(--card-bg, var(--surface)));
+  color: var(--primary); font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+.tab-bar button:active { transform: scale(.96); }
+.tab-bar button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.preview-wrapper { padding: 12px 20px 40px; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ========== 卡片容器 ========== */
+.form-card-header {
+  font-size: 13px; font-weight: 600; color: var(--primary);
+  margin-bottom: 12px; letter-spacing: 0.3px;
+  display: flex; align-items: center; gap: 6px;
+}
+.form-card-header::after {
+  content: ''; flex: 1; height: 1px;
+  background: var(--border); margin-left: 8px;
+}
+
+.form-card-schedule {
+  background: var(--bg-card, var(--card-bg, var(--surface)));
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow, var(--shadow-sm));
+  padding: 18px 18px 20px; margin-bottom: 14px;
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s cubic-bezier(.34,1.56,.64,1);
+  animation: cardSlideIn 0.4s ease both;
+}
+.form-card-schedule:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--card-hover-shadow, rgba(0,0,0,.1));
+}
+.form-card-schedule:active { transform: translateY(0); }
+.form-card-schedule:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* stagger 入场 */
+.form-card-schedule:nth-child(1) { animation-delay: 0s; }
+.form-card-schedule:nth-child(2) { animation-delay: 0.06s; }
+.form-card-schedule:nth-child(3) { animation-delay: 0.12s; }
+.form-card-schedule:nth-child(4) { animation-delay: 0.18s; }
+.form-card-schedule:nth-child(5) { animation-delay: 0.24s; }
+.form-card-schedule:nth-child(6) { animation-delay: 0.30s; }
+
+/* ========== label ========== */
+.fg-label {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 600;
+  color: var(--text-secondary); margin-bottom: 5px;
+  letter-spacing: 0.2px;
+}
+.fg-label .required { color: var(--danger); font-size: 15px; line-height: 1; }
+
+/* ========== input 包裹层（聚焦竖线） ========== */
+.fg-input-wrap {
+  position: relative;
+  display: block;
+}
+.fg-input-wrap .focus-bar {
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 3px; border-radius: 2px;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.fg-input-wrap:focus-within .focus-bar { opacity: 1; }
+
+/* select 自定义箭头（CSS border 方式，聚焦自动变色） */
+.fg-input-wrap:has(.fg-select)::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border: 2px solid var(--text-tertiary);
+  border-top: none;
+  border-left: none;
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+  transition: border-color .22s;
+  z-index: 1;
+}
+.fg-input-wrap:has(.fg-select):focus-within::after {
+  border-color: var(--primary);
+}
+
+/* ========== 方格 input ========== */
+.fg-input, .fg-select {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text-primary, var(--text));
+  font-size: 14px;
+  transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+  outline: none;
+  font-family: inherit;
+}
+.fg-input:hover, .fg-select:hover {
+  border-color: var(--input-border-hover, #c8ccd8);
+  background: var(--input-bg-hover);
+}
+.fg-input:active, .fg-select:active {
+  border-color: var(--text-primary, var(--text));
+}
+.fg-input:focus, .fg-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-alpha, rgba(var(--primary-rgb), .12));
+  background: var(--input-bg-focus);
+}
+/* 键盘聚焦保留可见环 */
+.fg-input:focus-visible, .fg-select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+.fg-input::placeholder {
+  color: var(--text-tertiary); font-style: italic; font-weight: 400; font-size: 13px;
+}
+
+/* date / time 与方格风格统一 */
+input[type="date"].fg-input,
+input[type="time"].fg-input {
+  min-height: 42px;
+  appearance: none; -webkit-appearance: none;
+  color-scheme: var(--date-color-scheme, light);
+}
+/* 数字 input 微调按钮 */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  opacity: 0.3; height: 24px;
+}
+
+/* ========== 行容器 ========== */
+.fgs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fgs-full { margin-top: 10px; }
+.mt-10 { margin-top: 10px; }
+.fgs-row.mt-10 { margin-top: 10px; }
+
+/* ========== select ========== */
+.fg-select {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  padding-right: 34px; cursor: pointer;
+}
+.fg-select option {
+  color: var(--text-primary, var(--text));
+  background: var(--bg-card, var(--card-bg, var(--surface)));
+}
+
+/* ========== 四象限 ========== */
+.quad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.quad-option {
+  padding: 8px 6px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  text-align: center; font-size: 12px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s; background: var(--input-bg);
+  color: var(--text-secondary); font-weight: 500;
+}
+.quad-option:hover { border-color: var(--primary); background: var(--primary-alpha, rgba(var(--primary-rgb), .06)); }
+.quad-option.active { border-color: var(--primary); background: var(--primary); color: var(--text-inverse); font-weight: 600; }
+.quad-option .q-icon { display: block; font-size: 16px; margin-bottom: 2px; }
+.quad-option:active { transform: scale(.95); }
+.quad-option:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+/* ========== 提醒多选 ========== */
+.check-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.check-chip {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  padding: 9px 4px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--input-bg); cursor: pointer;
+  font-size: 12px; color: var(--text-secondary); font-weight: 500;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+  -webkit-user-select: none; user-select: none;
+}
+.check-chip:hover { border-color: var(--primary); }
+.check-chip input { position: absolute; opacity: 0; pointer-events: none; }
+.check-chip:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--primary-alpha, rgba(var(--primary-rgb), .1));
+  color: var(--primary); font-weight: 600;
+}
+.check-chip:active { transform: scale(.93); }
+.check-chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.check-chip:has(input:checked)::after {
+  content: '✓';
+  position: absolute;
+  top: 1px; right: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ========== 子任务 ========== */
+.subtask-list { display: flex; flex-direction: column; gap: 8px; }
+.subtask-row {
+  display: flex; gap: 8px; align-items: center;
+  animation: subFadeIn 0.25s ease;
+}
+.subtask-row.removing {
+  animation: subFadeOut 0.2s ease forwards;
+  pointer-events: none;
+}
+.subtask-row .fg-input { flex: 1; }
+.subtask-del {
+  width: 32px; height: 32px; border: none; border-radius: var(--radius-sm);
+  background: var(--bg-secondary, var(--surface-soft));
+  color: var(--text-tertiary); font-size: 16px; cursor: pointer;
+  display: grid; place-items: center; transition: background 0.2s, color 0.2s, transform 0.2s; flex-shrink: 0;
+}
+.subtask-del:hover { background: var(--danger-soft); color: var(--danger); }
+.subtask-del:active { transform: scale(.88); }
+.subtask-del:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.btn-add-sub {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm);
+  background: transparent; color: var(--text-tertiary);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s, gap 0.2s; margin-top: 2px; width: fit-content;
+}
+.btn-add-sub:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-alpha, rgba(var(--primary-rgb), .04)); gap: 7px; }
+.btn-add-sub:active { transform: scale(.96); }
+.btn-add-sub:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.subtask-count {
+  font-size: 12px; color: var(--text-tertiary);
+  font-weight: 500; transition: opacity 0.2s;
+}
+
+/* ========== 折叠更多 ========== */
+.form-section-sch {
+  background: var(--bg-card, var(--card-bg, var(--surface)));
+  border-radius: var(--radius-md); box-shadow: var(--card-shadow, var(--shadow-sm));
+  overflow: hidden; margin-bottom: 14px;
+  animation: cardSlideIn 0.4s ease both;
+  animation-delay: 0.24s;
+}
+.form-section-sch details {
+  interpolate-size: allow-keywords;
+}
+.form-section-sch summary {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 18px; cursor: pointer;
+  color: var(--text-secondary); font-size: 13px; font-weight: 500;
+  list-style: none; -webkit-user-select: none; user-select: none;
+  transition: color 0.25s, background 0.25s;
+}
+.form-section-sch summary:hover { background: var(--primary-alpha, rgba(var(--primary-rgb), .04)); }
+.form-section-sch summary:active { transform: scale(.99); }
+.form-section-sch summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.form-section-sch summary::-webkit-details-marker { display: none; }
+.form-section-sch summary .arrow {
+  font-size: 12px;
+  transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+}
+.form-section-sch details[open] summary {
+  color: var(--primary);
+  background: var(--primary-alpha, rgba(var(--primary-rgb), .04));
+}
+.form-section-sch details[open] summary .arrow { transform: rotate(180deg); }
+.form-section-sch details .section-body {
+  padding: 0 18px;
+  opacity: 0;
+  transition: opacity 0.35s ease, padding 0.35s ease;
+}
+.form-section-sch details[open] .section-body {
+  opacity: 1;
+  padding: 0 18px 18px;
+}
+/* ========== 按钮 ========== */
+.btn-row {
+  display: flex; gap: 12px; margin-top: 24px;
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+.btn-primary, .btn-secondary {
+  flex: 1; padding: 13px 0; border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s cubic-bezier(.34,1.56,.64,1), background 0.25s, color 0.25s;
+  position: relative; overflow: hidden;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--accent-gradient);
+  color: var(--text-inverse);
+  box-shadow: 0 4px 14px var(--primary-alpha, rgba(var(--primary-rgb), .3));
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--primary-alpha, rgba(var(--primary-rgb), .4)); }
+.btn-primary:active { transform: scale(.97); box-shadow: 0 2px 8px var(--primary-alpha, rgba(var(--primary-rgb), .2)); }
+.btn-primary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn-secondary {
+  background: var(--bg-secondary, var(--surface-soft));
+  color: var(--text-secondary);
+}
+.btn-secondary:hover { background: var(--border); color: var(--text-primary, var(--text)); }
+.btn-secondary:active { transform: scale(.97); }
+.btn-secondary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* disabled 状态 */
+.btn-primary:disabled, .btn-secondary:disabled {
+  opacity: 0.45; cursor: not-allowed; transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 涟漪效果（点击时中心扩散） */
+.btn-primary::after, .btn-secondary::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 100%; padding-bottom: 100%;
+  border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform .5s cubic-bezier(.22,1,.36,1), opacity .35s;
+  opacity: 0;
+  pointer-events: none;
+}
+.btn-primary:active::after, .btn-secondary:active::after {
+  transform: translate(-50%, -50%) scale(2.5);
+  opacity: 1;
+  transition-duration: 0s;
+}
+.btn-primary:disabled::after, .btn-secondary:disabled::after {
+  display: none;
+}
+
+/* ========== 打卡 — 图标选择器 ========== */
+.icon-preview-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--input-bg);
+  cursor: pointer; transition: border-color 0.22s, background 0.22s;
+}
+.icon-preview-row:hover { border-color: var(--input-border-hover, #c8ccd8); background: var(--input-bg-hover); }
+.icon-preview-row:active { transform: scale(.98); }
+.icon-preview-row:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; border-color: var(--primary); }
+.icon-preview-row .ip-badge {
+  width: 40px; height: 40px; border-radius: var(--radius-sm);
+  display: grid; place-items: center; font-size: 22px;
+  flex-shrink: 0; color: var(--text-inverse);
+}
+.icon-preview-row .ip-name { flex: 1; font-size: 14px; font-weight: 500; color: var(--text-primary, var(--text)); }
+.icon-preview-row .ip-arrow { color: var(--text-tertiary); font-size: 18px; transition: transform 0.3s; }
+.icon-preview-row:hover .ip-arrow { transform: translateX(3px); }
+
+.ip-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--overlay-bg, rgba(0,0,0,.45));
+  opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;
+}
+.ip-overlay.open { opacity: 1; visibility: visible; }
+.ip-modal {
+  position: fixed; left: 0; bottom: 0;
+  width: 100%; max-height: 68vh; z-index: 1001;
+  background: var(--bg-card, var(--card-bg, var(--surface)));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 20px 20px 32px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+  overflow-y: auto;
+}
+.ip-overlay.open .ip-modal { transform: translateY(0); }
+.ip-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.ip-modal-header h3 { font-size: 16px; font-weight: 600; }
+.ip-modal-close {
+  width: 30px; height: 30px; border: none; border-radius: 50%;
+  background: var(--bg-secondary, var(--surface-soft));
+  font-size: 16px; cursor: pointer;
+  display: grid; place-items: center;
+  color: var(--text-secondary); transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.ip-modal-close:hover { background: var(--border); color: var(--text-primary, var(--text)); }
+.ip-modal-close:active { transform: scale(.88); }
+.ip-modal-close:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+.ip-modal::-webkit-scrollbar { width: 4px; }
+.ip-modal::-webkit-scrollbar-track { background: transparent; }
+.ip-modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.ip-modal::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+.ip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.ip-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 12px 4px; border: 1.5px solid transparent; border-radius: var(--radius-sm);
+  cursor: pointer; transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  background: var(--bg-secondary, var(--surface-soft));
+}
+.ip-item:hover { border-color: var(--primary); background: var(--primary-alpha, rgba(var(--primary-rgb), .08)); transform: translateY(-2px); }
+.ip-item:active { transform: scale(.94); }
+.ip-item:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.ip-item .ip-ico {
+  width: 40px; height: 40px; border-radius: var(--radius-sm);
+  display: grid; place-items: center; font-size: 22px; color: var(--text-inverse);
+}
+.ip-item .ip-txt { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+.ip-item.active { border-color: var(--primary); background: var(--primary); }
+.ip-item.active .ip-ico { background: rgba(255,255,255,.2) !important; }
+.ip-item.active .ip-txt { color: var(--text-inverse); }
+
+/* ========== 颜色选择器 ========== */
+.color-strip { display: flex; gap: 10px; flex-wrap: wrap; }
+.color-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer; position: relative;
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12);
+}
+.color-dot:hover { transform: scale(1.12); box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.color-dot:active { transform: scale(.92); }
+.color-dot:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.color-dot.active {
+  border-color: var(--text-primary, var(--text));
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px var(--bg-card, var(--surface)), 0 2px 8px rgba(0,0,0,.2);
+}
+.color-dot.active::after {
+  content: '✓'; position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-size: 16px; font-weight: 700;
+  color: var(--text-inverse);
+  mix-blend-mode: exclusion;
+  text-shadow: 0 0 3px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.2);
+}
+
+/* ========== 开关 ========== */
+.switch-row { display: flex; justify-content: space-between; align-items: center; }
+.slider-toggle {
+  width: 48px; height: 28px; border-radius: var(--radius-md);
+  background: var(--border); cursor: pointer;
+  position: relative; transition: background 0.3s, transform 0.3s; flex-shrink: 0;
+}
+.slider-toggle.on { background: var(--primary); }
+.slider-toggle:hover { transform: scale(1.04); }
+.slider-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.slider-toggle .knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.15);
+  transition: left 0.35s cubic-bezier(.34,1.56,.64,1), transform 0.35s cubic-bezier(.34,1.56,.64,1);
+}
+.slider-toggle.on .knob { left: 23px; }
+.slider-toggle:active { transform: scale(.94); }
+
+/* ========== 进度滑块 ========== */
+.progress-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--progress, 0%), var(--border) var(--progress, 0%), var(--border) 100%);
+  outline: none;
+  transition: background 0.2s;
+}
+.progress-slider::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 3px;
+}
+.progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 2px 6px var(--primary-alpha, rgba(var(--primary-rgb), .35));
+  transition: transform 0.2s;
+  margin-top: -7px;
+}
+.progress-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.progress-slider:active::-webkit-slider-thumb { transform: scale(.92); }
+.progress-slider::-moz-range-track {
+  height: 6px; border-radius: 3px;
+  background: var(--border);
+}
+.progress-slider::-moz-range-progress {
+  background: var(--primary);
+  border-radius: 3px;
+  height: 6px;
+}
+.progress-slider::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px var(--primary-alpha, rgba(var(--primary-rgb), .35));
+}
+.progress-slider:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.progress-val { font-size: 13px; font-weight: 600; color: var(--primary); min-width: 28px; text-align: right; }
+
+/* 深色主题下 dashed 边框可见性修复 */
+html[data-theme="dark"] .btn-add-sub,
+html[data-theme="purple"] .btn-add-sub,
+html[data-theme="glass"] .btn-add-sub {
+  border-color: var(--text-tertiary);
+}
+
+/* ========== 主题补偿：glass/orangold 卡片边框 ========== */
+html[data-theme="glass"] .form-card-schedule,
+html[data-theme="glass"] .form-section-sch {
+  border: 1px solid rgba(255,255,255,0.08);
+}
+html[data-theme="orangold"] .form-card-schedule,
+html[data-theme="orangold"] .form-section-sch {
+  border: 1px solid var(--border);
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 420px) {
+  .preview-header { padding: 10px 14px; }
+  .tab-bar { margin: 0 14px 6px; }
+  .preview-wrapper { padding: 8px 14px 32px; }
+  .form-card-schedule { padding: 14px 14px 16px; }
+  .form-card-header { font-size: 12px; }
+  .fgs-row { grid-template-columns: 1fr; gap: 8px; }
+  .check-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-section-sch .section-body { padding: 0 14px 14px; }
+  .ip-grid { grid-template-columns: repeat(3, 1fr); }
+  .color-strip { gap: 8px; }
+  .color-dot { width: 28px; height: 28px; }
+  .progress-slider { height: 5px; }
+}
+
+/* 粗指针触摸目标放大 */
+@media (pointer: coarse) {
+  .ip-modal-close, .color-dot { min-width: 44px; min-height: 44px; }
+}
+
+/* 平板断点 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .preview-wrapper { max-width: 600px; margin: 0 auto; }
+  .check-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 1024px) {
+  .preview-header, .tab-bar { max-width: 1000px; margin-left: auto; margin-right: auto; }
+  .preview-wrapper { max-width: 640px; margin: 0 auto; }
+  .tab-bar { width: calc(100% - 40px); }
+}
+</style>
+</head>
+<body>
+
+<div class="preview-header">
+  <h1>📋 表单预览</h1>
+  <div class="hdr-actions">
+    <button id="themeToggle" type="button" title="切换主题">🎨</button>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button type="button" class="active" data-tab="schedule">📅 日程</button>
+  <button type="button" data-tab="checkin">✅ 打卡</button>
+</div>
+
+<div class="preview-wrapper">
+
+<!-- ===================== 日程表单 ===================== -->
+<div class="tab-pane active" id="tab-schedule">
+
+  <!-- 卡1：基本信息 -->
+  <div class="form-card-schedule">
+    <h3 class="form-card-header">基本信息</h3>
+
+    <div class="fgs-full">
+      <label class="fg-label" for="fTitle">📝 标题 <span class="required">*</span></label>
+      <div class="fg-input-wrap">
+        <input type="text" class="fg-input" id="fTitle" placeholder="输入日程标题…">
+        <span class="focus-bar"></span>
+      </div>
+    </div>
+
+    <div class="fgs-row mt-10">
+      <div>
+        <label class="fg-label" for="fDate">📅 日期 <span class="required">*</span></label>
+        <div class="fg-input-wrap">
+          <input type="date" class="fg-input" id="fDate">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+      <div>
+        <label class="fg-label" for="fCategory">🏷️ 分类</label>
+        <div class="fg-input-wrap">
+          <select class="fg-select" id="fCategory">
+            <option>工作</option><option>个人</option><option>学习</option><option>健康</option>
+          </select>
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fgs-row mt-10">
+      <div>
+        <label class="fg-label" for="fStartTime">🕐 开始时间</label>
+        <div class="fg-input-wrap">
+          <input type="time" class="fg-input" id="fStartTime">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+      <div>
+        <label class="fg-label" for="fEndTime">🕐 结束时间</label>
+        <div class="fg-input-wrap">
+          <input type="time" class="fg-input" id="fEndTime">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fgs-full">
+      <label class="fg-label" for="fLocation">📍 地点</label>
+      <div class="fg-input-wrap">
+        <input type="text" class="fg-input" id="fLocation" placeholder="添加地点（可选）…">
+        <span class="focus-bar"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡2：优先级设置 -->
+  <div class="form-card-schedule">
+    <h3 class="form-card-header">优先级设置</h3>
+
+    <div class="fgs-full">
+      <label class="fg-label">🎯 四象限</label>
+      <div class="quad-grid">
+        <div class="quad-option" role="button" tabindex="0" aria-pressed="false" data-quad="1"><span class="q-icon">🔴</span>重要紧急</div>
+        <div class="quad-option" role="button" tabindex="0" aria-pressed="false" data-quad="2"><span class="q-icon">🟡</span>重要不紧急</div>
+        <div class="quad-option" role="button" tabindex="0" aria-pressed="false" data-quad="3"><span class="q-icon">🔵</span>紧急不重要</div>
+        <div class="quad-option" role="button" tabindex="0" aria-pressed="false" data-quad="4"><span class="q-icon">⚪</span>不重要不紧急</div>
+      </div>
+    </div>
+
+    <div class="fgs-full">
+      <label class="fg-label" for="fPriority">⚡ 优先级</label>
+      <div class="fg-input-wrap">
+        <select class="fg-select" id="fPriority">
+          <option>P0 — 最高</option><option>P1 — 高</option><option selected>P2 — 中</option><option>P3 — 低</option>
+        </select>
+        <span class="focus-bar"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡3：时间与提醒 -->
+  <div class="form-card-schedule">
+    <h3 class="form-card-header">时间与提醒</h3>
+
+    <div class="fgs-full">
+      <label class="fg-label" for="fRepeat">🔄 重复</label>
+      <div class="fg-input-wrap">
+        <select class="fg-select" id="fRepeat">
+          <option>不重复</option><option>每天</option><option>每周</option><option>每月</option><option>每年</option><option>自定义</option>
+        </select>
+        <span class="focus-bar"></span>
+      </div>
+    </div>
+
+    <div class="fgs-full">
+      <label class="fg-label">🔔 提醒</label>
+      <div class="check-grid">
+        <label class="check-chip"><input type="checkbox" value="0"> 准时</label>
+        <label class="check-chip"><input type="checkbox" value="5"> 提前5分钟</label>
+        <label class="check-chip"><input type="checkbox" value="15"> 提前15分钟</label>
+        <label class="check-chip"><input type="checkbox" value="30"> 提前30分钟</label>
+        <label class="check-chip"><input type="checkbox" value="60"> 提前1小时</label>
+        <label class="check-chip"><input type="checkbox" value="120"> 提前2小时</label>
+        <label class="check-chip"><input type="checkbox" value="1440"> 提前1天</label>
+        <label class="check-chip"><input type="checkbox" value="10080"> 提前1周</label>
+      </div>
+    </div>
+
+    <div class="fgs-full">
+      <label class="fg-label" for="progressRange">📊 进度</label>
+      <div class="flex-gap-12">
+        <input type="range" class="progress-slider" min="0" max="100" value="0" id="progressRange">
+        <span class="progress-val" id="progressVal">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 更多设置（折叠） -->
+  <div class="form-section-sch">
+    <details>
+      <summary><span class="arrow">▼</span> 更多设置</summary>
+      <div class="section-body">
+
+        <div class="fgs-full">
+          <label class="fg-label" for="fTag">🏷️ 标签</label>
+          <div class="fg-input-wrap">
+            <input type="text" class="fg-input" id="fTag" placeholder="多个标签用逗号分隔…">
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+
+        <div class="fgs-full">
+          <label class="fg-label">📋 子任务</label>
+          <div class="subtask-list" id="subtaskList">
+            <div class="subtask-row">
+              <div class="fg-input-wrap flex-1">
+                <input type="text" class="fg-input" placeholder="输入子任务…">
+                <span class="focus-bar"></span>
+              </div>
+              <button type="button" class="subtask-del" onclick="removeSubtask(this)">✕</button>
+            </div>
+            <div class="subtask-row">
+              <div class="fg-input-wrap flex-1">
+                <input type="text" class="fg-input" placeholder="输入子任务…">
+                <span class="focus-bar"></span>
+              </div>
+              <button type="button" class="subtask-del" onclick="removeSubtask(this)">✕</button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
+            <button type="button" class="btn-add-sub" id="addSubtask">＋ 添加子任务</button>
+            <span class="subtask-count" id="subtaskCount">2 项</span>
+          </div>
+        </div>
+
+        <div class="fgs-full">
+          <label class="fg-label" for="fRemark">💬 备注</label>
+          <div class="fg-input-wrap">
+            <textarea class="fg-input ta-vert" id="fRemark" rows="3" placeholder="输入备注…"></textarea>
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+
+      </div>
+    </details>
+  </div>
+
+  <div class="btn-row">
+    <button type="button" class="btn-secondary">取消</button>
+    <button type="button" class="btn-primary">保存日程</button>
+  </div>
+</div>
+
+<!-- ===================== 打卡表单 ===================== -->
+<div class="tab-pane" id="tab-checkin">
+
+  <!-- 卡1：基本设置 -->
+  <div class="form-card-schedule">
+    <h3 class="form-card-header">基本设置</h3>
+
+    <div class="fgs-full">
+      <label class="fg-label">🎨 图标 <span class="required">*</span></label>
+      <div class="icon-preview-row" id="iconPreview" tabindex="0">
+        <div class="ip-badge" style="background:#6366f1">🏃</div>
+        <span class="ip-name">跑步</span>
+        <span class="ip-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="fgs-full">
+      <label class="fg-label" for="fName">📝 名称 <span class="required">*</span></label>
+      <div class="fg-input-wrap">
+        <input type="text" class="fg-input" id="fName" placeholder="如：每日跑步">
+        <span class="focus-bar"></span>
+      </div>
+    </div>
+
+    <div class="fgs-row mt-10">
+      <div>
+        <label class="fg-label" for="fGoalValue">🎯 目标值</label>
+        <div class="fg-input-wrap">
+          <input type="number" class="fg-input" id="fGoalValue" value="1" min="1" step="1">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+      <div>
+        <label class="fg-label" for="fCheckinCategory">🏷️ 分类</label>
+        <div class="fg-input-wrap">
+          <select class="fg-select" id="fCheckinCategory">
+            <option>健康</option><option>学习</option><option>工作</option><option>生活</option>
+          </select>
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡2：目标设置 -->
+  <div class="form-card-schedule">
+    <h3 class="form-card-header">目标设置</h3>
+
+    <div class="fgs-full">
+      <label class="fg-label" for="fGoalDesc">📖 目标描述</label>
+      <div class="fg-input-wrap">
+        <textarea class="fg-input ta-vert" id="fGoalDesc" rows="3" placeholder="写下你的目标…"></textarea>
+        <span class="focus-bar"></span>
+      </div>
+    </div>
+
+    <div class="fgs-full">
+      <label class="fg-label" for="fMotivation">💪 激励语</label>
+      <div class="fg-input-wrap">
+        <input type="text" class="fg-input" id="fMotivation" placeholder="给自己的鼓励">
+        <span class="focus-bar"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡3：时间与外观 -->
+  <div class="form-card-schedule">
+    <h3 class="form-card-header">时间与外观</h3>
+
+    <div class="fgs-row">
+      <div>
+        <label class="fg-label" for="fFrequency">🔄 频率</label>
+        <div class="fg-input-wrap">
+          <select class="fg-select" id="fFrequency">
+            <option>每天</option><option>每周</option><option>每月</option><option>自定义</option>
+          </select>
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+      <div>
+        <label class="fg-label" for="fTimeSlot">🕐 时间段</label>
+        <div class="fg-input-wrap">
+          <select class="fg-select" id="fTimeSlot">
+            <option>不限</option><option>早上</option><option>中午</option><option>下午</option><option>晚上</option>
+          </select>
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fgs-row mt-10">
+      <div>
+        <label class="fg-label" for="fRemindTime">🔔 提醒时间</label>
+        <div class="fg-input-wrap">
+          <input type="time" class="fg-input" id="fRemindTime">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+      <div>
+        <label class="fg-label" for="fStartDate">📅 开始日期</label>
+        <div class="fg-input-wrap">
+          <input type="date" class="fg-input" id="fStartDate">
+          <span class="focus-bar"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fgs-full">
+      <label class="fg-label">🎨 颜色标识</label>
+      <div class="color-strip">
+        <div class="color-dot active" role="button" tabindex="0" aria-label="靛蓝" style="background:#6366f1" data-color="#6366f1"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="红" style="background:#ef4444" data-color="#ef4444"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="金" style="background:#f59e0b" data-color="#f59e0b"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="绿" style="background:#10b981" data-color="#10b981"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="青" style="background:#06b6d4" data-color="#06b6d4"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="粉" style="background:#ec4899" data-color="#ec4899"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="紫" style="background:#8b5cf6" data-color="#8b5cf6"></div>
+        <div class="color-dot" role="button" tabindex="0" aria-label="橙" style="background:#f97316" data-color="#f97316"></div>
+      </div>
+    </div>
+
+    <div class="fgs-full">
+      <div class="switch-row">
+        <label class="fg-label mb-0">✅ 允许补卡</label>
+        <div class="slider-toggle" id="allowCatchUp" tabindex="0" role="switch" aria-checked="false" aria-label="允许补卡">
+          <div class="knob"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 更多设置（折叠） -->
+  <div class="form-section-sch">
+    <details>
+      <summary><span class="arrow">▼</span> 更多设置</summary>
+      <div class="section-body">
+
+        <div class="fgs-row">
+          <div>
+            <label class="fg-label" for="fEndDate">📅 结束日期</label>
+            <div class="fg-input-wrap">
+              <input type="date" class="fg-input" id="fEndDate">
+              <span class="focus-bar"></span>
+            </div>
+          </div>
+          <div>
+            <label class="fg-label" for="fSecondRemind">🔔 第二提醒</label>
+            <div class="fg-input-wrap">
+              <input type="time" class="fg-input" id="fSecondRemind">
+              <span class="focus-bar"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fgs-full">
+          <label class="fg-label" for="fRemark2">💬 备注</label>
+          <div class="fg-input-wrap">
+            <textarea class="fg-input ta-vert" id="fRemark2" rows="3" placeholder="可选备注…"></textarea>
+            <span class="focus-bar"></span>
+          </div>
+        </div>
+
+      </div>
+    </details>
+  </div>
+
+  <div class="btn-row">
+    <button type="button" class="btn-secondary">取消</button>
+    <button type="button" class="btn-primary">保存打卡</button>
+  </div>
+</div>
+
+</div><!-- /preview-wrapper -->
+
+<!-- ========== 图标选择器全屏弹窗 ========== -->
+<div class="ip-overlay" id="iconOverlay" role="dialog" aria-modal="true">
+  <div class="ip-modal">
+    <div class="ip-modal-header">
+      <h3>🎨 选择图标</h3>
+      <button type="button" class="ip-modal-close" id="iconClose">✕</button>
+    </div>
+    <div class="ip-grid" id="iconGrid">
+      <div class="ip-item" role="button" tabindex="0" aria-label="跑步图标" data-icon="🏃" data-name="跑步" data-color="#6366f1"><div class="ip-ico" style="background:#6366f1">🏃</div><span class="ip-txt">跑步</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="阅读图标" data-icon="📚" data-name="阅读" data-color="#ef4444"><div class="ip-ico" style="background:#ef4444">📚</div><span class="ip-txt">阅读</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="健身图标" data-icon="💪" data-name="健身" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">💪</div><span class="ip-txt">健身</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="冥想图标" data-icon="🧘" data-name="冥想" data-color="#10b981"><div class="ip-ico" style="background:#10b981">🧘</div><span class="ip-txt">冥想</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="写作图标" data-icon="✍️" data-name="写作" data-color="#06b6d4"><div class="ip-ico" style="background:#06b6d4">✍️</div><span class="ip-txt">写作</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="喝水图标" data-icon="💧" data-name="喝水" data-color="#3b82f6"><div class="ip-ico" style="background:#3b82f6">💧</div><span class="ip-txt">喝水</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="健康饮食图标" data-icon="🥗" data-name="健康饮食" data-color="#22c55e"><div class="ip-ico" style="background:#22c55e">🥗</div><span class="ip-txt">健康饮食</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="脑力图标" data-icon="🧠" data-name="脑力" data-color="#a855f7"><div class="ip-ico" style="background:#a855f7">🧠</div><span class="ip-txt">脑力</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="整理图标" data-icon="🧹" data-name="整理" data-color="#f97316"><div class="ip-ico" style="background:#f97316">🧹</div><span class="ip-txt">整理</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="目标图标" data-icon="🎯" data-name="目标" data-color="#ec4899"><div class="ip-ico" style="background:#ec4899">🎯</div><span class="ip-txt">目标</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="音乐图标" data-icon="🎵" data-name="音乐" data-color="#8b5cf6"><div class="ip-ico" style="background:#8b5cf6">🎵</div><span class="ip-txt">音乐</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="摄影图标" data-icon="📷" data-name="摄影" data-color="#14b8a6"><div class="ip-ico" style="background:#14b8a6">📷</div><span class="ip-txt">摄影</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="早起图标" data-icon="🌄" data-name="早起" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">🌄</div><span class="ip-txt">早起</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="日记图标" data-icon="📝" data-name="日记" data-color="#6366f1"><div class="ip-ico" style="background:#6366f1">📝</div><span class="ip-txt">日记</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="编程图标" data-icon="👨‍💻" data-name="编程" data-color="#3b82f6"><div class="ip-ico" style="background:#3b82f6">👨‍💻</div><span class="ip-txt">编程</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="习惯图标" data-icon="🌱" data-name="习惯" data-color="#22c55e"><div class="ip-ico" style="background:#22c55e">🌱</div><span class="ip-txt">习惯</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="关爱图标" data-icon="❤️" data-name="关爱" data-color="#ef4444"><div class="ip-ico" style="background:#ef4444">❤️</div><span class="ip-txt">关爱</span></div>
+      <div class="ip-item" role="button" tabindex="0" aria-label="理财图标" data-icon="💰" data-name="理财" data-color="#f59e0b"><div class="ip-ico" style="background:#f59e0b">💰</div><span class="ip-txt">理财</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script src="theme.js"></script>
+<script>
+// ========== Tab切换 ==========
+document.querySelectorAll('.tab-bar button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelector('.tab-bar .active')?.classList.remove('active');
+    document.querySelectorAll('.tab-pane.active').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const pane = document.getElementById('tab-' + btn.dataset.tab);
+    if (pane) {
+      pane.classList.add('active');
+      // 重新触发入场动画 — 用 replaceChildren 更干净
+      const cards = pane.querySelectorAll('.form-card-schedule, .form-section-sch');
+      cards.forEach(el => {
+        el.style.animation = 'none';
+        // eslint-disable-next-line no-void
+        void el.offsetWidth; // reflow
+        el.style.animation = '';
+      });
+    }
+  });
+});
+
+// ========== 四象限 ==========
+document.querySelectorAll('.quad-option').forEach(el => {
+  el.addEventListener('click', () => {
+    el.closest('.quad-grid').querySelectorAll('.quad-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+  });
+  // 键盘 Enter/Space 触发
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+  });
+});
+
+// ========== 子任务 ==========
+document.getElementById('addSubtask')?.addEventListener('click', () => {
+  const list = document.getElementById('subtaskList');
+  if (!list) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'fg-input-wrap';
+  wrap.style.flex = '1';
+  wrap.innerHTML = '<input type="text" class="fg-input" placeholder="输入子任务…"><span class="focus-bar"></span>';
+  const row = document.createElement('div');
+  row.className = 'subtask-row';
+  const del = document.createElement('button');
+  del.type = 'button';
+  del.className = 'subtask-del';
+  del.textContent = '✕';
+  del.onclick = function () { removeSubtask(this); };
+  row.append(wrap, del);
+  list.appendChild(row);
+  updateSubtaskCount();
+  row.querySelector('.fg-input').focus();
+});
+
+// ========== 进度滑块 ==========
+const pr = document.getElementById('progressRange');
+const pv = document.getElementById('progressVal');
+if (pr && pv) {
+  const upd = () => { pv.textContent = pr.value + '%'; pr.style.setProperty('--progress', pr.value + '%'); };
+  pr.addEventListener('input', upd);
+  upd(); // 初始化轨道填充
+}
+
+// ========== 图标选择器 ==========
+const overlay = document.getElementById('iconOverlay');
+const preview = document.getElementById('iconPreview');
+const closeBtn = document.getElementById('iconClose');
+let curIcon = '🏃', curName = '跑步', curColor = '#6366f1';
+
+preview?.addEventListener('click', () => overlay?.classList.add('open'));
+preview?.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); overlay?.classList.add('open'); }
+});
+closeBtn?.addEventListener('click', () => overlay?.classList.remove('open'));
+overlay?.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+
+document.querySelectorAll('#iconGrid .ip-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('#iconGrid .ip-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    curIcon = item.dataset.icon;
+    curName = item.dataset.name;
+    curColor = item.dataset.color;
+    overlay.classList.remove('open');
+    if (preview) {
+      preview.querySelector('.ip-badge').style.background = curColor;
+      preview.querySelector('.ip-badge').textContent = curIcon;
+      preview.querySelector('.ip-name').textContent = curName;
+    }
+  });
+  item.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
+  });
+});
+
+// ========== 颜色选择器 ==========
+document.querySelectorAll('.color-dot').forEach(dot => {
+  dot.addEventListener('click', () => {
+    dot.closest('.color-strip').querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+    dot.classList.add('active');
+  });
+  dot.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dot.click(); }
+  });
+});
+
+// ========== 开关 ==========
+document.querySelectorAll('.slider-toggle').forEach(tog => {
+  tog.addEventListener('click', () => {
+    tog.classList.toggle('on');
+    const checked = tog.classList.contains('on');
+    tog.setAttribute('aria-checked', checked);
+  });
+  tog.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      tog.click();
+    }
+  });
+});
+
+// ========== 主题切换 ==========
+document.getElementById('themeToggle')?.addEventListener('click', () => {
+  const html = document.documentElement;
+  const themes = ['white', 'dark', 'warm', 'aurora', 'purple', 'glass', 'orangold'];
+  const cur = html.getAttribute('data-theme') || 'white';
+  const next = themes[(themes.indexOf(cur) + 1) % themes.length];
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('know-theme', next);
+});
+
+// 初始化默认选中第一个图标
+document.querySelector('#iconGrid .ip-item')?.classList.add('active');
+</script>
+</body>
+</html>

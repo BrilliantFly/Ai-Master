@@ -12,11 +12,21 @@
                     <image
                         v-if="item.iconIsImage"
                         class="tab-icon-image"
-                        :src="currentKey === item.key && item.selectedIcon ? item.selectedIcon : item.icon"
+                        :src="
+                            currentKey === item.key && item.selectedIcon
+                                ? item.selectedIcon
+                                : item.icon
+                        "
                         mode="aspectFit"
                     />
-                    <view v-else-if="getSvgIcon(item.fallbackKey)" class="tab-icon-svg" v-html="getSvgIcon(item.fallbackKey)"></view>
-                    <text v-else class="tab-icon-text">{{ currentKey === item.key && item.selectedIcon ? item.selectedIcon : item.icon }}</text>
+                    <view
+                        v-else-if="getSvgIcon(item.fallbackKey)"
+                        class="tab-icon-svg"
+                        v-html="getSvgIcon(item.fallbackKey)"
+                    ></view>
+                    <text v-else class="tab-icon-text">{{
+                        currentKey === item.key && item.selectedIcon ? item.selectedIcon : item.icon
+                    }}</text>
                 </view>
                 <text class="nav-label">{{ item.label }}</text>
             </view>
@@ -103,7 +113,11 @@ const getSvgIcon = (key: string) => svgIconMap[key] || ''
 
 const isImageLike = (value?: string) => {
     if (!value) return false
-    return value.startsWith('/') || value.startsWith('http') || /\.(png|jpg|jpeg|svg|webp)$/i.test(value)
+    return (
+        value.startsWith('/') ||
+        value.startsWith('http') ||
+        /\.(png|jpg|jpeg|svg|webp)$/i.test(value)
+    )
 }
 
 const normalizeIcon = (value?: string) => {
@@ -114,18 +128,29 @@ const normalizeIcon = (value?: string) => {
 const inferFallbackKey = (menuCode: string, menuName: string, path: string) => {
     const code = menuCode.toLowerCase()
     const name = menuName.toLowerCase()
-    if (code.includes('home') || name.includes('首页') || path.includes('/pages/index/index')) return 'home'
-    if (code.includes('article') || name.includes('文章') || path.includes('/pages/news/news')) return 'article'
+    if (code.includes('home') || name.includes('首页') || path.includes('/pages/index/index'))
+        return 'home'
+    if (code.includes('article') || name.includes('文章') || path.includes('/pages/news/news'))
+        return 'article'
     if (code.includes('schedule') || name.includes('日程')) return 'schedule'
     if (code.includes('plan') || name.includes('计划')) return 'plan'
-    if (code.includes('customer') || name.includes('客户') || path.includes('/pages/customer/')) return 'customer'
-    if (code.includes('profile') || code.includes('user') || name.includes('我的') || path.includes('/pages/user/user')) return 'profile'
+    if (code.includes('customer') || name.includes('客户') || path.includes('/pages/customer/'))
+        return 'customer'
+    if (
+        code.includes('profile') ||
+        code.includes('user') ||
+        name.includes('我的') ||
+        path.includes('/pages/user/user')
+    )
+        return 'profile'
     return 'article'
 }
 
 const normalizedItems = computed((): NavItem[] => {
     const dynamicMenus = remoteTabbar.value
-        .filter((item: any) => (item.isShow ?? item.is_show) == 1 && (item.isBig ?? item.is_big) != 1)
+        .filter(
+            (item: any) => (item.isShow ?? item.is_show) == 1 && (item.isBig ?? item.is_big) != 1
+        )
         .sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0))
 
     if (!dynamicMenus.length) return fallbackItems
@@ -135,7 +160,10 @@ const normalizedItems = computed((): NavItem[] => {
         const menuName = menu.menuName || menu.menu_name || menu.text || `菜单${index + 1}`
         const menuCode = menu.menuCode || menu.menu_code || `menu-${index}`
         const icon = menu.icon ? normalizeIcon(menu.icon) : ''
-        const selectedIcon = menu.selectedIcon || menu.selected_icon ? normalizeIcon(menu.selectedIcon || menu.selected_icon) : icon
+        const selectedIcon =
+            menu.selectedIcon || menu.selected_icon
+                ? normalizeIcon(menu.selectedIcon || menu.selected_icon)
+                : icon
         const fallbackKey = inferFallbackKey(String(menuCode), String(menuName), path)
 
         return {
@@ -144,7 +172,9 @@ const normalizedItems = computed((): NavItem[] => {
             icon,
             selectedIcon,
             path,
-            navType: ['/pages/index/index', '/pages/news/news', '/pages/user/user'].includes(path) ? 'switchTab' : 'navigateTo',
+            navType: ['/pages/index/index', '/pages/news/news', '/pages/user/user'].includes(path)
+                ? 'switchTab'
+                : 'navigateTo',
             iconIsImage: isImageLike(menu.icon || ''),
             sort: Number(menu.sort || index + 1),
             fallbackKey
@@ -154,7 +184,9 @@ const normalizedItems = computed((): NavItem[] => {
 
 const currentKey = computed(() => {
     if (props.active) {
-        const matchedByActive = normalizedItems.value.find((item) => item.key === props.active || item.fallbackKey === props.active)
+        const matchedByActive = normalizedItems.value.find(
+            (item) => item.key === props.active || item.fallbackKey === props.active
+        )
         if (matchedByActive) return matchedByActive.key
     }
     const pages = getCurrentPages()

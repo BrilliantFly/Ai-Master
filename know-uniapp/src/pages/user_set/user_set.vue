@@ -1,10 +1,7 @@
 <template>
     <page-meta :page-style="$theme.pageStyle">
         <!-- #ifndef H5 -->
-        <navigation-bar
-            :front-color="$theme.navColor"
-            :background-color="$theme.navBgColor"
-        />
+        <navigation-bar :front-color="$theme.navColor" :background-color="$theme.navBgColor" />
         <!-- #endif -->
     </page-meta>
 
@@ -32,7 +29,10 @@
                 <view>主题设置</view>
                 <view class="flex items-center">
                     <view class="text-muted mr-[20rpx]">{{ currentThemeName }}</view>
-                    <u-icon :name="showThemePanel ? 'arrow-up' : 'arrow-down'" color="#666"></u-icon>
+                    <u-icon
+                        :name="showThemePanel ? 'arrow-up' : 'arrow-down'"
+                        color="#666"
+                    ></u-icon>
                 </view>
             </view>
 
@@ -177,21 +177,31 @@ const themeStore = useThemeStore()
 const userInfo = computed(() => userStore.userInfo || {})
 
 const displayName = computed(() => {
-    return userInfo.value?.nickname || userInfo.value?.realName || userInfo.value?.realname || userInfo.value?.name || userInfo.value?.username || '用户'
+    return (
+        userInfo.value?.nickname ||
+        userInfo.value?.realName ||
+        userInfo.value?.realname ||
+        userInfo.value?.name ||
+        userInfo.value?.username ||
+        '用户'
+    )
 })
 
 const displayAccount = computed(() => {
-    return userInfo.value?.account || userInfo.value?.username || userInfo.value?.mobile || userInfo.value?.phone || '未设置'
+    return (
+        userInfo.value?.account ||
+        userInfo.value?.username ||
+        userInfo.value?.mobile ||
+        userInfo.value?.phone ||
+        '未设置'
+    )
 })
 
 const displayAvatar = computed(() => {
     return userInfo.value?.avatar || '/static/images/user/default_avatar.png'
 })
 
-const list = ref([
-    { text: '修改密码' },
-    { text: '忘记密码' }
-])
+const list = ref([{ text: '修改密码' }, { text: '忘记密码' }])
 
 const themes = VISUAL_THEMES
 const currentTheme = computed(() => themeStore.currentVisualTheme)
@@ -299,8 +309,7 @@ onLoad(async (options) => {
         try {
             await oaAuthBind({ code })
             await userStore.getUser()
-        } catch (error) {
-        }
+        } catch (error) {}
         uni.hideLoading()
         router.redirectTo('/pages/user_set/user_set')
     }
@@ -318,7 +327,7 @@ onLoad(async (options) => {
     border-radius: 24rpx;
     overflow: hidden;
     background: var(--color-surface);
-    box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, .05);
+    box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.05);
 }
 
 .item {
@@ -391,7 +400,7 @@ onLoad(async (options) => {
     width: 28rpx;
     height: 28rpx;
     border-radius: 50%;
-    border: 2rpx solid rgba(0, 0, 0, .08);
+    border: 2rpx solid rgba(0, 0, 0, 0.08);
     flex-shrink: 0;
 }
 

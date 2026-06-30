@@ -62,7 +62,9 @@ const getData = async () => {
 const pageStyle = computed(() => {
     const { bg_type, bg_color, bg_image } = state.meta[0]?.content ?? {}
     if (bg_type !== undefined) {
-        return bg_type === 1 ? { 'background-color': bg_color } : { 'background-image': `url(${bg_image})` }
+        return bg_type === 1
+            ? { 'background-color': bg_color }
+            : { 'background-image': `url(${bg_image})` }
     }
     return ''
 })
