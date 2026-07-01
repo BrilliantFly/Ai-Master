@@ -16,6 +16,7 @@ export type HomeRenderConfig = {
     desc?: string
     tag?: string
     thumbBg?: string
+    thumbImage?: string
     sections?: string[]
     section?: string
 }
@@ -28,6 +29,8 @@ export type HomeDisplayItem = {
     icon: string
     iconClass: string
     iconIsImage: boolean
+    thumbImage: string
+    thumbImageIsImage: boolean
     sort: number
     title: string
     desc: string
@@ -43,6 +46,7 @@ type PresetConfig = {
     desc: string
     tag: string
     thumbBg: string
+    thumbImage: string
     sections: string[]
 }
 
@@ -53,6 +57,7 @@ const buildPreset = (
     desc: string,
     tag: string,
     thumbBg: string,
+    thumbImage: string,
     sections: string[]
 ): PresetConfig => ({
     icon,
@@ -61,6 +66,7 @@ const buildPreset = (
     desc,
     tag,
     thumbBg,
+    thumbImage,
     sections
 })
 
@@ -72,6 +78,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '快速了解如何配置和接入你的设备',
         '设备',
         'linear-gradient(135deg,#e0e7ff,#c7d2fe)',
+        '/static/images/home/camera.svg',
         ['quick', 'recommend']
     ),
     device: buildPreset(
@@ -81,6 +88,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '快速查看和管理你的智能设备',
         '设备',
         'linear-gradient(135deg,#e0e7ff,#c7d2fe)',
+        '/static/images/home/camera.svg',
         ['quick', 'recommend']
     ),
     monitor: buildPreset(
@@ -90,6 +98,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '实时分析，异常告警，7x24h 守护',
         '设备',
         'linear-gradient(135deg,#e0e7ff,#c7d2fe)',
+        '/static/images/home/camera.svg',
         ['quick', 'recommend']
     ),
     schedule: buildPreset(
@@ -99,6 +108,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '高效管理你的每日任务',
         '效率',
         'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        '/static/images/home/schedule.svg',
         ['quick', 'recommend', 'tool']
     ),
     plan: buildPreset(
@@ -108,6 +118,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '甘特图、日程、习惯打卡全新体验',
         '计划',
         'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        '/static/images/home/schedule.svg',
         ['quick', 'recommend', 'tool']
     ),
     calendar: buildPreset(
@@ -117,6 +128,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '统一查看近期日程与安排',
         '计划',
         'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        '/static/images/home/schedule.svg',
         ['quick', 'recommend', 'tool']
     ),
     gantt: buildPreset(
@@ -126,6 +138,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '项目计划与进度追踪',
         '工具',
         'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        '/static/images/home/gantt.svg',
         ['tool']
     ),
     habit: buildPreset(
@@ -135,6 +148,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '用科学方法培养持续力',
         '习惯',
         'linear-gradient(135deg,#fce7f3,#fbcfe8)',
+        '/static/images/home/habit.svg',
         ['quick', 'recommend']
     ),
     checkin: buildPreset(
@@ -144,24 +158,27 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '养成坚持记录的好习惯',
         '习惯',
         'linear-gradient(135deg,#fce7f3,#fbcfe8)',
+        '/static/images/home/habit.svg',
         ['quick', 'recommend']
     ),
     collection: buildPreset(
-        '📌',
+        '⭐',
         'premium-icon-g8',
         '我的收藏',
         '快速回到你保存过的内容与入口',
         '收藏',
         'linear-gradient(135deg,#fff7ed,#fde68a)',
+        '/static/images/home/collection.svg',
         ['quick', 'tool']
     ),
     favorite: buildPreset(
-        '📌',
+        '⭐',
         'premium-icon-g8',
         '收藏内容',
         '随时查看收藏的重点信息',
         '收藏',
         'linear-gradient(135deg,#fff7ed,#fde68a)',
+        '/static/images/home/collection.svg',
         ['quick', 'tool']
     ),
     customer: buildPreset(
@@ -171,6 +188,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '智能跟进提醒，高效维护客户关系',
         '客户',
         'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        '/static/images/home/customer.svg',
         ['quick', 'tool']
     ),
     crm: buildPreset(
@@ -180,24 +198,27 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '统一管理客户资料和跟进记录',
         '客户',
         'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        '/static/images/home/customer.svg',
         ['quick', 'tool']
     ),
     service: buildPreset(
-        '🛎️',
+        '📄',
         'premium-icon-g10',
         '在线客服支持',
         '快速联系平台客服获取帮助',
         '服务',
         'linear-gradient(135deg,#d1fae5,#99f6e4)',
+        '/static/images/home/service.svg',
         ['quick', 'tool']
     ),
     support: buildPreset(
-        '🛎️',
+        '📄',
         'premium-icon-g10',
         '支持服务',
         '获取帮助与常见问题解答',
         '服务',
         'linear-gradient(135deg,#d1fae5,#99f6e4)',
+        '/static/images/home/service.svg',
         ['quick', 'tool']
     ),
     finance: buildPreset(
@@ -207,6 +228,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '查看财务信息与收支概况',
         '财务',
         'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        '/static/images/home/export.svg',
         ['quick', 'tool']
     ),
     wallet: buildPreset(
@@ -216,6 +238,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '查看账户余额与充值记录',
         '财务',
         'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        '/static/images/home/export.svg',
         ['quick', 'tool']
     ),
     data: buildPreset(
@@ -225,24 +248,27 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '设备与业务数据洞察',
         '数据',
         'linear-gradient(135deg,#e0f2fe,#bae6fd)',
+        '/static/images/home/data.svg',
         ['quick', 'tool']
     ),
     report: buildPreset(
-        '📄',
+        '/static/images/home/export.svg',
         'premium-icon-g8',
         '报表导出',
         '一键生成运营报告',
         '工具',
         'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        '/static/images/home/export.svg',
         ['tool']
     ),
     export: buildPreset(
-        '📄',
+        '/static/images/home/export.svg',
         'premium-icon-g8',
         '报表导出',
         '一键生成运营报告',
         '工具',
         'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+        '/static/images/home/export.svg',
         ['tool']
     ),
     alert: buildPreset(
@@ -252,6 +278,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '异常事件统一管理',
         '工具',
         'linear-gradient(135deg,#fee2e2,#fecaca)',
+        '/static/images/home/alert.svg',
         ['tool']
     ),
     warning: buildPreset(
@@ -261,6 +288,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '重要提醒与异常事件汇总',
         '工具',
         'linear-gradient(135deg,#fee2e2,#fecaca)',
+        '/static/images/home/alert.svg',
         ['tool']
     ),
     news: buildPreset(
@@ -270,6 +298,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '及时了解平台资讯与行业动态',
         '资讯',
         'linear-gradient(135deg,#dbeafe,#bfdbfe)',
+        '/static/images/home/data.svg',
         ['quick', 'recommend']
     ),
     article: buildPreset(
@@ -279,6 +308,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '发现更有价值的内容与经验分享',
         '文章',
         'linear-gradient(135deg,#dbeafe,#bfdbfe)',
+        '/static/images/home/data.svg',
         ['quick', 'recommend']
     ),
     content: buildPreset(
@@ -288,6 +318,7 @@ const MENU_PRESETS: Record<string, PresetConfig> = {
         '浏览最新内容与专题推荐',
         '内容',
         'linear-gradient(135deg,#dbeafe,#bfdbfe)',
+        '/static/images/home/data.svg',
         ['quick', 'recommend']
     )
 }
@@ -356,6 +387,8 @@ export const REFERENCE_TOOL_ITEMS: HomeDisplayItem[] = [
         icon: '📋',
         iconClass: 'premium-icon-g2',
         iconIsImage: false,
+        thumbImage: '/static/images/home/gantt.svg',
+        thumbImageIsImage: true,
         sort: 1,
         title: '甘特图',
         desc: '项目计划与进度追踪',
@@ -371,6 +404,8 @@ export const REFERENCE_TOOL_ITEMS: HomeDisplayItem[] = [
         icon: '📊',
         iconClass: 'premium-icon-g6',
         iconIsImage: false,
+        thumbImage: '/static/images/home/data.svg',
+        thumbImageIsImage: true,
         sort: 2,
         title: '数据分析',
         desc: '设备与业务数据洞察',
@@ -386,6 +421,8 @@ export const REFERENCE_TOOL_ITEMS: HomeDisplayItem[] = [
         icon: '🔔',
         iconClass: 'premium-icon-g4',
         iconIsImage: false,
+        thumbImage: '/static/images/home/alert.svg',
+        thumbImageIsImage: true,
         sort: 3,
         title: '告警中心',
         desc: '异常事件统一管理',
@@ -401,6 +438,8 @@ export const REFERENCE_TOOL_ITEMS: HomeDisplayItem[] = [
         icon: '📄',
         iconClass: 'premium-icon-g8',
         iconIsImage: false,
+        thumbImage: '/static/images/home/export.svg',
+        thumbImageIsImage: true,
         sort: 4,
         title: '报表导出',
         desc: '一键生成运营报告',
@@ -416,6 +455,8 @@ export const REFERENCE_TOOL_ITEMS: HomeDisplayItem[] = [
         icon: '🍅',
         iconClass: 'premium-icon-g4',
         iconIsImage: false,
+        thumbImage: '/static/images/home/schedule.svg',
+        thumbImageIsImage: true,
         sort: 5,
         title: '番茄专注',
         desc: '25 分钟专注与节奏化休息',
@@ -473,6 +514,7 @@ export const normalizeHomeMenuItems = (menus: RawHomeMenu[] = []): HomeDisplayIt
             const preset = MENU_PRESETS[presetCode]
             const sort = Number(item.sort ?? index + 1)
             const rawIcon = preset?.icon || config.icon || item.icon || '📦'
+            const rawThumbImage = config.thumbImage || preset?.thumbImage || rawIcon
             const titleFallback = preset?.title || `菜单 ${index + 1}`
             const descFallback = preset?.desc || '后台菜单动态渲染'
             const tagFallback = preset?.tag || '菜单'
@@ -486,6 +528,8 @@ export const normalizeHomeMenuItems = (menus: RawHomeMenu[] = []): HomeDisplayIt
                 icon: rawIcon,
                 iconClass: config.iconClass || preset?.iconClass || 'premium-icon-g8',
                 iconIsImage: isImageLike(rawIcon),
+                thumbImage: rawThumbImage,
+                thumbImageIsImage: isImageLike(rawThumbImage),
                 sort,
                 title: safeText(config.title, titleFallback),
                 desc: safeText(config.desc, descFallback),

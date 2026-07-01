@@ -9,7 +9,20 @@ export const VISUAL_THEMES = [
     { key: 'aurora', name: '极光', icon: '🌌' },
     { key: 'purple', name: '暗紫', icon: '🔮' },
     { key: 'glass', name: '玻璃', icon: '🪟' },
-    { key: 'orangold', name: '橘金', icon: '✨' }
+    { key: 'orangold', name: '橘金', icon: '✨' },
+    { key: 'macaron', name: '马卡龙', icon: '🧁' },
+    { key: 'mint', name: '薄荷', icon: '🍃' },
+    { key: 'lavender', name: '薰衣草', icon: '💜' },
+    { key: 'milky', name: '奶白', icon: '🥛' },
+    { key: 'matcha', name: '抹茶', icon: '🍵' },
+    { key: 'berry', name: '浆果', icon: '🍓' },
+    { key: 'ocean', name: '海洋', icon: '🌊' },
+    { key: 'cream', name: '奶油', icon: '🧈' },
+    { key: 'chocolate', name: '巧克力', icon: '🍫' },
+    { key: 'neon', name: '霓虹', icon: '🌈' },
+    { key: 'sakura', name: '樱花', icon: '🌸' },
+    { key: 'forest', name: '森林', icon: '🌲' },
+    { key: 'sunset', name: '日落', icon: '🌇' }
 ] as const
 
 const THEME_STORAGE_KEY = 'know-theme'

@@ -1,7 +1,9 @@
 <template>
     <view class="theme-switcher">
         <view class="theme-trigger" @tap.stop="togglePanel" title="切换主题">
-            <view class="trigger-icon" v-html="sunIcon"></view>
+            <view class="trigger-icon">
+                <text>🎨</text>
+            </view>
         </view>
 
         <view v-if="isOpen" class="theme-overlay" @tap="closePanel"></view>
@@ -32,20 +34,6 @@ const isOpen = ref(false)
 
 const themes = VISUAL_THEMES
 const current = computed(() => themeStore.currentVisualTheme)
-
-const sunIcon = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="12" cy="12" r="5"></circle>
-  <line x1="12" y1="1" x2="12" y2="3"></line>
-  <line x1="12" y1="21" x2="12" y2="23"></line>
-  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-  <line x1="1" y1="12" x2="3" y2="12"></line>
-  <line x1="21" y1="12" x2="23" y2="12"></line>
-  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-</svg>
-`
 
 const togglePanel = () => {
     isOpen.value = !isOpen.value
@@ -93,12 +81,6 @@ const selectTheme = (key: string) => {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-:deep(.trigger-icon svg) {
-    display: block;
-    width: 18px;
-    height: 18px;
 }
 
 .theme-overlay {
@@ -199,6 +181,45 @@ const selectTheme = (key: string) => {
 }
 .sw-orangold::after {
     background: linear-gradient(135deg, #e87a5d, #d4a04a);
+}
+.sw-macaron::after {
+    background: #ff8ba7;
+}
+.sw-mint::after {
+    background: #34d399;
+}
+.sw-lavender::after {
+    background: #a78bfa;
+}
+.sw-milky::after {
+    background: #f59e0b;
+}
+.sw-matcha::after {
+    background: #65a30d;
+}
+.sw-berry::after {
+    background: #ec4899;
+}
+.sw-ocean::after {
+    background: #0ea5e9;
+}
+.sw-cream::after {
+    background: #d97706;
+}
+.sw-chocolate::after {
+    background: #8d6e63;
+}
+.sw-neon::after {
+    background: #00ff88;
+}
+.sw-sakura::after {
+    background: #ff69b4;
+}
+.sw-forest::after {
+    background: #4caf50;
+}
+.sw-sunset::after {
+    background: #ff6b35;
 }
 
 .theme-option.active .swatch {

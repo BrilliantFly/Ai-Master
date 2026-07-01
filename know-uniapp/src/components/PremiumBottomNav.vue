@@ -19,11 +19,13 @@
                         "
                         mode="aspectFit"
                     />
-                    <view
-                        v-else-if="getSvgIcon(item.fallbackKey)"
-                        class="tab-icon-svg"
-                        v-html="getSvgIcon(item.fallbackKey)"
-                    ></view>
+                    <view v-else-if="getSvgIcon(item.fallbackKey)" class="tab-icon-svg">
+                        <text class="svg-icon-text">{{
+                            currentKey === item.key && item.selectedIcon
+                                ? item.selectedIcon
+                                : item.icon || getFallbackEmoji(item.fallbackKey)
+                        }}</text>
+                    </view>
                     <text v-else class="tab-icon-text">{{
                         currentKey === item.key && item.selectedIcon ? item.selectedIcon : item.icon
                     }}</text>
@@ -110,6 +112,17 @@ const svgIconMap: Record<string, string> = {
 }
 
 const getSvgIcon = (key: string) => svgIconMap[key] || ''
+
+const emojiFallbackMap: Record<string, string> = {
+    home: '🏠',
+    article: '📰',
+    plan: '📅',
+    schedule: '🗂️',
+    customer: '👥',
+    profile: '👤'
+}
+
+const getFallbackEmoji = (key: string) => emojiFallbackMap[key] || '•'
 
 const isImageLike = (value?: string) => {
     if (!value) return false
@@ -260,12 +273,12 @@ onShow(() => {
 .nav-item.active::after {
     content: '';
     position: absolute;
-    left: 28%;
-    right: 28%;
-    bottom: -2rpx;
-    height: 5rpx;
+    left: 34%;
+    right: 34%;
+    top: -2rpx;
+    height: 6rpx;
     border-radius: 999rpx;
-    background: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
 }
 
 .tab-icon-wrap {
@@ -289,18 +302,39 @@ onShow(() => {
     display: block;
 }
 
+.svg-icon-text {
+    font-size: 40rpx;
+    line-height: 1.1;
+    transition: transform var(--duration) var(--ease);
+}
+
 .tab-icon-text {
     font-size: 40rpx;
     line-height: 1.1;
+    transition: transform var(--duration) var(--ease);
 }
 
 .tab-icon-image {
     width: 42rpx;
     height: 42rpx;
+    transition: transform var(--duration) var(--ease);
 }
 
 .nav-label {
     font-size: 20rpx;
     line-height: 1.2;
+    transition: color var(--duration) var(--ease), font-weight var(--duration) var(--ease);
+}
+
+.nav-item.active .tab-icon-text,
+.nav-item.active .svg-icon-text,
+.nav-item.active .tab-icon-image,
+.nav-item.active :deep(.tab-icon-svg svg) {
+    transform: scale(1.08);
+}
+
+.nav-item.active .nav-label {
+    color: var(--color-primary);
+    font-weight: 600;
 }
 </style>
