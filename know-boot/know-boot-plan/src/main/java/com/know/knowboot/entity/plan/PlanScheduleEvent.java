@@ -1,6 +1,9 @@
 package com.know.knowboot.entity.plan;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,6 +29,15 @@ public class PlanScheduleEvent implements Serializable {
 
     @ApiModelProperty("日程内容")
     private String content;
+
+    @ApiModelProperty("标签，逗号分隔")
+    private String tags;
+
+    @ApiModelProperty("子任务 JSON")
+    private String subtasks;
+
+    @ApiModelProperty("备注")
+    private String note;
 
     @ApiModelProperty("日程类型(1:日程 2:待办 3:提醒)")
     private Integer eventType;

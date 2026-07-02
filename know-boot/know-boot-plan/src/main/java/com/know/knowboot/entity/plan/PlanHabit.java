@@ -33,6 +33,39 @@ public class PlanHabit implements Serializable {
     @ApiModelProperty("颜色")
     private String color;
 
+    @ApiModelProperty("分类")
+    private String category;
+
+    @ApiModelProperty("目标值")
+    private Integer targetValue;
+
+    @ApiModelProperty("目标单位")
+    private String targetUnit;
+
+    @ApiModelProperty("打卡方式(boolean/numeric)")
+    private String trackingType;
+
+    @ApiModelProperty("备注")
+    private String note;
+
+    @ApiModelProperty("激励语")
+    private String motto;
+
+    @ApiModelProperty("时间段(all/morning/noon/afternoon/evening)")
+    private String timePeriod;
+
+    @ApiModelProperty("是否允许补卡")
+    private Boolean allowBackfill;
+
+    @ApiModelProperty("结束日期(时间戳)")
+    private Long endDate;
+
+    @ApiModelProperty("休息日(逗号分隔，0-6)")
+    private String restDays;
+
+    @ApiModelProperty("第二提醒时间(HH:mm)")
+    private String secondReminder;
+
     @ApiModelProperty("目标天数")
     private Integer targetDays;
 

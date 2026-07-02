@@ -39,6 +39,9 @@ public class PlanSchemaMigration {
 
             // 修复已有表可能缺失的列（兼容初始版本建表）
             ensureColumnExists("plan_schedule_event", "event_type", "tinyint DEFAULT 1 COMMENT '日程类型(1:日程 2:待办 3:提醒)' AFTER `content`");
+            ensureColumnExists("plan_schedule_event", "tags", "varchar(500) DEFAULT NULL COMMENT '标签(逗号分隔)' AFTER `content`");
+            ensureColumnExists("plan_schedule_event", "subtasks", "text DEFAULT NULL COMMENT '子任务JSON' AFTER `tags`");
+            ensureColumnExists("plan_schedule_event", "note", "varchar(500) DEFAULT NULL COMMENT '备注' AFTER `subtasks`");
             ensureColumnExists("plan_schedule_event", "priority", "tinyint DEFAULT 2 COMMENT '优先级(1:低 2:中 3:高)' AFTER `quadrant`");
             ensureColumnExists("plan_schedule_event", "category_id", "bigint DEFAULT NULL COMMENT '分类ID' AFTER `priority`");
             ensureColumnExists("plan_schedule_event", "plan_id", "bigint DEFAULT NULL COMMENT '关联计划ID' AFTER `category_id`");
@@ -54,6 +57,17 @@ public class PlanSchemaMigration {
             ensureColumnExists("plan_habit", "frequency_type", "tinyint DEFAULT 1 COMMENT '频率类型(1:每天 2:每周 3:自定义)' AFTER `target_days`");
             ensureColumnExists("plan_habit", "frequency_rule", "varchar(100) DEFAULT NULL COMMENT '频率规则' AFTER `frequency_type`");
             ensureColumnExists("plan_habit", "start_date", "bigint DEFAULT NULL COMMENT '开始日期(时间戳)' AFTER `frequency_rule`");
+            ensureColumnExists("plan_habit", "category", "varchar(50) DEFAULT NULL COMMENT '分类' AFTER `color`");
+            ensureColumnExists("plan_habit", "target_value", "int DEFAULT 1 COMMENT '目标值' AFTER `category`");
+            ensureColumnExists("plan_habit", "target_unit", "varchar(20) DEFAULT NULL COMMENT '目标单位' AFTER `target_value`");
+            ensureColumnExists("plan_habit", "tracking_type", "varchar(20) DEFAULT 'boolean' COMMENT '打卡方式(boolean/numeric)' AFTER `target_unit`");
+            ensureColumnExists("plan_habit", "note", "varchar(500) DEFAULT NULL COMMENT '备注' AFTER `reminder_time`");
+            ensureColumnExists("plan_habit", "motto", "varchar(100) DEFAULT NULL COMMENT '激励语' AFTER `note`");
+            ensureColumnExists("plan_habit", "time_period", "varchar(20) DEFAULT 'all' COMMENT '时间段(all/morning/noon/afternoon/evening)' AFTER `motto`");
+            ensureColumnExists("plan_habit", "allow_backfill", "tinyint(1) DEFAULT 1 COMMENT '是否允许补卡' AFTER `time_period`");
+            ensureColumnExists("plan_habit", "end_date", "bigint DEFAULT NULL COMMENT '结束日期(时间戳)' AFTER `start_date`");
+            ensureColumnExists("plan_habit", "rest_days", "varchar(50) DEFAULT NULL COMMENT '休息日(逗号分隔，0-6)' AFTER `end_date`");
+            ensureColumnExists("plan_habit", "second_reminder", "varchar(50) DEFAULT NULL COMMENT '第二提醒时间(HH:mm)' AFTER `reminder_time`");
             ensureColumnExists("plan_habit", "plan_id", "bigint DEFAULT NULL COMMENT '关联计划ID' AFTER `total_days`");
             ensureColumnExists("plan_habit", "delete_time", "bigint DEFAULT NULL COMMENT '删除时间' AFTER `update_time`");
             ensureColumnExists("plan_schedule_category", "delete_time", "bigint DEFAULT NULL COMMENT '删除时间' AFTER `update_time`");
@@ -192,6 +206,9 @@ public class PlanSchemaMigration {
                 "  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键'," +
                 "  `title` varchar(200) NOT NULL COMMENT '日程标题'," +
                 "  `content` text COMMENT '日程内容'," +
+                "  `tags` varchar(500) DEFAULT NULL COMMENT '标签(逗号分隔)'," +
+                "  `subtasks` text COMMENT '子任务JSON'," +
+                "  `note` varchar(500) DEFAULT NULL COMMENT '备注'," +
                 "  `event_type` tinyint DEFAULT 1 COMMENT '日程类型(1:日程 2:待办 3:提醒)'," +
                 "  `quadrant` tinyint DEFAULT 2 COMMENT '四象限(1:重要紧急 2:重要不紧急 3:紧急不重要 4:不紧急不重要)'," +
                 "  `priority` tinyint DEFAULT 2 COMMENT '优先级(1:低 2:中 3:高)'," +
@@ -240,11 +257,22 @@ public class PlanSchemaMigration {
                 "  `description` text COMMENT '描述'," +
                 "  `icon` varchar(50) DEFAULT NULL COMMENT '图标'," +
                 "  `color` varchar(20) DEFAULT '#52C41A' COMMENT '颜色'," +
+                "  `category` varchar(50) DEFAULT NULL COMMENT '分类'," +
+                "  `target_value` int DEFAULT 1 COMMENT '目标值'," +
+                "  `target_unit` varchar(20) DEFAULT NULL COMMENT '目标单位'," +
+                "  `tracking_type` varchar(20) DEFAULT 'boolean' COMMENT '打卡方式(boolean/numeric)'," +
                 "  `target_days` int DEFAULT 30 COMMENT '目标天数'," +
                 "  `frequency_type` tinyint DEFAULT 1 COMMENT '频率类型(1:每天 2:每周 3:自定义)'," +
                 "  `frequency_rule` varchar(100) DEFAULT NULL COMMENT '频率规则'," +
                 "  `start_date` bigint DEFAULT NULL COMMENT '开始日期(时间戳)'," +
+                "  `end_date` bigint DEFAULT NULL COMMENT '结束日期(时间戳)'," +
+                "  `rest_days` varchar(50) DEFAULT NULL COMMENT '休息日(逗号分隔，0-6)'," +
                 "  `reminder_time` varchar(50) DEFAULT NULL COMMENT '提醒时间(HH:mm)'," +
+                "  `second_reminder` varchar(50) DEFAULT NULL COMMENT '第二提醒时间(HH:mm)'," +
+                "  `note` varchar(500) DEFAULT NULL COMMENT '备注'," +
+                "  `motto` varchar(100) DEFAULT NULL COMMENT '激励语'," +
+                "  `time_period` varchar(20) DEFAULT 'all' COMMENT '时间段(all/morning/noon/afternoon/evening)'," +
+                "  `allow_backfill` tinyint(1) DEFAULT 1 COMMENT '是否允许补卡'," +
                 "  `status` tinyint DEFAULT 0 COMMENT '状态(0:进行中 1:已完成 2:已放弃)'," +
                 "  `current_days` int DEFAULT 0 COMMENT '当前连续天数'," +
                 "  `total_days` int DEFAULT 0 COMMENT '累计打卡天数'," +
