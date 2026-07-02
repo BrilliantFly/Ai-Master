@@ -1,7 +1,6 @@
 package com.know.knowboot.controller.plan;
 
 import com.know.knowboot.core.AjaxResult;
-import com.know.knowboot.entity.plan.PlanHomeConfig;
 import com.know.knowboot.service.plan.IPlanHomeConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +25,7 @@ public class PlanHomeController {
 
     @ApiOperation("获取首页配置")
     @GetMapping("/config")
-    public AjaxResult<Map<String, PlanHomeConfig>> getConfig(
+    public AjaxResult<Map<String, Map<String, Object>>> getConfig(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String roleId) {
         Long currentUserId = userId == null ? 1L : userId;

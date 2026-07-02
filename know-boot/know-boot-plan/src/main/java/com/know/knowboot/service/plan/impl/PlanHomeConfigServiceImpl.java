@@ -18,7 +18,7 @@ import java.util.Map;
 public class PlanHomeConfigServiceImpl extends ServiceImpl<PlanHomeConfigMapper, PlanHomeConfig> implements IPlanHomeConfigService {
 
     @Override
-    public Map<String, PlanHomeConfig> getConfig(Long userId, String roleId) {
+    public Map<String, Map<String, Object>> getConfig(Long userId, String roleId) {
         LambdaQueryWrapper<PlanHomeConfig> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(PlanHomeConfig::getStatus, 1)
                 .and(roleId != null && !roleId.isEmpty(), w -> w.isNull(PlanHomeConfig::getRoleId).or().eq(PlanHomeConfig::getRoleId, roleId))
@@ -26,10 +26,24 @@ public class PlanHomeConfigServiceImpl extends ServiceImpl<PlanHomeConfigMapper,
                 .orderByDesc(PlanHomeConfig::getUpdateTime);
 
         List<PlanHomeConfig> configs = list(wrapper);
-        Map<String, PlanHomeConfig> result = new LinkedHashMap<>();
+        Map<String, Map<String, Object>> result = new LinkedHashMap<>();
         for (PlanHomeConfig config : configs) {
-            result.putIfAbsent(config.getConfigType(), config);
+            result.putIfAbsent(config.getConfigType(), toResponse(config));
         }
         return result;
+    }
+
+    private Map<String, Object> toResponse(PlanHomeConfig config) {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("id", config.getId());
+        item.put("configType", config.getConfigType());
+        item.put("title", config.getTitle());
+        item.put("content", config.getContent());
+        item.put("icon", config.getIcon());
+        item.put("link", config.getLink());
+        item.put("sort", config.getSort());
+        item.put("status", config.getStatus());
+        item.put("roleId", config.getRoleId());
+        return item;
     }
 }

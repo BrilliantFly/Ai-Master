@@ -1,7 +1,5 @@
 package com.know.knowboot.service.plan;
 
-import com.know.knowboot.entity.plan.PlanHomeConfig;
-
 import java.util.Map;
 
 /**
@@ -12,5 +10,5 @@ public interface IPlanHomeConfigService {
     /**
      * 获取首页配置
      */
-    Map<String, PlanHomeConfig> getConfig(Long userId, String roleId);
+    Map<String, Map<String, Object>> getConfig(Long userId, String roleId);
 }
