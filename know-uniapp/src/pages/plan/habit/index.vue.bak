@@ -1,0 +1,1555 @@
+<template>
+    <view class="plan-habit-page">
+        <view class="page-header">
+            <view>
+                <text class="page-title">习惯打卡</text>
+                <text class="page-subtitle">用连续打卡培养稳定节奏</text>
+            </view>
+            <view class="header-actions">
+                <view class="premium-header-btn" @tap="goAddHabit">+</view>
+            </view>
+        </view>
+
+        <scroll-view scroll-y class="calendar-scroll">
+            <CalendarGrid
+                :year="currentYear"
+                :month="currentMonth"
+                :weeks="weeks"
+                :current-week-days="currentWeekDays"
+                :monthly-stats="monthlyStats"
+                :collapsed="collapsed"
+                :selected-date="selectedDateLabel"
+                :event-count="dayHabitRecords.length"
+                :quadrant-color="quadrantColor"
+                @date-tap="onDateTap"
+                @month-switch="onMonthSwitch"
+                @toggle-collapse="toggleCollapse"
+            />
+
+            <view class="insight-entry premium-card" @tap="goStatsPage">
+                <view class="section-head">
+                    <view>
+                        <text class="section-title">打卡洞察</text>
+                        <text class="section-subtitle">
+                            月完成率 {{ monthlyStats.rate }}% · 累计打卡
+                            {{ stats.totalCheckins }} 次 · 最佳连续
+                            {{ bestHabit?.currentDays || 0 }} 天
+                        </text>
+                    </view>
+                    <text class="section-badge">统计页</text>
+                </view>
+            </view>
+
+            <view class="milestone-card premium-card">
+                <view class="section-head">
+                    <view>
+                        <text class="section-title">连续打卡里程碑</text>
+                        <text class="section-subtitle">{{
+                            bestHabit
+                                ? `当前最佳：${bestHabit.habitName} 连续 ${
+                                      bestHabit.currentDays || 0
+                                  } 天`
+                                : '创建并坚持一个习惯，就会逐步点亮里程碑'
+                        }}</text>
+                    </view>
+                    <text class="section-badge accent"
+                        >{{ unlockedMilestoneCount }}/{{ MILESTONES.length }}</text
+                    >
+                </view>
+                <view class="milestone-grid">
+                    <view
+                        v-for="milestone in milestoneStatus"
+                        :key="milestone.days"
+                        class="milestone-item"
+                        :class="{ unlocked: milestone.unlocked }"
+                    >
+                        <text class="milestone-icon">{{ milestone.icon }}</text>
+                        <text class="milestone-name">{{ milestone.title }}</text>
+                        <text class="milestone-days">{{ milestone.days }} 天</text>
+                    </view>
+                </view>
+            </view>
+
+            <view v-if="selectedDateLabel" class="day-overview premium-card">
+                <view class="overview-top">
+                    <text class="overview-date">{{ selectedDateLabel }}</text>
+                    <text class="overview-count">{{ dayHabitRecords.length }} 个习惯</text>
+                </view>
+                <view class="overview-chips">
+                    <text class="overview-chip">已打卡 {{ checkedCount }}</text>
+                    <text class="overview-chip">未打卡 {{ uncheckedCount }}</text>
+                    <text class="overview-chip">月完成率 {{ monthlyStats.rate }}%</text>
+                </view>
+                <view class="overview-progress" v-if="dayHabitRecords.length > 0">
+                    <view class="overview-bar">
+                        <view class="overview-fill" :style="{ width: dayCheckRate + '%' }"></view>
+                    </view>
+                    <text class="overview-rate">{{ dayCheckRate }}%</text>
+                </view>
+            </view>
+
+            <view class="day-title" v-if="selectedDateLabel">
+                <text>{{ selectedDateLabel }} 打卡详情</text>
+            </view>
+
+            <view v-if="dayHabitRecords.length === 0 && selectedDateLabel" class="empty-state">
+                <text class="empty-icon">🎯</text>
+                <text class="empty-text">该日暂无打卡记录</text>
+            </view>
+
+            <view v-for="item in dayHabitRecords" :key="item.habitId" class="habit-swipe-wrap">
+                <view class="habit-swipe-actions">
+                    <view
+                        class="habit-swipe-btn"
+                        :class="item.checked ? 'habit-swipe-btn-done' : 'habit-swipe-btn-checkin'"
+                        @tap.stop="onHabitSwipeAction(item)"
+                    >
+                        <text class="habit-swipe-icon">{{ item.checked ? '✓' : '打' }}</text>
+                        <text class="habit-swipe-label">{{
+                            item.checked ? '已完成' : '打卡'
+                        }}</text>
+                    </view>
+                </view>
+                <view
+                    class="habit-swipe-content"
+                    :style="habitSwipeStyle(item.habitId)"
+                    @touchstart="onHabitTouchStart($event, item.habitId)"
+                    @touchmove="onHabitTouchMove($event, item.habitId)"
+                    @touchend="onHabitTouchEnd($event, item.habitId)"
+                    @tap="openHabitDetail(item)"
+                >
+                    <view class="habit-card premium-card">
+                        <view class="habit-header">
+                            <view class="habit-icon-badge">{{ item.icon || '🎯' }}</view>
+                            <view class="habit-info">
+                                <view class="habit-title-row">
+                                    <text class="habit-name">{{ item.habitName }}</text>
+                                    <text class="habit-chip">习惯</text>
+                                </view>
+                                <text class="habit-desc">{{
+                                    item.description || '坚持每天打卡'
+                                }}</text>
+                            </view>
+                            <view class="habit-status">
+                                <text v-if="item.checked" class="premium-tag premium-tag-success"
+                                    >已打卡</text
+                                >
+                                <text v-else class="premium-tag premium-tag-warning">未打卡</text>
+                            </view>
+                        </view>
+                        <view class="habit-footer">
+                            <text class="streak-text">连续 {{ item.currentDays || 0 }} 天</text>
+                            <text :class="item.checked ? 'checked-text' : 'swipe-hint-text'">
+                                {{ item.checked ? '今天已完成' : '左滑打卡' }}
+                            </text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+
+            <view style="height: 180rpx"></view>
+        </scroll-view>
+
+        <view class="floating-add" @tap="goAddHabit">+</view>
+
+        <view
+            v-if="detailModal.visible"
+            class="achievement-mask habit-detail-overlay"
+            @tap="closeHabitDetail"
+        >
+            <view class="habit-detail-modal" @tap.stop>
+                <view class="modal-handle"></view>
+                <view class="habit-detail-top">
+                    <view class="habit-detail-hero">
+                        <text class="habit-detail-icon" :style="{ color: detailModal.color }">{{
+                            detailModal.icon
+                        }}</text>
+                        <view class="habit-detail-copy">
+                            <text class="habit-detail-name">{{ detailModal.name }}</text>
+                            <text class="habit-detail-sub">{{
+                                `${detailModal.frequencyLabel} · ${detailModal.category || '健康'}`
+                            }}</text>
+                        </view>
+                    </view>
+                    <text class="habit-streak-badge" :style="{ color: detailModal.color }"
+                        >🔥 {{ detailModal.currentDays }}天</text
+                    >
+                </view>
+
+                <view class="habit-detail-stats">
+                    <view class="habit-detail-stat">
+                        <text class="habit-detail-stat-num">{{ detailModal.weekCompleted }}</text>
+                        <text class="habit-detail-stat-label">本周完成</text>
+                    </view>
+                    <view class="habit-detail-stat">
+                        <text class="habit-detail-stat-num primary"
+                            >{{ detailModal.weekRate }}%</text
+                        >
+                        <text class="habit-detail-stat-label">完成率</text>
+                    </view>
+                    <view class="habit-detail-stat">
+                        <text class="habit-detail-stat-num warning">{{
+                            detailModal.currentDays
+                        }}</text>
+                        <text class="habit-detail-stat-label">连续天数</text>
+                    </view>
+                </view>
+
+                <view v-if="detailModal.description" class="habit-detail-note-card primary-mist">
+                    <text class="habit-detail-desc">{{ `📌 ${detailModal.description}` }}</text>
+                </view>
+
+                <view v-if="detailModal.motto" class="habit-detail-note-card">
+                    <text class="habit-detail-motto">{{ `💬 ${detailModal.motto}` }}</text>
+                </view>
+
+                <view class="habit-detail-lines">
+                    <text class="habit-detail-line">{{
+                        `🎯 目标：${detailModal.targetValue || 1}${
+                            detailModal.targetUnit || '次'
+                        }/${detailModal.periodLabel}`
+                    }}</text>
+                    <text class="habit-detail-line">{{
+                        `🔔 提醒：${detailModal.reminderText}`
+                    }}</text>
+                    <text class="habit-detail-line">{{
+                        `📅 开始：${detailModal.startDate || '--'}${
+                            detailModal.endDate ? ` → ${detailModal.endDate}` : ''
+                        }`
+                    }}</text>
+                </view>
+
+                <view v-if="detailModal.note" class="habit-detail-note-card">
+                    <text class="habit-detail-motto">{{ `📝 今日备注：${detailModal.note}` }}</text>
+                </view>
+
+                <view
+                    v-if="detailModal.allowBackfill"
+                    class="detail-dashed-btn warning"
+                    @tap="handleBackfillEntry"
+                >
+                    📅 补卡（本月剩余 3/3 次）
+                </view>
+                <view class="detail-dashed-btn primary" @tap="handleShareEntry">📤 分享</view>
+
+                <view class="habit-detail-section">
+                    <text class="habit-detail-section-title">最近 7 天</text>
+                    <view class="habit-week-strip">
+                        <view
+                            v-for="day in detailModal.recentDays"
+                            :key="day.date"
+                            class="habit-week-day"
+                            :class="{ checked: day.checked, today: day.isToday }"
+                        >
+                            <text class="habit-week-name">{{ day.label }}</text>
+                            <text class="habit-week-date">{{ day.dayNumber }}</text>
+                            <text class="habit-week-dot">{{ day.checked ? '✓' : '' }}</text>
+                        </view>
+                    </view>
+                </view>
+
+                <view class="habit-detail-actions">
+                    <button
+                        class="detail-action-btn detail-action-btn-muted"
+                        @tap="editHabitFromDetail"
+                    >
+                        编辑
+                    </button>
+                    <button
+                        class="detail-action-btn detail-action-btn-primary"
+                        @tap="handleDetailCheckin"
+                    >
+                        {{ detailModal.checked ? '今日已完成' : '立即打卡' }}
+                    </button>
+                </view>
+                <view class="habit-detail-secondary-actions">
+                    <button class="detail-action-mini" type="button" @tap="handleBackfillEntry">
+                        补卡
+                    </button>
+                    <button class="detail-action-mini" type="button" @tap="handleShareEntry">
+                        分享
+                    </button>
+                </view>
+            </view>
+        </view>
+
+        <view v-if="achievementModal.visible" class="achievement-mask" @tap="closeAchievementModal">
+            <view class="achievement-modal premium-card" @tap.stop>
+                <text class="achievement-emoji">{{ achievementModal.icon }}</text>
+                <text class="achievement-title">{{ achievementModal.title }}</text>
+                <text class="achievement-desc"
+                    >{{ achievementModal.habitName }} 已连续打卡
+                    {{ achievementModal.days }} 天</text
+                >
+                <text class="achievement-copy">{{ achievementModal.desc }}</text>
+                <button class="achievement-btn" type="button" @tap="closeAchievementModal">
+                    继续打卡
+                </button>
+            </view>
+        </view>
+
+        <PremiumBottomNav active="plan" />
+    </view>
+</template>
+
+<script setup>
+import { computed, onMounted, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import PremiumBottomNav from '@/components/PremiumBottomNav.vue'
+import CalendarGrid from '@/components/calendar-grid/CalendarGrid.vue'
+import { checkinHabit, getCalendarMonthly, getHabitStats } from '@/api/plan/habit'
+import { getHolidays } from '@/api/holiday'
+import {
+    formatYYYYMMDD,
+    generateWeeks,
+    quadrantColor
+} from '@/components/calendar-grid/calendar-utils.js'
+
+const MILESTONES = [
+    { days: 7, icon: '🌱', title: '初露锋芒', desc: '坚持了一周，好的开始已经形成。' },
+    { days: 21, icon: '🌿', title: '习惯渐成', desc: '21 天打卡完成，节奏开始稳定下来。' },
+    { days: 66, icon: '🌳', title: '根深蒂固', desc: '66 天后，习惯已经开始融入你的生活。' },
+    { days: 100, icon: '🏆', title: '百日坚守', desc: '一百天不间断，这份执行力非常难得。' },
+    { days: 200, icon: '💎', title: '坚韧不拔', desc: '两百天的累计坚持，已经是一种可靠能力。' },
+    { days: 365, icon: '👑', title: '年度王者', desc: '一年如一日，你把习惯真正变成了日常。' }
+]
+
+const stats = ref({ activeCount: 0, completedCount: 0, totalCheckins: 0 })
+const hasLoaded = ref(false)
+
+const currentYear = ref(new Date().getFullYear())
+const currentMonth = ref(new Date().getMonth() + 1)
+const collapsed = ref(true)
+const selectedDateLabel = ref('')
+const habitCalendarMarks = ref([])
+const dayHabitRecords = ref([])
+const allHabits = ref([])
+const holidays = ref(null)
+const holidaysYear = ref(0)
+const achievementModal = ref({
+    visible: false,
+    icon: '',
+    title: '',
+    desc: '',
+    habitName: '',
+    days: 0
+})
+const detailModal = ref({
+    visible: false,
+    habitId: '',
+    name: '',
+    icon: '🎯',
+    description: '',
+    category: '',
+    color: '#5b5bd6',
+    motto: '',
+    trackingType: 'boolean',
+    targetValue: 1,
+    targetUnit: '次',
+    frequencyType: 1,
+    frequencyRule: '',
+    frequencyLabel: '每天',
+    periodLabel: '天',
+    weekRate: 0,
+    checked: false,
+    currentDays: 0,
+    totalDays: 0,
+    startDate: '',
+    endDate: '',
+    reminderTime: '',
+    secondReminder: '',
+    reminderText: '不提醒',
+    allowBackfill: true,
+    note: '',
+    weekCompleted: 0,
+    recentDays: []
+})
+
+const currentWeekDays = computed(() => {
+    if (!weeks.value.length) return []
+    const today = new Date()
+    const todayStr = formatYYYYMMDD(today.getFullYear(), today.getMonth() + 1, today.getDate())
+    const targetStr = selectedDateLabel.value || todayStr
+    for (const week of weeks.value) {
+        const found = week.find((day) => day.date === targetStr)
+        if (found) {
+            return week.map((day, index) => ({
+                ...day,
+                weekLabel: ['日', '一', '二', '三', '四', '五', '六'][index]
+            }))
+        }
+    }
+    return []
+})
+
+const weeks = computed(() =>
+    generateWeeks(currentYear.value, currentMonth.value, habitCalendarMarks.value, holidays.value)
+)
+const monthlyStats = computed(() => {
+    const daysInMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
+    const checkedDays = new Set(habitCalendarMarks.value.map((item) => item.date))
+    const total = daysInMonth
+    const completed = checkedDays.size
+    return {
+        total,
+        completed,
+        rate: total > 0 ? Math.round((completed / total) * 100) : 0
+    }
+})
+const checkedCount = computed(() => dayHabitRecords.value.filter((item) => item.checked).length)
+const uncheckedCount = computed(() => dayHabitRecords.value.filter((item) => !item.checked).length)
+const dayCheckRate = computed(() => {
+    if (!dayHabitRecords.value.length) return 0
+    return Math.round((checkedCount.value / dayHabitRecords.value.length) * 100)
+})
+const todayDate = computed(() => {
+    const now = new Date()
+    return formatYYYYMMDD(now.getFullYear(), now.getMonth() + 1, now.getDate())
+})
+const bestHabit = computed(() => {
+    if (!allHabits.value.length) return null
+    return [...allHabits.value].sort((a, b) => (b.currentDays || 0) - (a.currentDays || 0))[0]
+})
+const milestoneStatus = computed(() => {
+    const bestDays = bestHabit.value?.currentDays || 0
+    return MILESTONES.map((milestone) => ({
+        ...milestone,
+        unlocked: bestDays >= milestone.days
+    }))
+})
+const unlockedMilestoneCount = computed(() => {
+    return milestoneStatus.value.filter((item) => item.unlocked).length
+})
+
+const HABIT_SWIPE_THRESHOLD = 42
+const HABIT_SWIPE_MAX = 92
+const habitSwipeOffsets = ref({})
+const openHabitId = ref(null)
+
+const closeHabitSwipe = (id) => {
+    if (habitSwipeOffsets.value[id]) {
+        habitSwipeOffsets.value[id].translateX = 0
+    }
+    if (openHabitId.value === id) {
+        openHabitId.value = null
+    }
+}
+
+const onHabitTouchStart = (e, id) => {
+    const touch = e.touches[0]
+    if (openHabitId.value !== null && openHabitId.value !== id) {
+        closeHabitSwipe(openHabitId.value)
+    }
+    habitSwipeOffsets.value[id] = {
+        startX: touch.clientX,
+        currentX: touch.clientX,
+        translateX: openHabitId.value === id ? -HABIT_SWIPE_MAX : 0
+    }
+}
+
+const onHabitTouchMove = (e, id) => {
+    const data = habitSwipeOffsets.value[id]
+    if (!data) return
+    const touch = e.touches[0]
+    let targetX = data.translateX + (touch.clientX - data.currentX)
+    targetX = Math.max(-HABIT_SWIPE_MAX, Math.min(0, targetX))
+    data.translateX = targetX
+    data.currentX = touch.clientX
+}
+
+const onHabitTouchEnd = (e, id) => {
+    const data = habitSwipeOffsets.value[id]
+    if (!data) return
+    if (Math.abs(data.translateX) > HABIT_SWIPE_THRESHOLD) {
+        openHabitId.value = id
+        data.translateX = -HABIT_SWIPE_MAX
+    } else {
+        closeHabitSwipe(id)
+    }
+}
+
+const habitSwipeStyle = (id) => {
+    const data = habitSwipeOffsets.value[id]
+    const x = data ? data.translateX : openHabitId.value === id ? -HABIT_SWIPE_MAX : 0
+    return `transform: translateX(${x}px); transition: transform 0.25s cubic-bezier(.22,1,.36,1);`
+}
+
+const fetchStats = async () => {
+    try {
+        const res = await getHabitStats({})
+        stats.value = res || { activeCount: 0, completedCount: 0, totalCheckins: 0 }
+    } catch (error) {
+        console.error('获取统计失败', error)
+    }
+}
+
+const fetchHolidays = async (year = currentYear.value) => {
+    if (year !== holidaysYear.value) {
+        holidays.value = await getHolidays(year)
+        if (holidays.value) holidaysYear.value = year
+    }
+}
+
+const formatTimestampDate = (value) => {
+    if (!value) return ''
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return ''
+    return formatYYYYMMDD(date.getFullYear(), date.getMonth() + 1, date.getDate())
+}
+
+const getFrequencyMeta = (habit) => {
+    if (habit.frequencyType === 2) return { label: '每周', period: '周' }
+    if (habit.frequencyType === 3) {
+        try {
+            const parsed = JSON.parse(habit.frequencyRule || '{}')
+            const periodMap = {
+                weekday: ['工作日', '天'],
+                weekend: ['周末', '天'],
+                monthly: ['每月', '月'],
+                daily: ['每天', '天']
+            }
+            const [label, period] = periodMap[parsed.period] || ['自定义', '天']
+            return { label, period }
+        } catch {
+            return { label: '自定义', period: '天' }
+        }
+    }
+    return { label: '每天', period: '天' }
+}
+
+const buildReminderText = (habit) => {
+    const reminders = [habit.reminderTime, habit.secondReminder].filter(Boolean)
+    return reminders.length ? reminders.join(' / ') : '不提醒'
+}
+
+const mapHabitRecordsForDay = (dateStr) => {
+    if (!dateStr) return []
+    const day = Number(dateStr.split('-')[2])
+    return allHabits.value.map((habit) => {
+        const checked = (habit.checkinDays || []).includes(day)
+        return {
+            habitId: habit.habitId || habit.id,
+            habitName: habit.habitName || habit.name || '未命名习惯',
+            checked,
+            currentDays: habit.currentDays || 0,
+            totalDays: habit.totalDays || 0,
+            description: habit.description || '',
+            icon: habit.icon || '🎯',
+            color: habit.color || '#5b5bd6',
+            category: habit.category || '',
+            motto: habit.motto || '',
+            trackingType: habit.trackingType || 'boolean',
+            targetValue: habit.targetValue || 1,
+            targetUnit: habit.targetUnit || '次',
+            frequencyType: habit.frequencyType || 1,
+            frequencyRule: habit.frequencyRule || '',
+            timePeriod: habit.timePeriod || 'all',
+            allowBackfill: habit.allowBackfill !== false,
+            note: habit.note || '',
+            checkinDays: habit.checkinDays || [],
+            reminderTime: habit.reminderTime || '',
+            secondReminder: habit.secondReminder || '',
+            startDate: formatTimestampDate(habit.startDate),
+            endDate: formatTimestampDate(habit.endDate)
+        }
+    })
+}
+
+const fetchCalendarData = async () => {
+    try {
+        const res = await getCalendarMonthly({ year: currentYear.value, month: currentMonth.value })
+        if (!res) return
+        const habitsMap = res.habits || {}
+        allHabits.value = Object.keys(habitsMap).map((key) => {
+            const habit = habitsMap[key] || {}
+            return {
+                id: habit.habitId || habit.id || key,
+                habitId: habit.habitId || habit.id || key,
+                habitName: habit.habitName || habit.name || '未命名习惯',
+                description: habit.description || '',
+                currentDays: habit.currentDays || 0,
+                totalDays: habit.totalDays || 0,
+                icon: habit.icon || '🎯',
+                color: habit.color || '#5b5bd6',
+                category: habit.category || '',
+                motto: habit.motto || '',
+                trackingType: habit.trackingType || 'boolean',
+                targetValue: habit.targetValue || 1,
+                targetUnit: habit.targetUnit || '次',
+                frequencyType: habit.frequencyType || 1,
+                frequencyRule: habit.frequencyRule || '',
+                timePeriod: habit.timePeriod || 'all',
+                allowBackfill: habit.allowBackfill !== false,
+                note: habit.note || '',
+                reminderTime: habit.reminderTime || '',
+                secondReminder: habit.secondReminder || '',
+                startDate: habit.startDate || '',
+                endDate: habit.endDate || '',
+                checkinDays: habit.checkinDays || []
+            }
+        })
+
+        const marks = []
+        allHabits.value.forEach((habit) => {
+            ;(habit.checkinDays || []).forEach((day) => {
+                marks.push({
+                    date: formatYYYYMMDD(currentYear.value, currentMonth.value, day),
+                    quadrant: 2,
+                    status: 1,
+                    habitId: habit.habitId
+                })
+            })
+        })
+        habitCalendarMarks.value = marks
+        if (selectedDateLabel.value) {
+            dayHabitRecords.value = mapHabitRecordsForDay(selectedDateLabel.value)
+        }
+    } catch (error) {
+        console.error('获取月历数据失败', error)
+    }
+}
+
+const onMonthSwitch = async (year, month) => {
+    currentYear.value = year
+    currentMonth.value = month
+    selectedDateLabel.value = ''
+    dayHabitRecords.value = []
+    await fetchHolidays(year)
+    await fetchCalendarData()
+}
+
+const onDateTap = (dateStr) => {
+    selectedDateLabel.value = dateStr
+    dayHabitRecords.value = mapHabitRecordsForDay(dateStr)
+}
+
+const toggleCollapse = () => {
+    collapsed.value = !collapsed.value
+}
+
+const closeAchievementModal = () => {
+    achievementModal.value.visible = false
+}
+
+const closeHabitDetail = () => {
+    detailModal.value.visible = false
+}
+
+const buildRecentDays = (item) => {
+    const checkedDays = new Set((item.checkinDays || []).map((day) => Number(day)))
+    const base = selectedDateLabel.value
+        ? new Date(selectedDateLabel.value.replace(/-/g, '/'))
+        : new Date()
+    const labels = ['日', '一', '二', '三', '四', '五', '六']
+    return Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(base)
+        date.setDate(base.getDate() - 6 + index)
+        const dateStr = formatYYYYMMDD(date.getFullYear(), date.getMonth() + 1, date.getDate())
+        return {
+            date: dateStr,
+            label: labels[date.getDay()],
+            dayNumber: date.getDate(),
+            checked: checkedDays.has(date.getDate()),
+            isToday: dateStr === todayDate.value
+        }
+    })
+}
+
+const openHabitDetail = (item) => {
+    const recentDays = buildRecentDays(item)
+    const weekCompleted = recentDays.filter((day) => day.checked).length
+    const frequencyMeta = getFrequencyMeta(item)
+    detailModal.value = {
+        visible: true,
+        habitId: item.habitId,
+        name: item.habitName,
+        icon: item.icon || '🎯',
+        color: item.color || '#5b5bd6',
+        description: item.description || '',
+        category: item.category || '',
+        motto: item.motto || '',
+        trackingType: item.trackingType || 'boolean',
+        targetValue: item.targetValue || 1,
+        targetUnit: item.targetUnit || '次',
+        frequencyType: item.frequencyType || 1,
+        frequencyRule: item.frequencyRule || '',
+        frequencyLabel: frequencyMeta.label,
+        periodLabel: frequencyMeta.period,
+        checked: item.checked,
+        currentDays: item.currentDays || 0,
+        totalDays: item.totalDays || 0,
+        startDate: item.startDate || '',
+        endDate: item.endDate || '',
+        reminderTime: item.reminderTime || '',
+        secondReminder: item.secondReminder || '',
+        reminderText: buildReminderText(item),
+        allowBackfill: item.allowBackfill !== false,
+        note: item.note || '',
+        weekCompleted,
+        weekRate: Math.round((weekCompleted / 7) * 100),
+        recentDays
+    }
+}
+
+const showAchievementModal = (milestone, habitName) => {
+    achievementModal.value = {
+        visible: true,
+        icon: milestone.icon,
+        title: milestone.title,
+        desc: milestone.desc,
+        habitName,
+        days: milestone.days
+    }
+}
+
+const maybeShowMilestone = (previousDays, habit) => {
+    const currentDays = habit?.currentDays || 0
+    if (currentDays <= previousDays) return
+    const milestone = MILESTONES.find((item) => item.days === currentDays)
+    if (!milestone) return
+    showAchievementModal(milestone, habit.habitName || habit.name || '当前习惯')
+}
+
+const handleQuickCheckin = async (item) => {
+    try {
+        const previousDays = item.currentDays || 0
+        await checkinHabit(item.habitId, {})
+        uni.showToast({ title: '打卡成功', icon: 'success' })
+        await fetchStats()
+        await fetchCalendarData()
+        if (selectedDateLabel.value) {
+            dayHabitRecords.value = mapHabitRecordsForDay(selectedDateLabel.value)
+        }
+        const updatedHabit = allHabits.value.find(
+            (habit) => String(habit.habitId || habit.id) === String(item.habitId)
+        )
+        maybeShowMilestone(previousDays, updatedHabit)
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+const onHabitSwipeAction = (item) => {
+    closeHabitSwipe(item.habitId)
+    if (item.checked) return
+    handleQuickCheckin(item)
+}
+
+const handleDetailCheckin = async () => {
+    if (detailModal.value.checked) {
+        closeHabitDetail()
+        return
+    }
+    await handleQuickCheckin({
+        habitId: detailModal.value.habitId,
+        currentDays: detailModal.value.currentDays
+    })
+    closeHabitDetail()
+}
+
+const editHabitFromDetail = () => {
+    if (!detailModal.value.habitId) return
+    closeHabitDetail()
+    uni.navigateTo({ url: `/pages/plan/habit/form?id=${detailModal.value.habitId}` })
+}
+
+const handleBackfillEntry = () => {
+    uni.showToast({ title: '补卡入口已预留', icon: 'none' })
+}
+
+const handleShareEntry = () => {
+    uni.showToast({ title: '分享入口已预留', icon: 'none' })
+}
+
+const refreshHabitPage = async () => {
+    await fetchStats()
+    await fetchCalendarData()
+    if (selectedDateLabel.value) {
+        dayHabitRecords.value = mapHabitRecordsForDay(selectedDateLabel.value)
+    }
+}
+
+const goAddHabit = () => {
+    uni.navigateTo({ url: '/pages/plan/habit/form' })
+}
+
+const goStatsPage = () => {
+    uni.navigateTo({ url: '/pages/plan/stats/index' })
+}
+
+onMounted(async () => {
+    await fetchStats()
+    await fetchHolidays()
+    await fetchCalendarData()
+    const now = new Date()
+    const today = formatYYYYMMDD(now.getFullYear(), now.getMonth() + 1, now.getDate())
+    onDateTap(today)
+    hasLoaded.value = true
+})
+
+onShow(async () => {
+    if (!hasLoaded.value) return
+    await refreshHabitPage()
+})
+</script>
+
+<style scoped>
+.plan-habit-page {
+    min-height: 100vh;
+    background: var(--color-bg-app);
+    padding-bottom: 150rpx;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24rpx 40rpx 16rpx;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+}
+
+.page-title {
+    display: block;
+    font-size: 48rpx;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    display: block;
+    margin-top: 8rpx;
+    font-size: 26rpx;
+    color: var(--color-text-secondary);
+}
+
+.calendar-scroll {
+    padding-bottom: 20rpx;
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20rpx;
+    margin-bottom: 20rpx;
+}
+
+.section-title {
+    display: block;
+    font-size: 30rpx;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.section-subtitle {
+    display: block;
+    margin-top: 8rpx;
+    font-size: 22rpx;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+.section-badge {
+    font-size: 22rpx;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-primary-soft);
+    padding: 8rpx 16rpx;
+    border-radius: 999rpx;
+}
+
+.section-badge.accent {
+    color: var(--color-success);
+    background: rgba(82, 196, 26, 0.14);
+}
+
+.insight-entry,
+.milestone-card {
+    margin: 0 16px 14px;
+    padding: 24rpx;
+}
+
+.milestone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16rpx;
+}
+
+.milestone-item {
+    min-height: 148rpx;
+    padding: 18rpx 12rpx;
+    border-radius: 24rpx;
+    background: var(--color-surface-soft);
+    border: 2rpx solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0.6;
+}
+
+.milestone-item.unlocked {
+    opacity: 1;
+    border-color: rgba(82, 196, 26, 0.24);
+    background: linear-gradient(180deg, rgba(82, 196, 26, 0.12), rgba(82, 196, 26, 0.04));
+}
+
+.milestone-icon {
+    font-size: 40rpx;
+}
+
+.milestone-name {
+    margin-top: 10rpx;
+    font-size: 24rpx;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.milestone-days {
+    margin-top: 6rpx;
+    font-size: 21rpx;
+    color: var(--color-text-secondary);
+}
+
+.day-overview {
+    margin: 0 16px 14px;
+    padding: 22rpx 24rpx;
+}
+
+.overview-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20rpx;
+}
+
+.overview-date {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.overview-count {
+    font-size: 22rpx;
+    color: var(--color-text-secondary);
+}
+
+.overview-chips {
+    display: flex;
+    gap: 12rpx;
+    flex-wrap: wrap;
+    margin-top: 14rpx;
+}
+
+.overview-chip {
+    font-size: 22rpx;
+    color: var(--color-text-secondary);
+    background: var(--color-surface-soft);
+    padding: 6rpx 16rpx;
+    border-radius: 999rpx;
+}
+
+.overview-progress {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    margin-top: 16rpx;
+}
+
+.overview-bar {
+    flex: 1;
+    height: 10rpx;
+    border-radius: 999rpx;
+    background: var(--color-surface-soft);
+    overflow: hidden;
+}
+
+.overview-fill {
+    height: 100%;
+    border-radius: 999rpx;
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+}
+
+.overview-rate {
+    font-size: 22rpx;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.stat-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30rpx 10rpx 26rpx;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+    border: 2rpx solid transparent;
+}
+
+.stat-card.accent {
+    background: var(--color-primary-soft);
+    border-color: var(--color-primary-mist);
+}
+
+.stat-num {
+    font-size: 46rpx;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.2;
+}
+
+.stat-label {
+    margin-top: 8rpx;
+    font-size: 23rpx;
+    color: var(--color-text-secondary);
+}
+
+.day-title {
+    padding: 0 32rpx 12rpx;
+    font-size: 28rpx;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.habit-swipe-wrap {
+    position: relative;
+    margin: 0 16px 10px;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.habit-swipe-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    display: flex;
+}
+
+.habit-swipe-btn {
+    width: 92px;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8rpx;
+    color: #fff;
+}
+
+.habit-swipe-btn-checkin {
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+}
+
+.habit-swipe-btn-done {
+    background: linear-gradient(135deg, var(--color-success), #5ac8a0);
+}
+
+.habit-swipe-icon {
+    font-size: 30rpx;
+    font-weight: 700;
+}
+
+.habit-swipe-label {
+    font-size: 24rpx;
+    font-weight: 600;
+}
+
+.habit-swipe-content {
+    position: relative;
+    z-index: 2;
+    background: var(--color-surface);
+    will-change: transform;
+}
+
+.habit-card {
+    margin: 0;
+    padding: 26rpx 28rpx;
+    border-radius: 24rpx;
+}
+
+.habit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20rpx;
+}
+
+.habit-icon-badge {
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: 22rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    font-size: 34rpx;
+    flex-shrink: 0;
+}
+
+.habit-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.habit-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10rpx;
+    flex-wrap: wrap;
+}
+
+.habit-name {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.habit-chip {
+    font-size: 20rpx;
+    color: var(--color-primary);
+    background: var(--color-primary-soft);
+    padding: 4rpx 14rpx;
+    border-radius: 999rpx;
+}
+
+.habit-desc {
+    margin-top: 8rpx;
+    font-size: 24rpx;
+    color: var(--color-text-secondary);
+}
+
+.habit-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18rpx;
+}
+
+.streak-text {
+    font-size: 24rpx;
+    color: var(--color-text-secondary);
+    background: var(--color-surface-soft);
+    padding: 6rpx 16rpx;
+    border-radius: 999rpx;
+}
+
+.checkin-btn {
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    color: #fff;
+    font-size: 26rpx;
+    padding: 8rpx 30rpx;
+    border-radius: 999rpx;
+    border: none;
+    line-height: 1.8;
+}
+
+.checked-text {
+    font-size: 24rpx;
+    color: var(--color-success);
+}
+
+.swipe-hint-text {
+    font-size: 24rpx;
+    color: var(--color-text-tertiary);
+}
+
+.floating-add {
+    position: fixed;
+    right: 40rpx;
+    bottom: 122rpx;
+    z-index: 50;
+    width: 104rpx;
+    height: 104rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64rpx;
+    box-shadow: var(--shadow-glow);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 120rpx 0;
+}
+
+.empty-icon {
+    font-size: 80rpx;
+}
+
+.empty-text {
+    font-size: 28rpx;
+    color: var(--color-text-tertiary);
+    margin-top: 16rpx;
+}
+
+.achievement-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: rgba(15, 23, 42, 0.42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32rpx;
+}
+
+.habit-detail-overlay {
+    align-items: flex-end;
+    padding: 0 20rpx calc(env(safe-area-inset-bottom) + 20rpx);
+}
+
+.achievement-modal {
+    width: 100%;
+    max-width: 620rpx;
+    padding: 36rpx 32rpx;
+    border-radius: 32rpx;
+    text-align: center;
+}
+
+.habit-detail-modal {
+    width: 100%;
+    max-width: 640rpx;
+    max-height: 86vh;
+    overflow-y: auto;
+    padding: 18rpx 24rpx 28rpx;
+    border-radius: 30rpx;
+    background: var(--color-surface);
+    box-shadow: 0 22rpx 70rpx rgba(15, 23, 42, 0.18);
+}
+
+.modal-handle {
+    width: 72rpx;
+    height: 8rpx;
+    border-radius: 999rpx;
+    background: var(--color-border);
+    margin: 0 auto 18rpx;
+}
+
+.habit-detail-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20rpx;
+}
+
+.habit-detail-hero {
+    display: flex;
+    align-items: center;
+    gap: 18rpx;
+}
+
+.habit-detail-icon {
+    width: 88rpx;
+    height: 88rpx;
+    border-radius: 20rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-soft);
+    font-size: 54rpx;
+}
+
+.habit-detail-copy {
+    display: flex;
+    flex-direction: column;
+}
+
+.habit-detail-name {
+    font-size: 40rpx;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.habit-detail-sub {
+    margin-top: 6rpx;
+    font-size: 22rpx;
+    color: var(--color-text-secondary);
+}
+
+.habit-streak-badge {
+    padding: 8rpx 24rpx;
+    border-radius: 12rpx;
+    background: var(--color-surface-soft);
+    font-size: 24rpx;
+    font-weight: 800;
+}
+
+.habit-detail-stats {
+    margin-top: 24rpx;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14rpx;
+}
+
+.habit-detail-stat {
+    padding: 22rpx 12rpx;
+    border-radius: 18rpx;
+    background: var(--color-surface-soft);
+    text-align: center;
+}
+
+.habit-detail-stat-num {
+    display: block;
+    font-size: 42rpx;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.habit-detail-stat-num.primary {
+    color: var(--color-primary);
+}
+
+.habit-detail-stat-num.warning {
+    color: var(--color-warning);
+}
+
+.habit-detail-stat-label {
+    display: block;
+    margin-top: 6rpx;
+    font-size: 20rpx;
+    color: var(--color-text-secondary);
+}
+
+.habit-detail-note-card {
+    margin-top: 20rpx;
+    padding: 18rpx 24rpx;
+    border-radius: 18rpx;
+    background: var(--color-surface-soft);
+    text-align: center;
+}
+
+.habit-detail-note-card.primary-mist {
+    background: var(--color-primary-soft);
+    text-align: left;
+}
+
+.habit-detail-motto {
+    display: block;
+    font-size: 23rpx;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.habit-detail-lines {
+    margin-top: 18rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 10rpx;
+}
+
+.habit-detail-line {
+    font-size: 23rpx;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+}
+
+.detail-dashed-btn {
+    margin-top: 16rpx;
+    min-height: 74rpx;
+    border-radius: 18rpx;
+    border: 3rpx dashed var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25rpx;
+    font-weight: 700;
+    background: transparent;
+}
+
+.detail-dashed-btn.primary {
+    color: var(--color-primary);
+}
+
+.detail-dashed-btn.warning {
+    color: var(--color-warning);
+    border-color: var(--color-warning);
+}
+
+.habit-detail-section {
+    margin-top: 22rpx;
+    padding-top: 18rpx;
+    border-top: 1rpx solid var(--color-border-light);
+}
+
+.habit-detail-section-title {
+    display: block;
+    font-size: 24rpx;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 12rpx;
+}
+
+.habit-detail-desc {
+    display: block;
+    font-size: 24rpx;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.habit-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18rpx;
+    padding: 10rpx 0;
+}
+
+.habit-detail-label {
+    font-size: 22rpx;
+    color: var(--color-text-tertiary);
+}
+
+.habit-detail-value {
+    font-size: 22rpx;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.habit-week-strip {
+    display: flex;
+    gap: 8rpx;
+}
+
+.habit-week-day {
+    flex: 1;
+    min-height: 88rpx;
+    border-radius: 16rpx;
+    background: var(--color-surface-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6rpx;
+}
+
+.habit-week-day.checked {
+    background: var(--color-primary-mist);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+}
+
+.habit-week-day.today {
+    box-shadow: inset 0 0 0 2rpx var(--color-primary);
+}
+
+.habit-week-name {
+    font-size: 20rpx;
+    color: var(--color-text-tertiary);
+}
+
+.habit-week-dot {
+    min-height: 16rpx;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16rpx;
+    font-weight: 700;
+}
+
+.habit-week-date {
+    font-size: 18rpx;
+    color: var(--color-text-tertiary);
+    opacity: 0.72;
+}
+
+.habit-detail-actions {
+    display: flex;
+    gap: 16rpx;
+    margin-top: 26rpx;
+}
+
+.habit-detail-secondary-actions {
+    display: none;
+}
+
+.detail-action-btn {
+    flex: 1;
+    height: 84rpx;
+    border: none;
+    border-radius: 999rpx;
+    font-size: 26rpx;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+.detail-action-btn-muted {
+    background: var(--color-surface-soft);
+    color: var(--color-text-secondary);
+    border: 1rpx solid var(--color-border-light);
+}
+
+.detail-action-btn-primary {
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    color: #fff;
+    box-shadow: var(--shadow-glow);
+}
+
+.detail-action-mini {
+    height: 70rpx;
+    border-radius: 999rpx;
+    border: 1rpx solid var(--color-border-light);
+    background: var(--color-surface-soft);
+    color: var(--color-text-secondary);
+    font-size: 24rpx;
+    font-weight: 700;
+}
+
+.achievement-emoji {
+    display: block;
+    font-size: 84rpx;
+}
+
+.achievement-title {
+    display: block;
+    margin-top: 18rpx;
+    font-size: 38rpx;
+    font-weight: 800;
+    color: var(--color-text);
+}
+
+.achievement-desc {
+    display: block;
+    margin-top: 16rpx;
+    font-size: 26rpx;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--color-text);
+}
+
+.achievement-copy {
+    display: block;
+    margin-top: 12rpx;
+    font-size: 24rpx;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.achievement-btn {
+    margin-top: 28rpx;
+    width: 100%;
+    height: 88rpx;
+    border: none;
+    border-radius: 999rpx;
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    color: #fff;
+    font-size: 28rpx;
+    font-weight: 700;
+}
+</style>
