@@ -2,7 +2,7 @@
     <view class="plan-habit-page">
         <view class="page-header">
             <view>
-                <text class="page-title">习惯打卡</text>
+                <text class="page-title">🎯 习惯打卡</text>
                 <text class="page-subtitle">用连续打卡培养稳定节奏</text>
             </view>
             <view class="header-actions">
@@ -26,46 +26,24 @@
                 @toggle-collapse="toggleCollapse"
             />
 
-            <view class="insight-entry premium-card" @tap="goStatsPage">
-                <view class="section-head">
-                    <view>
-                        <text class="section-title">打卡洞察</text>
-                        <text class="section-subtitle">
-                            月完成率 {{ monthlyStats.rate }}% · 累计打卡 {{ stats.totalCheckins }} 次 ·
-                            最佳连续 {{ bestHabit?.currentDays || 0 }} 天
-                        </text>
-                    </view>
-                    <text class="section-badge">统计页</text>
+            <view class="checkin-tabs premium-fade-in premium-d1">
+                <view
+                    class="checkin-tab"
+                    :class="{ active: activeTab === 'checkin' }"
+                    @tap="activeTab = 'checkin'"
+                >
+                    打卡 <text class="tab-badge">{{ checkedCount }}/{{ dayHabitRecords.length }}</text>
+                </view>
+                <view
+                    class="checkin-tab"
+                    :class="{ active: activeTab === 'manage' }"
+                    @tap="activeTab = 'manage'"
+                >
+                    管理 <text class="tab-badge">{{ allHabits.length }}</text>
                 </view>
             </view>
 
-            <view class="milestone-card premium-card">
-                <view class="section-head">
-                    <view>
-                        <text class="section-title">连续打卡里程碑</text>
-                        <text class="section-subtitle">{{
-                            bestHabit
-                                ? `当前最佳：${bestHabit.habitName} 连续 ${bestHabit.currentDays || 0} 天`
-                                : '创建并坚持一个习惯，就会逐步点亮里程碑'
-                        }}</text>
-                    </view>
-                    <text class="section-badge accent">{{ unlockedMilestoneCount }}/{{ MILESTONES.length }}</text>
-                </view>
-                <view class="milestone-grid">
-                    <view
-                        v-for="milestone in milestoneStatus"
-                        :key="milestone.days"
-                        class="milestone-item"
-                        :class="{ unlocked: milestone.unlocked }"
-                    >
-                        <text class="milestone-icon">{{ milestone.icon }}</text>
-                        <text class="milestone-name">{{ milestone.title }}</text>
-                        <text class="milestone-days">{{ milestone.days }} 天</text>
-                    </view>
-                </view>
-            </view>
-
-            <view v-if="selectedDateLabel" class="day-overview premium-card">
+            <view v-if="activeTab === 'checkin' && selectedDateLabel" class="day-overview premium-card premium-fade-in premium-d2">
                 <view class="overview-top">
                     <text class="overview-date">{{ selectedDateLabel }}</text>
                     <text class="overview-count">{{ dayHabitRecords.length }} 个习惯</text>
@@ -83,60 +61,134 @@
                 </view>
             </view>
 
-            <view class="day-title" v-if="selectedDateLabel">
+            <view class="day-title premium-fade-in premium-d3" v-if="activeTab === 'checkin' && selectedDateLabel">
                 <text>{{ selectedDateLabel }} 打卡详情</text>
             </view>
 
-            <view v-if="dayHabitRecords.length === 0 && selectedDateLabel" class="empty-state">
+            <view v-if="activeTab === 'checkin' && dayHabitRecords.length === 0 && selectedDateLabel" class="empty-state">
                 <text class="empty-icon">🎯</text>
                 <text class="empty-text">该日暂无打卡记录</text>
             </view>
 
-            <view v-for="item in dayHabitRecords" :key="item.habitId" class="habit-swipe-wrap">
-                <view class="habit-swipe-actions">
-                    <view
-                        class="habit-swipe-btn"
-                        :class="item.checked ? 'habit-swipe-btn-done' : 'habit-swipe-btn-checkin'"
-                        @tap.stop="onHabitSwipeAction(item)"
-                    >
-                        <text class="habit-swipe-icon">{{ item.checked ? '✓' : '打' }}</text>
-                        <text class="habit-swipe-label">{{
-                            item.checked ? '已完成' : '打卡'
-                        }}</text>
+    <template v-if="activeTab === 'checkin'">
+    <view v-for="item in dayHabitRecords" :key="item.habitId" class="goal-card-wrap">
+        <view class="swipe-actions">
+            <view
+                class="swipe-action action-done"
+                @tap.stop="onHabitSwipeAction(item)"
+            >
+                <text class="sa-icon">{{ item.checked ? '↩' : '✓' }}</text>
+                <text class="sa-label">{{ item.checked ? '取消' : '完成' }}</text>
+            </view>
+            <view
+                class="swipe-action action-edit"
+                @tap.stop="editHabitFromCheckin(item)"
+            >
+                <text class="sa-icon">✏️</text>
+                <text class="sa-label">编辑</text>
+            </view>
+            <view
+                class="swipe-action action-archive"
+                @tap.stop="archiveHabit(item)"
+            >
+                <text class="sa-icon">📦</text>
+                <text class="sa-label">结束</text>
+            </view>
+        </view>
+        <view
+            class="swipe-content"
+            :style="habitSwipeStyle(item.habitId)"
+            @touchstart="onHabitTouchStart($event, item.habitId)"
+            @touchmove="onHabitTouchMove($event, item.habitId)"
+            @touchend="onHabitTouchEnd($event, item.habitId)"
+            @tap="openHabitDetail(item)"
+        >
+            <view class="goal-card color-border premium-hover-lift" :style="{ borderLeftColor: item.color || '#5b5bd6' }">
+                <view class="g-header">
+                    <text class="g-icon">{{ item.icon || '🎯' }}</text>
+                    <text class="g-name">{{ item.habitName }}</text>
+                    <text class="g-badge" :style="{ background: (item.color || '#5b5bd6') + '22', color: item.color || '#5b5bd6' }">{{ getFrequencyMeta(item).label }}</text>
+                </view>
+                <view class="g-streak">
+                    <text><text class="fire-icon">🔥</text> 连续 {{ item.currentDays || 0 }} 天</text>
+                </view>
+                <view v-if="getCardWeekData(item).weekDays" class="g-progress">
+                    <view class="g-progress-bar">
+                        <view class="g-progress-fill" :style="{ width: getCardWeekData(item).rate + '%' }"></view>
+                    </view>
+                    <view class="g-progress-label">
+                        <text>本周 {{ getCardWeekData(item).completed }}/7</text>
+                        <text>{{ getCardWeekData(item).rate }}%</text>
                     </view>
                 </view>
-                <view
-                    class="habit-swipe-content"
-                    :style="habitSwipeStyle(item.habitId)"
-                    @touchstart="onHabitTouchStart($event, item.habitId)"
-                    @touchmove="onHabitTouchMove($event, item.habitId)"
-                    @touchend="onHabitTouchEnd($event, item.habitId)"
-                >
-                    <view class="habit-card premium-card">
-                        <view class="habit-header">
-                            <view class="habit-info">
-                                <view class="habit-title-row">
-                                    <text class="habit-name">{{ item.habitName }}</text>
-                                    <text class="habit-chip">习惯</text>
-                                </view>
-                                <text class="habit-desc">{{
-                                    item.description || '坚持每天打卡'
-                                }}</text>
-                            </view>
-                            <view class="habit-status">
-                                <text v-if="item.checked" class="premium-tag premium-tag-success"
-                                    >已打卡</text
-                                >
-                                <text v-else class="premium-tag premium-tag-warning">未打卡</text>
-                            </view>
-                        </view>
-                        <view class="habit-footer">
-                            <text class="streak-text">连续 {{ item.currentDays || 0 }} 天</text>
-                            <text :class="item.checked ? 'checked-text' : 'swipe-hint-text'">
-                                {{ item.checked ? '今天已完成' : '左滑打卡' }}
-                            </text>
+                <view class="g-footer">
+                    <view class="g-week">
+                        <view v-for="day in getCardWeekData(item).weekDays" :key="day.date" 
+                              class="g-week-day" 
+                              :class="{ done: day.checked, today: day.isToday }">
+                            <text>{{ day.isToday ? '今' : day.label }}</text>
                         </view>
                     </view>
+                    <button class="checkin-btn" :class="{ checked: item.checked }" 
+                            @tap.stop="onHabitSwipeAction(item)">
+                        <text>{{ item.checked ? '✓' : '○' }}</text>
+                    </button>
+                </view>
+            </view>
+        </view>
+    </view>
+    </template>
+
+            <view v-if="activeTab === 'manage'" class="section-pad premium-fade-in premium-d2">
+                <view class="section-sub">进行中的目标</view>
+                <view v-if="allHabits.length === 0" class="empty-state">
+                    <text class="empty-icon">🎯</text>
+                    <text class="empty-text">还没有目标，点击右下角 + 新建</text>
+                </view>
+                <template v-for="(group, cat) in groupedHabits" :key="cat">
+                    <view class="grp-header" @tap="toggleGroup(cat)">
+                        <text class="grp-arrow" :class="{ collapsed: isGroupCollapsed(cat) }">▼</text>
+                        <text class="grp-name">{{ cat || '未分类' }}</text>
+                        <text class="grp-count">{{ group.length }}项</text>
+                    </view>
+                    <view v-show="!isGroupCollapsed(cat)">
+                        <view
+                            v-for="(habit, hIdx) in group"
+                            :key="habit.habitId || habit.id"
+                            class="manage-item"
+                            @tap="openHabitDetail(toHabitRecord(habit))"
+                        >
+                            <text class="mi-icon">{{ habit.icon || '🎯' }}</text>
+                            <view class="mi-info">
+                                <text class="mi-name">{{ habit.habitName || habit.name || '未命名习惯' }}</text>
+                                <text class="mi-sub">连续 {{ habit.currentDays || 0 }} 天 · {{ habit.category || '健康' }}</text>
+                            </view>
+                            <view class="manage-actions">
+                                <button class="mi-action move-btn" type="button" @tap.stop="moveHabit(habit, -1, cat)" :disabled="hIdx === 0">▲</button>
+                                <button class="mi-action move-btn" type="button" @tap.stop="moveHabit(habit, 1, cat)" :disabled="hIdx === group.length - 1">▼</button>
+                            </view>
+                            <button class="mi-action end-btn" type="button" @tap.stop="archiveHabitFromManage(habit)">结束</button>
+                        </view>
+                    </view>
+                </template>
+                <view style="font-size:12px;color:var(--color-text-tertiary);margin:16px 0 10px;font-weight:500">已结束的目标</view>
+                <view v-if="archivedHabits.length === 0" style="text-align:center;padding:24px 0;font-size:12px;color:var(--color-text-tertiary)">暂无结束的目标</view>
+                <view
+                    v-for="habit in archivedHabits"
+                    :key="'arch-' + (habit.habitId || habit.id)"
+                    class="manage-item archived"
+                    @tap="openHabitDetail(toHabitRecord(habit))"
+                >
+                    <text class="mi-icon">{{ habit.icon || '🎯' }}</text>
+                    <view class="mi-info">
+                        <text class="mi-name">{{ habit.habitName || habit.name || '未命名习惯' }}</text>
+                        <text class="mi-sub">已结束 · {{ habit.category || '健康' }}</text>
+                    </view>
+                    <button class="mi-action" type="button" @tap.stop="editHabitFromManage(habit)">恢复</button>
+                </view>
+                <view style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;border-top:1px solid var(--color-border-light);padding-top:12px">
+                    <button type="button" @tap="goAddHabit" class="manage-bottom-btn">📋 习惯模板</button>
+                    <button type="button" @tap="goStatsPage" class="manage-bottom-btn">🔒 密码锁</button>
                 </view>
             </view>
 
@@ -145,12 +197,134 @@
 
         <view class="floating-add" @tap="goAddHabit">+</view>
 
+        <view
+            v-if="detailModal.visible"
+            class="achievement-mask habit-detail-overlay"
+            @tap="closeHabitDetail"
+        >
+            <view class="habit-detail-modal" @tap.stop>
+                <view class="modal-handle"></view>
+                <view class="habit-detail-top">
+                    <view class="habit-detail-hero">
+                        <text class="habit-detail-icon" :style="{ color: detailModal.color }">{{
+                            detailModal.icon
+                        }}</text>
+                        <view class="habit-detail-copy">
+                            <text class="habit-detail-name">{{ detailModal.name }}</text>
+                            <text class="habit-detail-sub">{{
+                                `${detailModal.frequencyLabel} · ${detailModal.category || '健康'}`
+                            }}</text>
+                        </view>
+                    </view>
+                    <text class="habit-streak-badge" :style="{ color: detailModal.color }"
+                        >🔥 {{ detailModal.currentDays }}天</text
+                    >
+                </view>
+
+                <view class="habit-detail-stats">
+                    <view class="habit-detail-stat">
+                        <text class="habit-detail-stat-num">{{ detailModal.weekCompleted }}</text>
+                        <text class="habit-detail-stat-label">本周完成</text>
+                    </view>
+                    <view class="habit-detail-stat">
+                        <text class="habit-detail-stat-num primary"
+                            >{{ detailModal.weekRate }}%</text
+                        >
+                        <text class="habit-detail-stat-label">完成率</text>
+                    </view>
+                    <view class="habit-detail-stat">
+                        <text class="habit-detail-stat-num warning">{{
+                            detailModal.currentDays
+                        }}</text>
+                        <text class="habit-detail-stat-label">连续天数</text>
+                    </view>
+                </view>
+
+                <view v-if="detailModal.description" class="habit-detail-note-card primary-mist">
+                    <text class="habit-detail-desc">{{ `📌 ${detailModal.description}` }}</text>
+                </view>
+
+                <view v-if="detailModal.motto" class="habit-detail-note-card">
+                    <text class="habit-detail-motto">{{ `💬 ${detailModal.motto}` }}</text>
+                </view>
+
+                <view class="habit-detail-lines">
+                    <text class="habit-detail-line">{{
+                        `🎯 目标：${detailModal.targetValue || 1}${
+                            detailModal.targetUnit || '次'
+                        }/${detailModal.periodLabel}`
+                    }}</text>
+                    <text class="habit-detail-line">{{
+                        `🔔 提醒：${detailModal.reminderText}`
+                    }}</text>
+                    <text class="habit-detail-line">{{
+                        `📅 开始：${detailModal.startDate || '--'}${
+                            detailModal.endDate ? ` → ${detailModal.endDate}` : ''
+                        }`
+                    }}</text>
+                </view>
+
+                <view v-if="detailModal.note" class="habit-detail-note-card">
+                    <text class="habit-detail-motto">{{ `📝 今日备注：${detailModal.note}` }}</text>
+                </view>
+
+                <view
+                    v-if="detailModal.allowBackfill"
+                    class="detail-dashed-btn warning"
+                    @tap="handleBackfillEntry"
+                >
+                    📅 补卡（本月剩余 3/3 次）
+                </view>
+                <view class="detail-dashed-btn primary" @tap="handleShareEntry">📤 分享</view>
+
+                <view class="habit-detail-section">
+                    <text class="habit-detail-section-title">最近 7 天</text>
+                    <view class="habit-week-strip">
+                        <view
+                            v-for="day in detailModal.recentDays"
+                            :key="day.date"
+                            class="habit-week-day"
+                            :class="{ checked: day.checked, today: day.isToday }"
+                        >
+                            <text class="habit-week-name">{{ day.label }}</text>
+                            <text class="habit-week-date">{{ day.dayNumber }}</text>
+                            <text class="habit-week-dot">{{ day.checked ? '✓' : '' }}</text>
+                        </view>
+                    </view>
+                </view>
+
+                <view class="habit-detail-actions">
+                    <button
+                        class="detail-action-btn detail-action-btn-muted"
+                        @tap="editHabitFromDetail"
+                    >
+                        编辑
+                    </button>
+                    <button
+                        class="detail-action-btn detail-action-btn-primary"
+                        @tap="handleDetailCheckin"
+                    >
+                        {{ detailModal.checked ? '今日已完成' : '立即打卡' }}
+                    </button>
+                </view>
+                <view class="habit-detail-secondary-actions">
+                    <button class="detail-action-mini" type="button" @tap="handleBackfillEntry">
+                        补卡
+                    </button>
+                    <button class="detail-action-mini" type="button" @tap="handleShareEntry">
+                        分享
+                    </button>
+                </view>
+            </view>
+        </view>
+
         <view v-if="achievementModal.visible" class="achievement-mask" @tap="closeAchievementModal">
             <view class="achievement-modal premium-card" @tap.stop>
                 <text class="achievement-emoji">{{ achievementModal.icon }}</text>
                 <text class="achievement-title">{{ achievementModal.title }}</text>
                 <text class="achievement-desc"
-                    >{{ achievementModal.habitName }} 已连续打卡 {{ achievementModal.days }} 天</text
+                    >{{ achievementModal.habitName }} 已连续打卡
+                    {{ achievementModal.days }} 天</text
                 >
                 <text class="achievement-copy">{{ achievementModal.desc }}</text>
                 <button class="achievement-btn" type="button" @tap="closeAchievementModal">
@@ -159,6 +333,13 @@
             </view>
         </view>
 
+        <HabitFormSheet
+            :visible="showForm"
+            :edit-data="editingHabit"
+            :selected-date="selectedDateLabel"
+            @close="showForm = false; editingHabit = null"
+            @saved="onFormSaved"
+        />
         <PremiumBottomNav active="plan" />
     </view>
 </template>
@@ -168,6 +349,7 @@ import { computed, onMounted, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import PremiumBottomNav from '@/components/PremiumBottomNav.vue'
 import CalendarGrid from '@/components/calendar-grid/CalendarGrid.vue'
+import HabitFormSheet from './components/HabitFormSheet.vue'
 import { checkinHabit, getCalendarMonthly, getHabitStats } from '@/api/plan/habit'
 import { getHolidays } from '@/api/holiday'
 import {
@@ -187,6 +369,7 @@ const MILESTONES = [
 
 const stats = ref({ activeCount: 0, completedCount: 0, totalCheckins: 0 })
 const hasLoaded = ref(false)
+const activeTab = ref('checkin')
 
 const currentYear = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth() + 1)
@@ -197,6 +380,9 @@ const dayHabitRecords = ref([])
 const allHabits = ref([])
 const holidays = ref(null)
 const holidaysYear = ref(0)
+const showForm = ref(false)
+const editingHabit = ref(null)
+
 const achievementModal = ref({
     visible: false,
     icon: '',
@@ -204,6 +390,36 @@ const achievementModal = ref({
     desc: '',
     habitName: '',
     days: 0
+})
+const detailModal = ref({
+    visible: false,
+    habitId: '',
+    name: '',
+    icon: '🎯',
+    description: '',
+    category: '',
+    color: '#5b5bd6',
+    motto: '',
+    trackingType: 'boolean',
+    targetValue: 1,
+    targetUnit: '次',
+    frequencyType: 1,
+    frequencyRule: '',
+    frequencyLabel: '每天',
+    periodLabel: '天',
+    weekRate: 0,
+    checked: false,
+    currentDays: 0,
+    totalDays: 0,
+    startDate: '',
+    endDate: '',
+    reminderTime: '',
+    secondReminder: '',
+    reminderText: '不提醒',
+    allowBackfill: true,
+    note: '',
+    weekCompleted: 0,
+    recentDays: []
 })
 
 const currentWeekDays = computed(() => {
@@ -243,6 +459,10 @@ const dayCheckRate = computed(() => {
     if (!dayHabitRecords.value.length) return 0
     return Math.round((checkedCount.value / dayHabitRecords.value.length) * 100)
 })
+const todayDate = computed(() => {
+    const now = new Date()
+    return formatYYYYMMDD(now.getFullYear(), now.getMonth() + 1, now.getDate())
+})
 const bestHabit = computed(() => {
     if (!allHabits.value.length) return null
     return [...allHabits.value].sort((a, b) => (b.currentDays || 0) - (a.currentDays || 0))[0]
@@ -258,8 +478,33 @@ const unlockedMilestoneCount = computed(() => {
     return milestoneStatus.value.filter((item) => item.unlocked).length
 })
 
+const collapsedGroups = ref({})
+
+const groupedHabits = computed(() => {
+    const groups = {}
+    const active = allHabits.value.filter((h) => !h.endDate)
+    active.forEach((habit) => {
+        const cat = habit.category || '未分类'
+        if (!groups[cat]) groups[cat] = []
+        groups[cat].push(habit)
+    })
+    return groups
+})
+
+const archivedHabits = computed(() => {
+    return allHabits.value.filter((h) => h.endDate)
+})
+
+const toggleGroup = (cat) => {
+    collapsedGroups.value[cat] = !collapsedGroups.value[cat]
+}
+
+const isGroupCollapsed = (cat) => {
+    return !!collapsedGroups.value[cat]
+}
+
 const HABIT_SWIPE_THRESHOLD = 42
-const HABIT_SWIPE_MAX = 92
+const HABIT_SWIPE_MAX = 210
 const habitSwipeOffsets = ref({})
 const openHabitId = ref(null)
 
@@ -327,6 +572,38 @@ const fetchHolidays = async (year = currentYear.value) => {
     }
 }
 
+const formatTimestampDate = (value) => {
+    if (!value) return ''
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return ''
+    return formatYYYYMMDD(date.getFullYear(), date.getMonth() + 1, date.getDate())
+}
+
+const getFrequencyMeta = (habit) => {
+    if (habit.frequencyType === 2) return { label: '每周', period: '周' }
+    if (habit.frequencyType === 3) {
+        try {
+            const parsed = JSON.parse(habit.frequencyRule || '{}')
+            const periodMap = {
+                weekday: ['工作日', '天'],
+                weekend: ['周末', '天'],
+                monthly: ['每月', '月'],
+                daily: ['每天', '天']
+            }
+            const [label, period] = periodMap[parsed.period] || ['自定义', '天']
+            return { label, period }
+        } catch {
+            return { label: '自定义', period: '天' }
+        }
+    }
+    return { label: '每天', period: '天' }
+}
+
+const buildReminderText = (habit) => {
+    const reminders = [habit.reminderTime, habit.secondReminder].filter(Boolean)
+    return reminders.length ? reminders.join(' / ') : '不提醒'
+}
+
 const mapHabitRecordsForDay = (dateStr) => {
     if (!dateStr) return []
     const day = Number(dateStr.split('-')[2])
@@ -337,9 +614,57 @@ const mapHabitRecordsForDay = (dateStr) => {
             habitName: habit.habitName || habit.name || '未命名习惯',
             checked,
             currentDays: habit.currentDays || 0,
-            description: habit.description || ''
+            totalDays: habit.totalDays || 0,
+            description: habit.description || '',
+            icon: habit.icon || '🎯',
+            color: habit.color || '#5b5bd6',
+            category: habit.category || '',
+            motto: habit.motto || '',
+            trackingType: habit.trackingType || 'boolean',
+            targetValue: habit.targetValue || 1,
+            targetUnit: habit.targetUnit || '次',
+            frequencyType: habit.frequencyType || 1,
+            frequencyRule: habit.frequencyRule || '',
+            timePeriod: habit.timePeriod || 'all',
+            allowBackfill: habit.allowBackfill !== false,
+            note: habit.note || '',
+            checkinDays: habit.checkinDays || [],
+            reminderTime: habit.reminderTime || '',
+            secondReminder: habit.secondReminder || '',
+            startDate: formatTimestampDate(habit.startDate),
+            endDate: formatTimestampDate(habit.endDate)
         }
     })
+}
+
+const toHabitRecord = (habit) => {
+    const dateStr = selectedDateLabel.value || todayDate.value
+    const day = Number(dateStr.split('-')[2])
+    return {
+        habitId: habit.habitId || habit.id,
+        habitName: habit.habitName || habit.name || '未命名习惯',
+        checked: (habit.checkinDays || []).includes(day),
+        currentDays: habit.currentDays || 0,
+        totalDays: habit.totalDays || 0,
+        description: habit.description || '',
+        icon: habit.icon || '🎯',
+        color: habit.color || '#5b5bd6',
+        category: habit.category || '',
+        motto: habit.motto || '',
+        trackingType: habit.trackingType || 'boolean',
+        targetValue: habit.targetValue || 1,
+        targetUnit: habit.targetUnit || '次',
+        frequencyType: habit.frequencyType || 1,
+        frequencyRule: habit.frequencyRule || '',
+        timePeriod: habit.timePeriod || 'all',
+        allowBackfill: habit.allowBackfill !== false,
+        note: habit.note || '',
+        checkinDays: habit.checkinDays || [],
+        reminderTime: habit.reminderTime || '',
+        secondReminder: habit.secondReminder || '',
+        startDate: formatTimestampDate(habit.startDate),
+        endDate: formatTimestampDate(habit.endDate)
+    }
 }
 
 const fetchCalendarData = async () => {
@@ -355,6 +680,23 @@ const fetchCalendarData = async () => {
                 habitName: habit.habitName || habit.name || '未命名习惯',
                 description: habit.description || '',
                 currentDays: habit.currentDays || 0,
+                totalDays: habit.totalDays || 0,
+                icon: habit.icon || '🎯',
+                color: habit.color || '#5b5bd6',
+                category: habit.category || '',
+                motto: habit.motto || '',
+                trackingType: habit.trackingType || 'boolean',
+                targetValue: habit.targetValue || 1,
+                targetUnit: habit.targetUnit || '次',
+                frequencyType: habit.frequencyType || 1,
+                frequencyRule: habit.frequencyRule || '',
+                timePeriod: habit.timePeriod || 'all',
+                allowBackfill: habit.allowBackfill !== false,
+                note: habit.note || '',
+                reminderTime: habit.reminderTime || '',
+                secondReminder: habit.secondReminder || '',
+                startDate: habit.startDate || '',
+                endDate: habit.endDate || '',
                 checkinDays: habit.checkinDays || []
             }
         })
@@ -401,6 +743,66 @@ const closeAchievementModal = () => {
     achievementModal.value.visible = false
 }
 
+const closeHabitDetail = () => {
+    detailModal.value.visible = false
+}
+
+const buildRecentDays = (item) => {
+    const checkedDays = new Set((item.checkinDays || []).map((day) => Number(day)))
+    const base = selectedDateLabel.value
+        ? new Date(selectedDateLabel.value.replace(/-/g, '/'))
+        : new Date()
+    const labels = ['日', '一', '二', '三', '四', '五', '六']
+    return Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(base)
+        date.setDate(base.getDate() - 6 + index)
+        const dateStr = formatYYYYMMDD(date.getFullYear(), date.getMonth() + 1, date.getDate())
+        return {
+            date: dateStr,
+            label: labels[date.getDay()],
+            dayNumber: date.getDate(),
+            checked: checkedDays.has(date.getDate()),
+            isToday: dateStr === todayDate.value
+        }
+    })
+}
+
+const openHabitDetail = (item) => {
+    const recentDays = buildRecentDays(item)
+    const weekCompleted = recentDays.filter((day) => day.checked).length
+    const frequencyMeta = getFrequencyMeta(item)
+    detailModal.value = {
+        visible: true,
+        habitId: item.habitId,
+        name: item.habitName,
+        icon: item.icon || '🎯',
+        color: item.color || '#5b5bd6',
+        description: item.description || '',
+        category: item.category || '',
+        motto: item.motto || '',
+        trackingType: item.trackingType || 'boolean',
+        targetValue: item.targetValue || 1,
+        targetUnit: item.targetUnit || '次',
+        frequencyType: item.frequencyType || 1,
+        frequencyRule: item.frequencyRule || '',
+        frequencyLabel: frequencyMeta.label,
+        periodLabel: frequencyMeta.period,
+        checked: item.checked,
+        currentDays: item.currentDays || 0,
+        totalDays: item.totalDays || 0,
+        startDate: item.startDate || '',
+        endDate: item.endDate || '',
+        reminderTime: item.reminderTime || '',
+        secondReminder: item.secondReminder || '',
+        reminderText: buildReminderText(item),
+        allowBackfill: item.allowBackfill !== false,
+        note: item.note || '',
+        weekCompleted,
+        weekRate: Math.round((weekCompleted / 7) * 100),
+        recentDays
+    }
+}
+
 const showAchievementModal = (milestone, habitName) => {
     achievementModal.value = {
         visible: true,
@@ -445,6 +847,111 @@ const onHabitSwipeAction = (item) => {
     handleQuickCheckin(item)
 }
 
+const handleDetailCheckin = async () => {
+    if (detailModal.value.checked) {
+        closeHabitDetail()
+        return
+    }
+    await handleQuickCheckin({
+        habitId: detailModal.value.habitId,
+        currentDays: detailModal.value.currentDays
+    })
+    closeHabitDetail()
+}
+
+const editHabitFromDetail = () => {
+    if (!detailModal.value.habitId) return
+    closeHabitDetail()
+    const habit = allHabits.value.find(
+        (h) => String(h.habitId || h.id) === String(detailModal.value.habitId)
+    )
+    editingHabit.value = habit || { habitId: detailModal.value.habitId }
+    showForm.value = true
+}
+
+const getCardWeekData = (item) => {
+    const checkedDays = new Set((item.checkinDays || []).map((day) => Number(day)))
+    const base = selectedDateLabel.value
+        ? new Date(selectedDateLabel.value.replace(/-/g, '/'))
+        : new Date()
+    const labels = ['日', '一', '二', '三', '四', '五', '六']
+    const weekDays = Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(base)
+        date.setDate(base.getDate() - 6 + index)
+        const dayNum = date.getDate()
+        return {
+            date: date.toISOString().slice(0, 10),
+            label: labels[date.getDay()],
+            dayNumber: dayNum,
+            checked: checkedDays.has(dayNum),
+            isToday: date.toISOString().slice(0, 10) === todayDate.value
+        }
+    })
+    const completed = weekDays.filter((day) => day.checked).length
+    return {
+        weekDays,
+        completed,
+        rate: Math.round((completed / 7) * 100)
+    }
+}
+
+const editHabitFromCheckin = (item) => {
+    const habit = allHabits.value.find(
+        (h) => String(h.habitId || h.id) === String(item.habitId)
+    )
+    editingHabit.value = habit || { habitId: item.habitId }
+    showForm.value = true
+}
+
+const archiveHabit = (item) => {
+    uni.showToast({ title: '归档功能已预留', icon: 'none' })
+}
+
+const moveHabit = (habit, dir, cat) => {
+    const group = groupedHabits.value[cat] || []
+    const idx = group.indexOf(habit)
+    if (idx === -1) return
+    const newIdx = idx + dir
+    if (newIdx < 0 || newIdx >= group.length) return
+    // Swap in the actual allHabits array
+    const aIdx = allHabits.value.indexOf(habit)
+    const aTarget = allHabits.value.indexOf(group[newIdx])
+    if (aIdx === -1 || aTarget === -1) return
+    const tmp = allHabits.value[aIdx]
+    allHabits.value[aIdx] = allHabits.value[aTarget]
+    allHabits.value[aTarget] = tmp
+    // Force reactivity by replacing the array
+    allHabits.value = [...allHabits.value]
+}
+
+const archiveHabitFromManage = (habit) => {
+    const habitId = habit.habitId || habit.id
+    uni.showModal({
+        title: '结束目标',
+        content: `确定要结束「${habit.habitName || habit.name || '未命名习惯'}」吗？`,
+        success: (res) => {
+            if (res.confirm) {
+                // Toggle archived state locally by setting endDate
+                habit.endDate = habit.endDate ? '' : new Date().toISOString().slice(0, 10)
+                uni.showToast({ title: habit.endDate ? '已结束' : '已恢复', icon: 'success' })
+            }
+        }
+    })
+}
+
+const editHabitFromManage = (habit) => {
+    editingHabit.value = habit
+    showForm.value = true
+}
+
+const handleBackfillEntry = () => {
+    uni.showToast({ title: '补卡入口已预留', icon: 'none' })
+}
+
+const handleShareEntry = () => {
+    uni.showToast({ title: '分享入口已预留', icon: 'none' })
+}
+
 const refreshHabitPage = async () => {
     await fetchStats()
     await fetchCalendarData()
@@ -454,7 +961,14 @@ const refreshHabitPage = async () => {
 }
 
 const goAddHabit = () => {
-    uni.navigateTo({ url: '/pages/plan/habit/form' })
+    editingHabit.value = null
+    showForm.value = true
+}
+
+const onFormSaved = async () => {
+    showForm.value = false
+    editingHabit.value = null
+    await refreshHabitPage()
 }
 
 const goStatsPage = () => {
@@ -516,6 +1030,184 @@ onShow(async () => {
     padding-bottom: 20rpx;
 }
 
+.checkin-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 40rpx 24rpx;
+    margin-bottom: 24rpx;
+    border-bottom: 2rpx solid var(--color-border-light);
+}
+
+.checkin-tab {
+    flex: 1;
+    min-height: 70rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8rpx;
+    color: var(--color-text-tertiary);
+    font-size: 28rpx;
+    font-weight: 700;
+    border-bottom: 4rpx solid transparent;
+}
+
+.checkin-tab.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+.tab-badge {
+    font-size: 21rpx;
+    color: inherit;
+    opacity: 0.72;
+}
+
+.section-pad {
+    padding: 0 32rpx 180rpx;
+}
+
+.manage-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: var(--radius-md, 12px);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    animation: cardSlideIn 0.4s ease both;
+}
+.manage-item:hover {
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.manage-item:active {
+    transform: scale(0.96);
+}
+
+.mi-icon {
+    font-size: 24px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.mi-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mi-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.mi-sub {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+}
+
+.mi-action {
+    font-size: 12px;
+    color: var(--color-danger, #ff3b30);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm, 6px);
+    border: none;
+    background: var(--color-danger-soft, rgba(255, 59, 48, 0.1));
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.mi-action:hover {
+    background: var(--color-danger, #ff3b30);
+    color: #fff;
+}
+.mi-action:active {
+    transform: scale(0.94);
+}
+.mi-action:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none !important;
+}
+.mi-action.move-btn {
+    font-size: 14px;
+    padding: 4px 6px;
+    background: var(--color-surface-soft, #f5f5f7);
+    color: var(--color-text-tertiary);
+}
+.mi-action.move-btn:hover {
+    background: var(--color-border-light, #d1d1d6);
+    color: var(--color-text-secondary);
+}
+.mi-action.end-btn {
+    color: var(--color-danger, #ff3b30);
+    background: var(--color-danger-soft, rgba(255, 59, 48, 0.1));
+}
+.manage-actions {
+    display: flex;
+    gap: 2px;
+    margin-right: 4px;
+}
+
+.grp-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm, 6px);
+    cursor: pointer;
+    background: var(--color-surface-soft, #f5f5f7);
+    margin-bottom: 4px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.grp-header:active {
+    transform: scale(0.99);
+}
+.grp-arrow {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    transition: transform 0.2s;
+    display: inline-block;
+}
+.grp-arrow.collapsed {
+    transform: rotate(-90deg);
+}
+.grp-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+.grp-count {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+.manage-item.archived {
+    opacity: 0.5;
+}
+.manage-bottom-btn {
+    padding: 10px 20px;
+    border: 1.5px dashed var(--color-primary);
+    border-radius: var(--radius-sm, 8px);
+    background: transparent;
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+}
+.manage-bottom-btn:active {
+    transform: scale(0.96);
+}
+
+.section-sub {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin: 16px 0 10px;
+    font-weight: 500;
+}
+
 .section-head {
     display: flex;
     justify-content: space-between;
@@ -557,6 +1249,13 @@ onShow(async () => {
 .milestone-card {
     margin: 0 16px 14px;
     padding: 24rpx;
+}
+
+.premium-card {
+    border-radius: 24rpx;
+    background: var(--color-surface, #ffffff);
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .milestone-grid {
@@ -649,7 +1348,7 @@ onShow(async () => {
 
 .overview-bar {
     flex: 1;
-    height: 10rpx;
+    height: 6rpx;
     border-radius: 999rpx;
     background: var(--color-surface-soft);
     overflow: hidden;
@@ -703,14 +1402,15 @@ onShow(async () => {
     color: var(--color-text);
 }
 
-.habit-swipe-wrap {
+/* ===== Goal Card (checkin) ===== */
+.goal-card-wrap {
     position: relative;
-    margin: 0 16px 10px;
-    border-radius: 14px;
+    margin: 0 16px 8px;
+    border-radius: 12px;
     overflow: hidden;
 }
 
-.habit-swipe-actions {
+.goal-card-wrap .swipe-actions {
     position: absolute;
     top: 0;
     right: 0;
@@ -719,119 +1419,244 @@ onShow(async () => {
     display: flex;
 }
 
-.habit-swipe-btn {
-    width: 92px;
+.goal-card-wrap .swipe-action {
+    width: 70px;
     min-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8rpx;
+    gap: 3px;
     color: #fff;
+    font-size: 11px;
+    cursor: pointer;
 }
 
-.habit-swipe-btn-checkin {
+.goal-card-wrap .swipe-action.action-done {
     background: linear-gradient(135deg, var(--color-primary), #8980f0);
 }
 
-.habit-swipe-btn-done {
-    background: linear-gradient(135deg, var(--color-success), #5ac8a0);
+.goal-card-wrap .swipe-action.action-edit {
+    background: var(--color-primary, #ff8700);
 }
 
-.habit-swipe-icon {
-    font-size: 30rpx;
-    font-weight: 700;
+.goal-card-wrap .swipe-action.action-archive {
+    background: var(--color-text-tertiary, #8e8e93);
 }
 
-.habit-swipe-label {
-    font-size: 24rpx;
-    font-weight: 600;
+.goal-card-wrap .swipe-action:hover {
+    opacity: 0.9;
 }
 
-.habit-swipe-content {
+.goal-card-wrap .swipe-action:active {
+    transform: scale(0.95);
+}
+
+.goal-card-wrap .swipe-action .sa-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.goal-card-wrap .swipe-action .sa-label {
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.goal-card-wrap .swipe-content {
     position: relative;
     z-index: 2;
     background: var(--color-surface);
     will-change: transform;
 }
 
-.habit-card {
-    margin: 0;
-    padding: 24rpx 28rpx;
+.goal-card {
+    border-radius: 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    animation: cardSlideIn 0.4s ease both;
 }
 
-.habit-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20rpx;
+.goal-card:hover {
+    box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
 }
 
-.habit-info {
-    display: flex;
-    flex-direction: column;
+.goal-card:active {
+    transform: scale(0.96);
 }
 
-.habit-title-row {
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes donePop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.goal-card.color-border {
+    border-left: 4px solid var(--color-primary);
+}
+
+.goal-card .g-header {
     display: flex;
     align-items: center;
-    gap: 10rpx;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 8px;
 }
 
-.habit-name {
-    font-size: 32rpx;
+.goal-card .g-icon {
+    font-size: 32px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.goal-card .g-name {
+    font-size: 16px;
     font-weight: 600;
     color: var(--color-text);
+    flex: 1;
+    margin-left: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.habit-chip {
-    font-size: 20rpx;
-    color: var(--color-primary);
-    background: var(--color-primary-soft);
-    padding: 4rpx 14rpx;
-    border-radius: 999rpx;
+.goal-card .g-badge {
+    font-size: 10px;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+    flex-shrink: 0;
 }
 
-.habit-desc {
-    margin-top: 8rpx;
-    font-size: 24rpx;
-    color: var(--color-text-secondary);
+.goal-card .g-streak {
+    font-size: 12px;
+    color: var(--color-warning, #f0a020);
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.habit-footer {
+.goal-card .g-streak .fire-icon {
+    display: inline-block;
+    animation: firePulse 2s infinite;
+}
+
+@keyframes firePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.goal-card .g-progress {
+    margin-bottom: 10px;
+}
+
+.goal-card .g-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-border-light, #d1d1d6);
+    overflow: hidden;
+    position: relative;
+}
+
+.goal-card .g-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    transition: width 0.5s ease;
+}
+
+.goal-card .g-progress-label {
+    font-size: 10px;
+    color: var(--color-text-tertiary, #b0b0b5);
+    margin-top: 3px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-top: 18rpx;
 }
 
-.streak-text {
-    font-size: 24rpx;
-    color: var(--color-text-secondary);
-    background: var(--color-surface-soft);
-    padding: 6rpx 16rpx;
-    border-radius: 999rpx;
+.goal-card .g-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border-light, #d1d1d6);
+}
+
+.goal-card .g-week {
+    display: flex;
+    gap: 3px;
+}
+
+.goal-card .g-week-day {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    background: var(--color-surface-soft, #f5f5f7);
+    color: var(--color-text-tertiary, #b0b0b5);
+}
+
+.goal-card .g-week-day.done {
+    background: var(--color-success-soft, rgba(52, 199, 89, 0.12));
+    color: var(--color-success, #34c759);
+}
+
+.goal-card .g-week-day.today {
+    border: 1.5px solid var(--color-primary, #ff8700);
 }
 
 .checkin-btn {
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--color-border, #d1d1d6);
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--color-text-tertiary, #b0b0b5);
+    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.checkin-btn:hover {
+    transform: scale(1.05);
+}
+
+.checkin-btn.checked {
+    background: var(--color-success, #34c759);
+    border-color: var(--color-success, #34c759);
     color: #fff;
-    font-size: 26rpx;
-    padding: 8rpx 30rpx;
-    border-radius: 999rpx;
-    border: none;
-    line-height: 1.8;
+    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
 }
 
-.checked-text {
-    font-size: 24rpx;
-    color: var(--color-success);
-}
-
-.swipe-hint-text {
-    font-size: 24rpx;
-    color: var(--color-text-tertiary);
+.checkin-btn:active {
+    transform: scale(0.9);
 }
 
 .floating-add {
@@ -849,6 +1674,14 @@ onShow(async () => {
     justify-content: center;
     font-size: 64rpx;
     box-shadow: var(--shadow-glow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.floating-add:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12rpx 40rpx rgba(var(--color-primary-rgb, 255, 135, 0), 0.3);
+}
+.floating-add:active {
+    transform: scale(0.95);
 }
 
 .empty-state {
@@ -872,19 +1705,326 @@ onShow(async () => {
     position: fixed;
     inset: 0;
     z-index: 120;
-    background: rgba(15, 23, 42, 0.42);
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 32rpx;
 }
 
+.habit-detail-overlay {
+    align-items: flex-end;
+    padding: 0 0 calc(env(safe-area-inset-bottom));
+}
+
 .achievement-modal {
-    width: 100%;
-    max-width: 620rpx;
-    padding: 36rpx 32rpx;
+    width: 90%;
+    max-width: 560rpx;
+    padding: 40rpx 32rpx;
     border-radius: 32rpx;
     text-align: center;
+    animation: achievementPopIn 0.4s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes achievementPopIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.habit-detail-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 18rpx 24px calc(28rpx + env(safe-area-inset-bottom));
+    border-radius: 32rpx 32rpx 0 0;
+    background: var(--color-surface);
+    box-shadow: 0 -8rpx 40rpx rgba(15, 23, 42, 0.12);
+}
+
+.modal-handle {
+    width: 72rpx;
+    height: 8rpx;
+    border-radius: 999rpx;
+    background: var(--color-border);
+    margin: 0 auto 18rpx;
+}
+
+.habit-detail-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20rpx;
+}
+
+.habit-detail-hero {
+    display: flex;
+    align-items: center;
+    gap: 18rpx;
+}
+
+.habit-detail-icon {
+    width: 88rpx;
+    height: 88rpx;
+    border-radius: 20rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-soft);
+    font-size: 54rpx;
+}
+
+.habit-detail-copy {
+    display: flex;
+    flex-direction: column;
+}
+
+.habit-detail-name {
+    font-size: 40rpx;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.habit-detail-sub {
+    margin-top: 6rpx;
+    font-size: 22rpx;
+    color: var(--color-text-secondary);
+}
+
+.habit-streak-badge {
+    padding: 8rpx 24rpx;
+    border-radius: 12rpx;
+    background: var(--color-surface-soft);
+    font-size: 24rpx;
+    font-weight: 800;
+}
+
+.habit-detail-stats {
+    margin-top: 24rpx;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14rpx;
+}
+
+.habit-detail-stat {
+    padding: 22rpx 12rpx;
+    border-radius: 18rpx;
+    background: var(--color-surface-soft);
+    text-align: center;
+}
+
+.habit-detail-stat-num {
+    display: block;
+    font-size: 42rpx;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.habit-detail-stat-num.primary {
+    color: var(--color-primary);
+}
+
+.habit-detail-stat-num.warning {
+    color: var(--color-warning);
+}
+
+.habit-detail-stat-label {
+    display: block;
+    margin-top: 6rpx;
+    font-size: 20rpx;
+    color: var(--color-text-secondary);
+}
+
+.habit-detail-note-card {
+    margin-top: 20rpx;
+    padding: 18rpx 24rpx;
+    border-radius: 18rpx;
+    background: var(--color-surface-soft);
+    text-align: center;
+}
+
+.habit-detail-note-card.primary-mist {
+    background: var(--color-primary-soft);
+    text-align: left;
+}
+
+.habit-detail-motto {
+    display: block;
+    font-size: 23rpx;
+    line-height: 1.5;
+    color: var(--color-text-tertiary);
+}
+
+.habit-detail-lines {
+    margin-top: 18rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 10rpx;
+}
+
+.habit-detail-line {
+    font-size: 23rpx;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+}
+
+.detail-dashed-btn {
+    margin-top: 16rpx;
+    min-height: 74rpx;
+    border-radius: 18rpx;
+    border: 3rpx dashed var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25rpx;
+    font-weight: 700;
+    background: transparent;
+}
+
+.detail-dashed-btn.primary {
+    color: var(--color-primary);
+}
+
+.detail-dashed-btn.warning {
+    color: var(--color-warning);
+    border-color: var(--color-warning);
+}
+
+.habit-detail-section {
+    margin-top: 22rpx;
+    padding-top: 18rpx;
+    border-top: 1rpx solid var(--color-border-light);
+}
+
+.habit-detail-section-title {
+    display: block;
+    font-size: 24rpx;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 12rpx;
+}
+
+.habit-detail-desc {
+    display: block;
+    font-size: 24rpx;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.habit-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18rpx;
+    padding: 10rpx 0;
+}
+
+.habit-detail-label {
+    font-size: 22rpx;
+    color: var(--color-text-tertiary);
+}
+
+.habit-detail-value {
+    font-size: 22rpx;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.habit-week-strip {
+    display: flex;
+    gap: 8rpx;
+}
+
+.habit-week-day {
+    flex: 1;
+    min-height: 88rpx;
+    border-radius: 16rpx;
+    background: var(--color-surface-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6rpx;
+}
+
+.habit-week-day.checked {
+    background: var(--color-primary-mist);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+}
+
+.habit-week-day.today {
+    box-shadow: inset 0 0 0 2rpx var(--color-primary);
+}
+
+.habit-week-name {
+    font-size: 20rpx;
+    color: var(--color-text-tertiary);
+}
+
+.habit-week-dot {
+    min-height: 16rpx;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16rpx;
+    font-weight: 700;
+}
+
+.habit-week-date {
+    font-size: 18rpx;
+    color: var(--color-text-tertiary);
+    opacity: 0.72;
+}
+
+.habit-detail-actions {
+    display: flex;
+    gap: 16rpx;
+    margin-top: 26rpx;
+}
+
+.habit-detail-secondary-actions {
+    display: none;
+}
+
+.detail-action-btn {
+    flex: 1;
+    height: 84rpx;
+    border: none;
+    border-radius: 999rpx;
+    font-size: 26rpx;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+.detail-action-btn-muted {
+    background: var(--color-surface-soft);
+    color: var(--color-text-secondary);
+    border: 1rpx solid var(--color-border-light);
+}
+
+.detail-action-btn-primary {
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    color: #fff;
+    box-shadow: var(--shadow-glow);
+}
+
+.detail-action-mini {
+    height: 70rpx;
+    border-radius: 999rpx;
+    border: 1rpx solid var(--color-border-light);
+    background: var(--color-surface-soft);
+    color: var(--color-text-secondary);
+    font-size: 24rpx;
+    font-weight: 700;
 }
 
 .achievement-emoji {

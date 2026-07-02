@@ -1,6 +1,6 @@
 <template>
-    <view class="plan-form-page">
-        <view class="modal-sheet">
+    <view v-if="visible" class="form-overlay" @tap.self="emit('close')">
+        <view class="form-sheet">
             <view class="modal-handle"></view>
             <text class="modal-title">{{ isEdit ? '编辑目标' : '新建目标' }}</text>
 
@@ -42,6 +42,7 @@
                             placeholder="如：每日跑步"
                             placeholder-class="field-placeholder"
                         />
+                        <view class="focus-bar"></view>
                     </view>
                 </view>
 
@@ -49,6 +50,7 @@
                     <text class="fg-label">🎯 目标值</text>
                     <view class="fg-input-wrap">
                         <input v-model="form.targetValue" class="fg-input" type="number" />
+                        <view class="focus-bar"></view>
                     </view>
                 </view>
 
@@ -92,6 +94,7 @@
                                 placeholder="次"
                                 placeholder-class="field-placeholder"
                             />
+                            <view class="focus-bar"></view>
                         </view>
                     </view>
                 </view>
@@ -119,6 +122,7 @@
                             placeholder="给自己的鼓励"
                             placeholder-class="field-placeholder"
                         />
+                        <view class="focus-bar"></view>
                     </view>
                 </view>
             </view>
@@ -243,6 +247,7 @@
                             <text class="fg-label">目标天数</text>
                             <view class="fg-input-wrap">
                                 <input v-model="form.targetDays" class="fg-input" type="number" />
+                                <view class="focus-bar"></view>
                             </view>
                         </view>
                     </view>
@@ -260,11 +265,16 @@
             </view>
 
             <view class="btn-row">
-                <button class="btn-secondary" type="button" @tap="goBack">取消</button>
+                <button class="btn-secondary" type="button" @tap="emit('close')">取消</button>
                 <button class="btn-secondary template-btn" type="button" @tap="saveAsTemplate">
                     💾 存为模板
                 </button>
-                <button class="btn-primary" type="button" :disabled="submitting" @tap="handleSave">
+                <button
+                    class="btn-primary"
+                    type="button"
+                    :disabled="submitting"
+                    @tap="handleSave"
+                >
                     {{ submitting ? '保存中...' : '保存打卡' }}
                 </button>
             </view>
@@ -273,10 +283,16 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
-import { addHabit, getHabitDetail, updateHabit } from '@/api/plan/habit'
+import { computed, reactive, ref, watch } from 'vue'
 import { formatYYYYMMDD } from '@/components/calendar-grid/calendar-utils.js'
+import { addHabit, getHabitDetail, updateHabit } from '@/api/plan/habit'
+
+const props = defineProps({
+    visible: { type: Boolean, default: false },
+    editData: { type: Object, default: null },
+    selectedDate: { type: String, default: '' }
+})
+const emit = defineEmits(['close', 'saved'])
 
 const categoryOptions = ['健康', '学习', '工作', '生活']
 const frequencyPeriods = [
@@ -381,12 +397,30 @@ const timePeriodIndex = computed(() => {
 })
 const timePeriodLabels = computed(() => timePeriods.map((item) => item.label))
 
-onLoad(async (query = {}) => {
-    if (query.id) {
-        editId.value = query.id
-        await loadDetail(query.id)
-    }
-})
+const resetForm = () => {
+    const today = new Date()
+    form.name = ''
+    form.description = ''
+    form.motto = ''
+    form.themeKey = 'goal'
+    form.color = '#5b5bd6'
+    form.category = '健康'
+    form.targetValue = 1
+    form.targetUnit = '次'
+    form.trackingType = 'boolean'
+    form.note = ''
+    form.targetDays = 30
+    form.freqTarget = 1
+    form.freqPeriod = 'daily'
+    form.timePeriod = 'all'
+    form.allowBackfill = true
+    form.restDays = []
+    form.startDate = formatYYYYMMDD(today.getFullYear(), today.getMonth() + 1, today.getDate())
+    form.endDate = ''
+    form.reminderTime = '09:00'
+    form.secondReminder = ''
+    moreOpen.value = false
+}
 
 const normalizeDate = (dateStr) => dateStr.replace(/-/g, '/')
 const formatDateValue = (value) => {
@@ -454,6 +488,35 @@ const loadDetail = async (id) => {
     }
 }
 
+watch(() => props.visible, async (val) => {
+    if (val) {
+        const edit = props.editData
+        if (edit && edit.habitId) {
+            editId.value = edit.habitId
+            await loadDetail(edit.habitId)
+        } else if (edit && edit.id) {
+            editId.value = edit.id
+            await loadDetail(edit.id)
+        } else if (edit && edit.habitId === undefined && edit.id === undefined && edit.name) {
+            editId.value = ''
+            resetForm()
+            form.name = edit.name || ''
+            form.description = edit.description || ''
+            form.motto = edit.motto || ''
+            form.color = edit.color || '#5b5bd6'
+            form.category = edit.category || '健康'
+            form.targetValue = edit.targetValue || 1
+            form.targetUnit = edit.targetUnit || '次'
+            form.trackingType = edit.trackingType || 'boolean'
+            form.icon = edit.icon || ''
+            form.themeKey = habitThemes.find((t) => t.icon === edit.icon)?.key || 'goal'
+        } else {
+            editId.value = ''
+            resetForm()
+        }
+    }
+})
+
 const toggleIconPicker = () => {
     iconPickerVisible.value = !iconPickerVisible.value
 }
@@ -504,14 +567,6 @@ const toggleRestDay = (value) => {
         return
     }
     form.restDays = [...form.restDays, value]
-}
-
-const goBack = () => {
-    uni.navigateBack()
-}
-
-const saveAsTemplate = () => {
-    uni.showToast({ title: '模板入口已预留', icon: 'none' })
 }
 
 const buildFrequencyRule = () => {
@@ -593,34 +648,55 @@ const handleSave = async () => {
             await addHabit(payload)
             uni.showToast({ title: '保存成功', icon: 'success' })
         }
-        setTimeout(() => uni.navigateBack(), 500)
+        emit('saved')
+        emit('close')
     } catch (error) {
         console.error(error)
     } finally {
         submitting.value = false
     }
 }
+
+const saveAsTemplate = () => {
+    uni.setStorageSync('habit-template-draft', buildPayload())
+    uni.showToast({ title: '已存为模板', icon: 'success' })
+}
 </script>
 
 <style scoped lang="scss">
-.plan-form-page {
-    min-height: 100vh;
-    background: var(--color-bg-app);
-    padding: 20rpx 18rpx calc(env(safe-area-inset-bottom) + 30rpx);
-    box-sizing: border-box;
+.form-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(15, 23, 42, 0.42);
+    display: flex;
+    align-items: flex-end;
+    animation: fadeIn 0.2s ease;
 }
 
-.modal-sheet {
-    max-width: 720rpx;
-    margin: 0 auto;
-    padding: 24rpx;
-    border-radius: 30rpx;
-    background: var(--color-surface);
-    box-shadow: 0 24rpx 70rpx rgba(15, 23, 42, 0.12);
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.form-sheet {
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 18rpx 18rpx calc(30rpx + env(safe-area-inset-bottom));
+    border-radius: 32rpx 32rpx 0 0;
+    background: var(--color-bg-app);
+    box-shadow: 0 -8rpx 40rpx rgba(15, 23, 42, 0.12);
+    animation: sheetSlideUp 0.3s cubic-bezier(.22,1,.36,1);
+}
+
+@keyframes sheetSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
 }
 
 .modal-handle {
-    width: 76rpx;
+    width: 72rpx;
     height: 8rpx;
     border-radius: 999rpx;
     background: var(--color-border);
@@ -641,14 +717,35 @@ const handleSave = async () => {
     border-radius: 24rpx;
     background: var(--color-surface-soft);
     border: 2rpx solid var(--color-border-light);
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+    animation: cardSlideIn 0.4s ease both;
+}
+
+.form-card-schedule:hover {
+    transform: translateY(-2rpx);
+    box-shadow: 0 12rpx 36rpx rgba(15, 23, 42, 0.08);
+}
+
+.form-card-schedule:active {
+    transform: translateY(0);
+    box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.04);
 }
 
 .form-card-header {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
     margin-bottom: 18rpx;
     font-size: 29rpx;
     font-weight: 800;
-    color: var(--color-text);
+    color: var(--color-primary);
+}
+
+.form-card-header::after {
+    content: '';
+    flex: 1;
+    height: 2rpx;
+    background: var(--color-border-light);
 }
 
 .fgs-full {
@@ -695,6 +792,29 @@ const handleSave = async () => {
     border-radius: 18rpx;
     border: 2rpx solid var(--color-border-light);
     background: var(--color-surface);
+    transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+}
+
+.fg-input:hover,
+.fg-select:hover,
+.fg-textarea:hover {
+    border-color: var(--color-border-hover, #c8ccd8);
+    background: var(--color-surface);
+}
+
+.fg-input:focus,
+.fg-select:focus,
+.fg-textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4rpx rgba(var(--color-primary-rgb), 0.12);
+    background: var(--color-surface);
+}
+
+.fg-input:focus-visible,
+.fg-select:focus-visible,
+.fg-textarea:focus-visible {
+    outline: 2rpx solid var(--color-primary);
+    outline-offset: 1rpx;
 }
 
 .fg-input,
@@ -732,6 +852,22 @@ const handleSave = async () => {
     display: flex;
     align-items: center;
     gap: 16rpx;
+    transition: border-color 0.22s, background 0.22s;
+    cursor: pointer;
+}
+
+.icon-preview-row:hover {
+    border-color: var(--color-border-hover, #c8ccd8);
+    background: var(--color-surface-hover, #f2f4f8);
+}
+
+.icon-preview-row:active {
+    transform: scale(0.98);
+}
+
+.icon-preview-row:focus-visible {
+    outline: 2rpx solid var(--color-primary);
+    outline-offset: 1rpx;
 }
 
 .ip-badge,
@@ -756,6 +892,11 @@ const handleSave = async () => {
 .ip-arrow {
     font-size: 34rpx;
     color: var(--color-text-tertiary);
+    transition: transform 0.3s ease;
+}
+
+.icon-preview-row:hover .ip-arrow {
+    transform: translateX(3rpx);
 }
 
 .icon-grid {
@@ -776,6 +917,17 @@ const handleSave = async () => {
     align-items: center;
     justify-content: center;
     gap: 8rpx;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+
+.icon-chip:hover {
+    border-color: var(--color-primary);
+    background: var(--color-surface-hover, #f2f4f8);
+}
+
+.icon-chip:active {
+    transform: scale(0.95);
 }
 
 .icon-chip.active {
@@ -806,12 +958,27 @@ const handleSave = async () => {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+
+.track-type-opt:hover {
+    border-color: var(--color-primary);
+}
+
+.track-type-opt:active {
+    transform: scale(0.96);
 }
 
 .track-type-opt.active {
     border-color: var(--color-primary);
     background: var(--color-primary-soft);
     color: var(--color-primary);
+}
+
+.track-type-opt:focus-visible {
+    outline: 2rpx solid var(--color-primary);
+    outline-offset: 1rpx;
 }
 
 .freq-row {
@@ -841,11 +1008,41 @@ const handleSave = async () => {
     border-radius: 999rpx;
     border: 4rpx solid #fff;
     box-shadow: 0 0 0 2rpx rgba(15, 23, 42, 0.08);
+    transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+    cursor: pointer;
+}
+
+.color-opt:hover {
+    transform: scale(1.12);
+    box-shadow: 0 2rpx 12rpx rgba(15, 23, 42, 0.16);
+}
+
+.color-opt:active {
+    transform: scale(0.92);
 }
 
 .color-opt.active {
     box-shadow: 0 0 0 5rpx var(--color-primary-soft);
     transform: scale(1.08);
+    position: relative;
+}
+
+.color-opt.active::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 26rpx;
+    font-weight: 700;
+    mix-blend-mode: exclusion;
+}
+
+.color-opt:focus-visible {
+    outline: 2rpx solid var(--color-primary);
+    outline-offset: 2rpx;
 }
 
 .switch-row {
@@ -867,7 +1064,21 @@ const handleSave = async () => {
     border-radius: 999rpx;
     background: var(--color-border);
     box-sizing: border-box;
-    transition: background 0.2s ease;
+    transition: background 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+}
+
+.slider-toggle:hover {
+    transform: scale(1.04);
+}
+
+.slider-toggle:active {
+    transform: scale(0.94);
+}
+
+.slider-toggle:focus-visible {
+    outline: 2rpx solid var(--color-primary);
+    outline-offset: 2rpx;
 }
 
 .slider-toggle.on {
@@ -879,11 +1090,18 @@ const handleSave = async () => {
     height: 42rpx;
     border-radius: 999rpx;
     background: #fff;
-    transition: transform 0.2s ease;
+    box-shadow: 0 1rpx 4rpx rgba(0,0,0,0.15);
+    transition: left 0.35s cubic-bezier(.34,1.56,.64,1), transform 0.35s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+    left: 4rpx;
 }
 
 .slider-toggle.on .knob {
-    transform: translateX(42rpx);
+    left: 46rpx;
+}
+
+.slider-toggle:active .knob {
+    transform: scale(0.92);
 }
 
 .more-card {
@@ -894,15 +1112,46 @@ const handleSave = async () => {
     font-size: 26rpx;
     font-weight: 800;
     color: var(--color-text);
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: color 0.25s;
+    display: flex;
+    align-items: center;
+}
+
+.more-summary:hover {
+    color: var(--color-primary);
+}
+
+.more-summary:focus-visible {
+    outline: 2rpx solid var(--color-primary);
+    outline-offset: 1rpx;
+}
+
+.more-summary.active {
+    color: var(--color-primary);
 }
 
 .arrow {
     margin-right: 8rpx;
     color: var(--color-primary);
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+    display: inline-block;
+}
+
+.arrow.open {
+    transform: rotate(180deg);
 }
 
 .more-body {
     margin-top: 18rpx;
+    opacity: 0;
+    transition: opacity 0.35s ease, margin-top 0.35s ease;
+}
+
+.more-body.open {
+    opacity: 1;
 }
 
 .rest-days-strip {
@@ -923,6 +1172,15 @@ const handleSave = async () => {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.rd-btn:hover {
+    border-color: var(--color-primary);
+}
+
+.rd-btn:active {
+    transform: scale(0.92);
 }
 
 .rd-btn.active {
@@ -931,14 +1189,17 @@ const handleSave = async () => {
     color: var(--color-primary);
 }
 
-.btn-row {
+.form-actions {
     display: flex;
     gap: 14rpx;
     margin-top: 22rpx;
+    padding-top: 14rpx;
+    border-top: 1rpx solid var(--color-border-light);
 }
 
-.btn-primary,
-.btn-secondary {
+.btn-save,
+.btn-cancel {
+    flex: 1;
     height: 86rpx;
     border-radius: 18rpx;
     border: none;
@@ -947,6 +1208,92 @@ const handleSave = async () => {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s, color 0.25s;
+}
+
+.btn-save {
+    flex: 1.15;
+    color: #fff;
+    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-save:hover {
+    transform: translateY(-1rpx);
+    box-shadow: 0 8rpx 32rpx rgba(var(--color-primary-rgb), 0.3);
+}
+
+.btn-save:active {
+    transform: scale(0.97);
+    box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
+}
+
+.btn-cancel {
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+    border: 2rpx solid var(--color-border-light);
+}
+
+.btn-cancel:hover {
+    background: var(--color-border-light);
+    color: var(--color-text);
+}
+
+.btn-cancel:active {
+    transform: scale(0.97);
+}
+
+.btn-save[disabled] {
+    opacity: 0.65;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btn-row {
+    display: flex;
+    gap: 14rpx;
+    margin-top: 22rpx;
+    padding-top: 14rpx;
+    border-top: 1rpx solid var(--color-border-light);
+}
+
+.btn-primary,
+.btn-secondary {
+    flex: 1;
+    min-height: 86rpx;
+    border-radius: 18rpx;
+    border: none;
+    font-size: 27rpx;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s, background 0.25s, color 0.25s;
+}
+
+.btn-primary::after,
+.btn-secondary::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    padding-bottom: 100%;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    transform: translate(-50%,-50%) scale(0);
+    transition: transform 0.5s cubic-bezier(.22,1,.36,1), opacity 0.35s;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.btn-primary:active::after,
+.btn-secondary:active::after {
+    transform: translate(-50%,-50%) scale(2.5);
+    opacity: 1;
+    transition-duration: 0s;
 }
 
 .btn-primary {
@@ -956,19 +1303,62 @@ const handleSave = async () => {
     box-shadow: var(--shadow-glow);
 }
 
+.btn-primary:hover {
+    transform: translateY(-1rpx);
+    box-shadow: 0 6rpx 28rpx rgba(var(--color-primary-rgb), 0.3);
+}
+
+.btn-primary:active {
+    transform: scale(0.97);
+    box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
+}
+
+.btn-primary:focus-visible {
+    outline: 2rpx solid var(--color-primary);
+    outline-offset: 1rpx;
+}
+
 .btn-secondary {
-    flex: 1;
     color: var(--color-text-secondary);
     background: var(--color-surface);
     border: 2rpx solid var(--color-border-light);
 }
 
+.btn-secondary:hover {
+    background: var(--color-border-light);
+    color: var(--color-text);
+}
+
+.btn-secondary:active {
+    transform: scale(0.97);
+}
+
+.btn-secondary:focus-visible {
+    outline: 2rpx solid var(--color-primary);
+    outline-offset: 1rpx;
+}
+
 .template-btn {
-    flex: 1.08;
+    flex: 1.05;
 }
 
 .btn-primary[disabled] {
     opacity: 0.65;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.form-sheet::-webkit-scrollbar {
+    width: 4px;
+}
+
+.form-sheet::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.form-sheet::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
 }
 
 @media (max-width: 360px) {
@@ -976,8 +1366,60 @@ const handleSave = async () => {
         grid-template-columns: 1fr;
     }
 
+    .form-actions,
     .btn-row {
         flex-direction: column;
+    }
+}
+
+/* ===== Focus bar for input wraps ===== */
+.fg-input-wrap {
+    position: relative;
+}
+
+.focus-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4rpx;
+    border-radius: 2rpx;
+    background: var(--color-primary);
+    opacity: 0;
+    transition: opacity 0.22s ease;
+    pointer-events: none;
+}
+
+.fg-input-wrap:focus-within .focus-bar {
+    opacity: 1;
+}
+
+/* ===== Placeholder style ===== */
+::v-deep .field-placeholder {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* ===== Keyframe animations ===== */
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes sheetSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(12rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 </style>
