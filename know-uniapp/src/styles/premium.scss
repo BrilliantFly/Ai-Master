@@ -188,6 +188,91 @@
 .premium-anim-delay-2 { animation-delay: 0.10s; }
 .premium-anim-delay-3 { animation-delay: 0.15s; }
 
+/* ============================================
+   交互效果系统 (移植自首页预览_v3)
+   ============================================ */
+
+/* ---- 入场动画 ---- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.premium-fade-in { animation: fadeUp 0.5s ease both; }
+
+/* 交错延迟 (适配首页/日程/打卡等场景) */
+.premium-d1 { animation-delay: 0.05s; }
+.premium-d2 { animation-delay: 0.10s; }
+.premium-d3 { animation-delay: 0.15s; }
+.premium-d4 { animation-delay: 0.20s; }
+.premium-d5 { animation-delay: 0.25s; }
+.premium-d6 { animation-delay: 0.30s; }
+.premium-d7 { animation-delay: 0.35s; }
+
+/* ---- 卡片悬浮提升 (hover lift + shadow) ---- */
+.premium-hover-lift {
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.premium-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: transparent;
+}
+.premium-hover-lift:active {
+  transform: scale(0.97);
+}
+
+/* ---- 图标悬浮缩放 ---- */
+.premium-icon-scale {
+  transition: transform 0.2s ease;
+}
+.premium-hover-scale-parent:hover .premium-icon-scale {
+  transform: scale(1.1);
+}
+
+/* ---- 列表项/卡片背景悬浮 ---- */
+.premium-hover-bg {
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.premium-hover-bg:hover {
+  background: var(--color-surface);
+}
+.premium-hover-bg:active {
+  transform: scale(0.96);
+}
+
+/* ---- 悬浮阴影 (不用lift) ---- */
+.premium-hover-shadow {
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+.premium-hover-shadow:hover {
+  box-shadow: var(--shadow-md);
+}
+.premium-hover-shadow:active {
+  transform: scale(0.96);
+}
+
+/* ---- 通用按压缩放 ---- */
+.premium-press:active {
+  transform: scale(0.96);
+}
+
+/* ---- 节点头部「更多」链接 ---- */
+.premium-more-link {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: color var(--duration) var(--ease);
+}
+.premium-more-link:hover {
+  color: var(--color-primary);
+}
+
 /* ===== 通用卡片 ===== */
 .premium-card {
   background: var(--color-surface);
@@ -195,6 +280,10 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   transition: all var(--duration) var(--ease);
+}
+.premium-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
 }
 .premium-card:active {
   transform: scale(0.97);
@@ -487,3 +576,5 @@
   font-size: 28rpx;
   color: var(--color-primary);
 }
+
+/* uni-app view 元素不响应 CSS :hover，已改用 JS toggle(.hover-active) 方案在组件内实现 */

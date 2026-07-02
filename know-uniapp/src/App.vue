@@ -69,6 +69,11 @@ onLaunch(async () => {
 })
 </script>
 <style lang="scss">
+@import './styles/variables.scss';
+@import './styles/themes.scss';
+@import './styles/public.scss';
+@import './styles/premium.scss';
+
 page {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;

@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
 import { useRouter } from 'uniapp-router-next'
@@ -231,6 +231,29 @@ const navigate = (item: NavItem) => {
 onShow(() => {
     fetchTabbar()
 })
+
+// uni-app view 元素不支持任何鼠标事件，改用 document-level capture 监听器
+let navHoverEl = null
+function onDocNavMove (e) {
+    const nav = e.target.closest('.premium-bottom-nav')
+    if (!nav) {
+        if (navHoverEl) { navHoverEl.classList.remove('hover-active'); navHoverEl = null }
+        return
+    }
+    const el = e.target.closest('.nav-item')
+    if (el !== navHoverEl) {
+        if (navHoverEl) navHoverEl.classList.remove('hover-active')
+        navHoverEl = el
+        if (navHoverEl) navHoverEl.classList.add('hover-active')
+    }
+}
+onMounted(() => {
+    document.addEventListener('mousemove', onDocNavMove, { capture: true })
+})
+onUnmounted(() => {
+    document.removeEventListener('mousemove', onDocNavMove, { capture: true })
+    if (navHoverEl) { navHoverEl.classList.remove('hover-active'); navHoverEl = null }
+})
 </script>
 
 <style scoped lang="scss">
@@ -265,7 +288,7 @@ onShow(() => {
     color: var(--color-text-tertiary);
     transition: color var(--duration) var(--ease);
 }
-
+.nav-item.hover-active { color: var(--color-primary); }
 .nav-item.active {
     color: var(--color-primary);
 }
