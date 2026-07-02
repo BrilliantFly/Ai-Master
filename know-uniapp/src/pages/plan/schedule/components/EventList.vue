@@ -1,7 +1,7 @@
 <template>
     <view class="event-list">
         <!-- 日期标题 -->
-        <view class="day-section" v-if="selectedDateLabel">
+        <view class="day-section premium-fade-in premium-d2" v-if="selectedDateLabel">
             <view class="day-header">
                 <text class="day-label">{{ selectedDateLabel }} 的日程</text>
                 <text class="day-count" v-if="filteredEvents.length"
@@ -10,13 +10,14 @@
             </view>
 
             <!-- 四象限筛选 -->
-            <scroll-view scroll-x class="filter-scroll" show-scrollbar="false">
+            <scroll-view scroll-x class="filter-scroll premium-fade-in premium-d3" show-scrollbar="false">
                 <view class="filter-list">
                     <view
                         v-for="q in quadrants"
                         :key="q.value"
                         class="filter-pill"
                         :class="{ active: currentQuadrant === q.value }"
+                        :style="currentQuadrant === q.value ? { background: q.color + '26', color: q.color } : {}"
                         @tap="$emit('quadrantChange', q.value)"
                     >
                         <view class="pill-dot" :style="{ background: q.color }"></view>
@@ -42,13 +43,17 @@
         >
             <!-- 操作按钮（左滑后露出） -->
             <view class="swipe-actions">
-                <view class="swipe-btn swipe-btn-done" @tap.stop="onSwipeAction('done', item)">
-                    <text class="swipe-btn-icon">✓</text>
-                    <text class="swipe-btn-label">完成</text>
+                <view class="swipe-action action-done" @tap.stop="onSwipeAction('done', item)">
+                    <text class="sa-icon">{{ completedMap[item.id] ? '↩' : '✓' }}</text>
+                    <text class="sa-label">{{ completedMap[item.id] ? '取消' : '完成' }}</text>
                 </view>
-                <view class="swipe-btn swipe-btn-delete" @tap.stop="onSwipeAction('delete', item)">
-                    <text class="swipe-btn-icon">✕</text>
-                    <text class="swipe-btn-label">删除</text>
+                <view class="swipe-action action-edit" @tap.stop="onSwipeAction('edit', item)">
+                    <text class="sa-icon">✏️</text>
+                    <text class="sa-label">编辑</text>
+                </view>
+                <view class="swipe-action action-delete" @tap.stop="onSwipeAction('delete', item)">
+                    <text class="sa-icon">🗑</text>
+                    <text class="sa-label">删除</text>
                 </view>
             </view>
 
@@ -61,44 +66,30 @@
                 @touchend="onTouchEnd($event, item.id)"
                 @tap="onCardTap(item)"
             >
-                <view class="schedule-card" :class="{ completed: completedMap[item.id] }">
-                    <view class="check-col">
-                        <view
-                            class="check-circle"
-                            :class="{ checked: completedMap[item.id] }"
-                            @tap.stop="$emit('check', item)"
-                        >
-                            <text v-if="completedMap[item.id]">✓</text>
-                        </view>
+                <view class="s-card premium-hover-lift" :class="{ done: completedMap[item.id] }">
+                    <view class="quadrant-bar" :style="{ background: getQuadrantColor(item.quadrant) }"></view>
+                    <view class="time-col">
+                        <text class="t">{{ formatTime(item.startTime) }}</text>
+                        <text v-if="item.endTime" class="t sub">{{ formatTime(item.endTime) }}</text>
                     </view>
-                    <view class="timeline-col">
-                        <text class="time-text">{{ formatTime(item.startTime) }}</text>
-                        <text class="time-text end">{{ formatTime(item.endTime) }}</text>
-                        <view class="time-line"></view>
-                    </view>
-                    <view class="content-col">
-                        <view class="content-title">
+                    <view class="content">
+                        <view class="ctitle">
                             <text>{{ item.title }}</text>
-                            <text
-                                class="quadrant-tag"
-                                :style="{
-                                    background: getQuadrantColor(item.quadrant) + '22',
-                                    color: getQuadrantColor(item.quadrant)
-                                }"
-                            >
-                                {{ getQuadrantLabel(item.quadrant) }}
-                            </text>
-                            <text v-if="item.isRepeat && item.repeatType" class="meta-repeat">{{
-                                repeatIconMap[item.repeatType]
-                            }}</text>
+                            <text v-if="item.categoryName" class="tag">{{ item.categoryName }}</text>
                         </view>
-                        <view class="content-meta" v-if="item.location || item.categoryName">
-                            <text v-if="item.location" class="content-meta-tag"
-                                >📍 {{ item.location }}</text
-                            >
-                            <text v-if="item.categoryName" class="content-meta-tag">{{
-                                item.categoryName
-                            }}</text>
+                        <view v-if="item.location || item.description || (item.subtasks && item.subtasks.length) || (item.progress !== undefined && item.progress !== null)" class="meta-row">
+                            <text v-if="item.location" class="m-item">📍 {{ item.location }}</text>
+                            <text v-if="item.tags && item.tags.length" class="m-item"># {{ item.tags.join(', ') }}</text>
+                        </view>
+                        <view v-if="item.subtasks && item.subtasks.length" class="st-row">
+                            <text v-for="(st, stIdx) in item.subtasks" :key="stIdx" class="st-item" :class="{ done: st.done }">
+                                {{ st.done ? '●' : '○' }} {{ st.text || st }}
+                            </text>
+                            <text v-if="item.subtasks.length > 3" class="st-item">{{ item.subtasks.filter(s => s.done).length }}/{{ item.subtasks.length }}</text>
+                        </view>
+                        <text v-if="item.description" class="cdesc">{{ item.description }}</text>
+                        <view v-if="item.progress !== undefined && item.progress !== null" class="progress-micro">
+                            <view class="pm-fill" :style="{ width: item.progress + '%' }"></view>
                         </view>
                     </view>
                 </view>
@@ -120,7 +111,7 @@ const props = defineProps({
     quadrants: { type: Array, default: () => [] }
 })
 
-const emit = defineEmits(['check', 'quadrantChange', 'goDetail', 'delete'])
+const emit = defineEmits(['check', 'quadrantChange', 'goDetail', 'delete', 'edit'])
 
 const QUADRANT_LABELS = {
     1: '重要紧急',
@@ -148,7 +139,7 @@ const repeatIconMap = REPEAT_ICON
 
 // ===== 左滑逻辑 =====
 const SWIPE_THRESHOLD = 50 // 超过此距离触发
-const SWIPE_MAX = 140 // 最大滑动距离（两按钮宽度）
+const SWIPE_MAX = 210 // 最大滑动距离（三按钮宽度 70*3）
 
 // 每个项的滑动偏移量
 const offsets = ref({})
@@ -239,6 +230,8 @@ const onCardTap = (item) => {
 const onSwipeAction = (action, item) => {
     if (action === 'done') {
         emit('check', item)
+    } else if (action === 'edit') {
+        emit('edit', item)
     } else if (action === 'delete') {
         emit('delete', item)
     }
@@ -281,24 +274,209 @@ const onSwipeAction = (action, item) => {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 16px;
-    border-radius: 20px;
-    background: var(--color-bg, #f5f5f7);
+    padding: 6px 14px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.04);
     font-size: 12px;
     color: var(--color-text-secondary, #8e8e93);
+    font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
+    cursor: pointer;
+    transition: color 0.25s ease, background 0.25s ease, transform 0.2s ease;
+}
+.filter-pill:hover {
+    background: rgba(0,0,0,0.08);
+    color: var(--color-text, #1d1d1f);
+}
+.filter-pill:active {
+    transform: scale(0.95);
 }
 .filter-pill.active {
-    background: var(--color-primary-mist, #f5f3ff);
-    color: var(--color-primary, #ff8700);
-    font-weight: 500;
+    font-weight: 600;
 }
 .pill-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
+}
+
+/* ===== s-card (schedule card, ref-aligned) ===== */
+.s-card {
+    display: flex;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--color-surface, #ffffff);
+    border: 1px solid rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.s-card:hover {
+    box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+    border-color: transparent;
+}
+
+.s-card:active {
+    transform: scale(0.97);
+}
+
+.s-card.done {
+    animation: donePop 0.4s ease;
+}
+
+@keyframes donePop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
+/* 已完成 */
+.s-card.done {
+    opacity: 0.65;
+}
+
+.s-card.done .ctitle {
+    text-decoration: line-through;
+    color: var(--color-text-tertiary, #b0b0b5);
+}
+
+.s-card.done .time-col .t {
+    color: var(--color-success, #34c759);
+}
+
+.s-card.done::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(52, 199, 89, 0.06), rgba(52, 199, 89, 0.02));
+    pointer-events: none;
+}
+
+/* 象限色条 */
+.quadrant-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+}
+
+/* 时间列 */
+.time-col {
+    text-align: center;
+    min-width: 40px;
+    flex-shrink: 0;
+}
+
+.time-col .t {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text, #1d1d1f);
+}
+
+.time-col .t.sub {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--color-text-tertiary, #b0b0b5);
+}
+
+/* 内容列 */
+.content {
+    flex: 1;
+    min-width: 0;
+}
+
+.content .ctitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text, #1d1d1f);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.content .ctitle .tag {
+    font-size: 10px;
+    padding: 1px 8px;
+    border-radius: 4px;
+    background: var(--color-primary-soft, rgba(255, 135, 0, 0.12));
+    color: var(--color-primary, #ff8700);
+    flex-shrink: 0;
+}
+
+.content .cdesc {
+    font-size: 12px;
+    color: var(--color-text-secondary, #8e8e93);
+    line-height: 1.4;
+    margin-top: 3px;
+}
+
+/* 元数据行 */
+.meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 3px;
+}
+
+.meta-row .m-item {
+    font-size: 10px;
+    color: var(--color-text-tertiary, #b0b0b5);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--color-surface-soft, #f5f5f7);
+}
+
+/* 子任务行 */
+.st-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dashed var(--color-border-light, rgba(0,0,0,0.06));
+}
+
+.st-row .st-item {
+    font-size: 11px;
+    color: var(--color-text-tertiary, #b0b0b5);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 8px;
+    border-radius: 4px;
+    background: var(--color-surface-soft, #f5f5f7);
+}
+
+.st-row .st-item.done {
+    color: var(--color-success, #34c759);
+    background: var(--color-success-soft, rgba(52, 199, 89, 0.1));
+}
+
+/* 进度微条 */
+.progress-micro {
+    height: 3px;
+    background: var(--color-border-light, #d1d1d6);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.progress-micro .pm-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(135deg, var(--color-primary, #ff8700), #8980f0);
+    transition: width 0.3s ease;
 }
 
 /* 空状态 */
@@ -322,7 +500,6 @@ const onSwipeAction = (action, item) => {
     position: relative;
     margin: 0 20px 10px;
     overflow: hidden;
-    border-radius: 14px;
 }
 
 .swipe-actions {
@@ -335,7 +512,7 @@ const onSwipeAction = (action, item) => {
     z-index: 1;
 }
 
-.swipe-btn {
+.swipe-action {
     width: 70px;
     display: flex;
     flex-direction: column;
@@ -343,28 +520,33 @@ const onSwipeAction = (action, item) => {
     justify-content: center;
     gap: 3px;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.2s;
+    color: #fff;
 }
-.swipe-btn:active {
+.swipe-action:active {
+    opacity: 0.85;
+    transform: scale(0.95);
+}
+
+.swipe-action.action-done {
+    background: var(--color-primary, #ff8700);
+}
+
+.swipe-action.action-edit {
+    background: var(--color-primary, #ff8700);
     opacity: 0.85;
 }
 
-.swipe-btn-done {
-    background: var(--color-primary, #ff8700);
-    color: #fff;
-}
-
-.swipe-btn-delete {
+.swipe-action.action-delete {
     background: var(--color-danger, #ff3b30);
-    color: #fff;
 }
 
-.swipe-btn-icon {
-    font-size: 18px;
+.swipe-action .sa-icon {
+    font-size: 16px;
     line-height: 1;
 }
 
-.swipe-btn-label {
+.swipe-action .sa-label {
     font-size: 11px;
     font-weight: 500;
 }
@@ -373,108 +555,35 @@ const onSwipeAction = (action, item) => {
 .swipe-content {
     position: relative;
     z-index: 2;
-    background: var(--color-surface, #fff);
+    background: var(--color-surface, #ffffff);
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
     will-change: transform;
+    animation: cardSlideIn 0.4s ease both;
+}
+.swipe-content:active {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* 日程卡片 */
-.schedule-card {
-    display: flex;
-    gap: 14px;
-    background: var(--color-surface, #fff);
-    border-radius: 14px;
-    padding: 16px 16px 15px;
-    border: 1px solid var(--color-border-light, #f2f2f7);
-    align-items: flex-start;
-}
-.schedule-card.completed {
-    opacity: 0.6;
-}
+/* Staggered card entrance */
+.swipe-wrap:nth-child(1) .swipe-content { animation-delay: 0s; }
+.swipe-wrap:nth-child(2) .swipe-content { animation-delay: 0.04s; }
+.swipe-wrap:nth-child(3) .swipe-content { animation-delay: 0.08s; }
+.swipe-wrap:nth-child(4) .swipe-content { animation-delay: 0.12s; }
+.swipe-wrap:nth-child(5) .swipe-content { animation-delay: 0.16s; }
+.swipe-wrap:nth-child(6) .swipe-content { animation-delay: 0.20s; }
+.swipe-wrap:nth-child(7) .swipe-content { animation-delay: 0.24s; }
 
-.check-col {
-    display: flex;
-    align-items: flex-start;
-    padding-top: 4px;
-}
-.check-circle {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 2px solid var(--color-border-light, #d1d1d6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    color: transparent;
-    flex-shrink: 0;
-}
-.check-circle.checked {
-    background: var(--color-primary, #ff8700);
-    border-color: var(--color-primary, #ff8700);
-    color: #fff;
-}
-
-.timeline-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    width: 50px;
-    flex-shrink: 0;
-}
-.time-text {
-    font-size: 12px;
-    color: var(--color-text, #1d1d1f);
-    font-weight: 700;
-    line-height: 1.1;
-}
-.time-text.end {
-    margin-top: 3px;
-    font-size: 10px;
-    color: var(--color-text-tertiary, #8e8e93);
-    font-weight: 500;
-}
-.time-line {
-    width: 1px;
-    background: linear-gradient(180deg, rgba(255, 135, 0, 0.28), rgba(255, 135, 0, 0.04));
-    margin: 6px 0 0;
-    min-height: 48px;
-}
-
-.content-col {
-    flex: 1;
-    min-width: 0;
-    padding-top: 1px;
-}
-.content-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--color-text, #1d1d1f);
-}
-.quadrant-tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    white-space: nowrap;
-}
-.meta-repeat {
-    font-size: 12px;
-}
-.content-meta {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-    flex-wrap: wrap;
-}
-.content-meta-tag {
-    font-size: 11px;
-    color: var(--color-text-secondary, #8e8e93);
-    background: var(--color-bg, #f5f5f7);
-    padding: 2px 8px;
-    border-radius: 4px;
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>

@@ -3,7 +3,7 @@
         <view class="detail-header-bar">
             <view class="detail-header-copy">
                 <text class="detail-page-title">日程详情</text>
-                <text class="detail-page-sub">查看任务状态与时间线</text>
+                <text class="detail-page-sub">保留当前日历不变，只调整详情信息与编辑入口</text>
             </view>
         </view>
 
@@ -12,7 +12,7 @@
         </view>
 
         <template v-else-if="event">
-            <view class="hero-card" :style="{ borderTopColor: getQuadrantColor(event.quadrant) }">
+            <view class="hero-card" :style="{ borderLeftColor: getQuadrantColor(event.quadrant) }">
                 <view class="hero-meta">
                     <text
                         class="hero-tag"
@@ -42,32 +42,82 @@
                 </view>
             </view>
 
+            <view class="summary-card premium-card">
+                <view class="summary-chip">
+                    <text class="summary-chip-label">状态</text>
+                    <text class="summary-chip-value">{{
+                        event.status === 1 ? '已完成' : '待处理'
+                    }}</text>
+                </view>
+                <view class="summary-chip">
+                    <text class="summary-chip-label">重复</text>
+                    <text class="summary-chip-value">{{
+                        event.isRepeat ? repeatLabel(event.repeatType) : '不重复'
+                    }}</text>
+                </view>
+                <view class="summary-chip">
+                    <text class="summary-chip-label">提醒</text>
+                    <text class="summary-chip-value">{{ remindLabel(event.remindMinutes) }}</text>
+                </view>
+            </view>
+
             <view class="detail-section premium-card">
                 <view class="section-title">详情信息</view>
                 <view class="detail-row">
                     <text class="label">象限</text>
                     <text class="value">{{ quadrantLabel(event.quadrant) }}</text>
                 </view>
+                <view class="detail-row">
+                    <text class="label">优先级</text>
+                    <text class="value">{{ priorityLabel(event.priority) }}</text>
+                </view>
+                <view class="detail-row" v-if="categoryDisplay">
+                    <text class="label">分类</text>
+                    <text class="value">{{ categoryDisplay }}</text>
+                </view>
                 <view class="detail-row" v-if="event.location">
                     <text class="label">地点</text>
-                    <text class="value">📍 {{ event.location }}</text>
+                    <text class="value">{{ event.location }}</text>
                 </view>
                 <view class="detail-row" v-if="event.isRepeat">
                     <text class="label">重复</text>
                     <text class="value">{{ repeatLabel(event.repeatType) }}</text>
                 </view>
-                <view class="detail-row" v-if="event.priority">
-                    <text class="label">优先级</text>
-                    <text class="value">{{ priorityLabel(event.priority) }}</text>
-                </view>
-                <view class="detail-row" v-if="event.categoryId">
-                    <text class="label">分类</text>
-                    <text class="value">#{{ event.categoryId }}</text>
+                <view
+                    class="detail-row"
+                    v-if="event.remindMinutes !== null && event.remindMinutes !== undefined"
+                >
+                    <text class="label">提醒</text>
+                    <text class="value">{{ remindLabel(event.remindMinutes) }}</text>
                 </view>
                 <view class="detail-row" v-if="event.completedTime">
                     <text class="label">完成时间</text>
                     <text class="value">{{ formatDateTime(event.completedTime) }}</text>
                 </view>
+            </view>
+
+            <view class="detail-section premium-card" v-if="tagList.length">
+                <view class="section-title">标签</view>
+                <view class="tag-list">
+                    <text v-for="tag in tagList" :key="tag" class="tag-chip">{{ tag }}</text>
+                </view>
+            </view>
+
+            <view class="detail-section premium-card" v-if="subtaskList.length">
+                <view class="section-title">子任务</view>
+                <view
+                    v-for="(task, index) in subtaskList"
+                    :key="`${task}-${index}`"
+                    class="detail-row"
+                >
+                    <text class="label">步骤 {{ index + 1 }}</text>
+                    <text class="value">{{ task }}</text>
+                </view>
+            </view>
+
+            <view class="detail-section premium-card" v-if="event.note">
+                <view class="section-title">备注</view>
+                <text class="note-text">{{ event.note }}</text>
             </view>
 
             <view class="timeline-card premium-card">
@@ -95,6 +145,12 @@
                         <text class="timeline-time">{{ formatDateTime(event.completedTime) }}</text>
                     </view>
                 </view>
+            </view>
+
+            <view class="detail-toolbar">
+                <button class="detail-toolbar-btn detail-toolbar-btn-muted" @tap="goEdit">
+                    编辑
+                </button>
             </view>
 
             <view class="detail-action-swipe">
@@ -140,11 +196,17 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
-import { completeSchedule, deleteSchedule, getScheduleDetail } from '@/api/plan/schedule'
+import { computed, onMounted, ref } from 'vue'
+import {
+    completeSchedule,
+    deleteSchedule,
+    getCategoryList,
+    getScheduleDetail
+} from '@/api/plan/schedule'
 
 const event = ref(null)
 const loading = ref(true)
+const categories = ref([])
 const DETAIL_ACTION_WIDTH = 92
 const DETAIL_SWIPE_THRESHOLD = 42
 const detailSwipe = ref({
@@ -156,6 +218,46 @@ const detailSwipe = ref({
 const detailActionMax = computed(() =>
     event.value?.status === 0 ? DETAIL_ACTION_WIDTH * 2 : DETAIL_ACTION_WIDTH
 )
+
+const categoryDisplay = computed(() => {
+    if (!event.value?.categoryId) return ''
+    const matched = categories.value.find(
+        (item) => String(item.id) === String(event.value.categoryId)
+    )
+    return matched?.name || `分类 #${event.value.categoryId}`
+})
+
+const tagList = computed(() => {
+    return String(event.value?.tags || '')
+        .split(/[,，]/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+})
+
+const subtaskList = computed(() => {
+    const raw = event.value?.subtasks
+    if (!raw) return []
+    try {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) {
+            return parsed
+                .map((item) => {
+                    if (typeof item === 'string') return item
+                    if (item && typeof item === 'object') {
+                        return item.title || item.name || item.text || ''
+                    }
+                    return ''
+                })
+                .filter(Boolean)
+        }
+    } catch (error) {
+        return String(raw)
+            .split(/\r?\n/)
+            .map((item) => item.trim())
+            .filter(Boolean)
+    }
+    return []
+})
 
 const closeDetailSwipe = () => {
     detailSwipe.value.translateX = 0
@@ -212,7 +314,20 @@ const repeatLabel = (repeatType) => {
 }
 
 const priorityLabel = (priority) => {
-    return ['低', '中', '高'][priority - 1] || '中'
+    const labels = {
+        4: 'P0 最高',
+        3: 'P1 高',
+        2: 'P2 中',
+        1: 'P3 低'
+    }
+    return labels[priority] || 'P2 中'
+}
+
+const remindLabel = (minutes) => {
+    if (minutes === null || minutes === undefined || minutes === '') return '不提醒'
+    if (Number(minutes) === 0) return '准时提醒'
+    if (Number(minutes) < 60) return `提前 ${minutes} 分钟`
+    return `提前 ${Math.round(Number(minutes) / 60)} 小时`
 }
 
 const formatDateTime = (ts) => {
@@ -224,6 +339,16 @@ const formatDateTime = (ts) => {
         2,
         '0'
     )}`
+}
+
+const loadCategories = async () => {
+    try {
+        const list = await getCategoryList({})
+        categories.value = Array.isArray(list) ? list : []
+    } catch (error) {
+        console.error('加载分类失败', error)
+        categories.value = []
+    }
 }
 
 const fetchDetail = async (id) => {
@@ -261,6 +386,11 @@ const handleDelete = async () => {
     }
 }
 
+const goEdit = () => {
+    if (!event.value?.id) return
+    uni.navigateTo({ url: `/pages/plan/schedule/form?id=${event.value.id}` })
+}
+
 const onDetailSwipeAction = (action) => {
     if (action === 'complete') {
         handleComplete()
@@ -275,6 +405,7 @@ onMounted(() => {
     const pages = getCurrentPages()
     const currentPage = pages[pages.length - 1]
     const id = currentPage.$page?.options?.id || currentPage.options?.id
+    loadCategories()
     if (id) {
         fetchDetail(id)
     } else {
@@ -286,16 +417,19 @@ onMounted(() => {
 <style scoped lang="scss">
 .schedule-detail-page {
     min-height: 100vh;
-    background: var(--color-bg-app);
-    padding: 24rpx 24rpx 40rpx;
+    background: linear-gradient(
+            180deg,
+            rgba(var(--color-primary-rgb), 0.08),
+            rgba(var(--color-primary-rgb), 0)
+        ),
+        var(--color-bg-app);
+    padding: 18rpx 18rpx 34rpx;
 }
 
 .detail-header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20rpx;
-    margin-bottom: 18rpx;
+    max-width: 720rpx;
+    margin: 0 auto 16rpx;
+    padding: 0 8rpx;
 }
 
 .detail-header-copy {
@@ -325,11 +459,14 @@ onMounted(() => {
 }
 
 .hero-card {
+    max-width: 720rpx;
+    margin: 0 auto;
     background: var(--color-surface);
     border-radius: 24rpx;
-    padding: 32rpx 30rpx;
-    border-top: 8rpx solid var(--color-primary);
-    box-shadow: var(--shadow-sm);
+    padding: 32rpx;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-left: 8rpx solid var(--color-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .hero-meta {
@@ -379,11 +516,15 @@ onMounted(() => {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18rpx;
-    margin-top: 20rpx;
+    margin: 20rpx auto 0;
+    max-width: 720rpx;
 }
 
 .info-card {
     padding: 24rpx;
+    border-radius: 24rpx;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .info-label {
@@ -401,17 +542,60 @@ onMounted(() => {
     line-height: 1.5;
 }
 
+.summary-card {
+    margin-top: 20rpx;
+    padding: 24rpx;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16rpx;
+    max-width: 720rpx;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 24rpx;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.summary-chip {
+    text-align: center;
+    padding: 18rpx 12rpx;
+    border-radius: 22rpx;
+    background: var(--color-surface-soft);
+    border: 1rpx solid var(--color-border-light);
+}
+
+.summary-chip-label {
+    display: block;
+    font-size: 22rpx;
+    color: var(--color-text-tertiary);
+}
+
+.summary-chip-value {
+    display: block;
+    margin-top: 8rpx;
+    font-size: 24rpx;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.4;
+}
+
 .detail-section,
 .timeline-card {
     margin-top: 20rpx;
-    padding: 28rpx 28rpx 16rpx;
+    padding: 28rpx 28rpx 18rpx;
+    max-width: 720rpx;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 24rpx;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .section-title {
     font-size: 30rpx;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-text);
-    margin-bottom: 12rpx;
+    margin-bottom: 14rpx;
 }
 
 .detail-row {
@@ -436,6 +620,28 @@ onMounted(() => {
     font-size: 26rpx;
     color: var(--color-text);
     line-height: 1.6;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14rpx;
+}
+
+.tag-chip {
+    padding: 10rpx 20rpx;
+    border-radius: 999rpx;
+    background: var(--color-primary-mist);
+    color: var(--color-primary);
+    font-size: 24rpx;
+    font-weight: 600;
+}
+
+.note-text {
+    display: block;
+    font-size: 26rpx;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
 }
 
 .timeline-item {
@@ -482,11 +688,36 @@ onMounted(() => {
     color: var(--color-text);
 }
 
+.detail-toolbar {
+    margin-top: 20rpx;
+    max-width: 720rpx;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.detail-toolbar-btn {
+    width: 100%;
+    height: 82rpx;
+    border-radius: 999rpx;
+    font-size: 26rpx;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+.detail-toolbar-btn-muted {
+    background: var(--color-surface-soft);
+    color: var(--color-text-secondary);
+    border: 1rpx solid var(--color-border-light);
+}
+
 .detail-action-swipe {
     position: relative;
     margin-top: 20rpx;
     border-radius: 24rpx;
     overflow: hidden;
+    max-width: 720rpx;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .detail-swipe-actions {
