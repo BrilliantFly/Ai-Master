@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 习惯服务实现
@@ -54,9 +55,11 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
         long activeCount = habits.stream().filter(h -> h.getStatus() == 0).count();
         long completedCount = habits.stream().filter(h -> h.getStatus() == 1).count();
 
-        long totalCheckins = planHabitRecordMapper.selectCount(
+        List<Long> habitIds = habits.stream().map(PlanHabit::getId).collect(Collectors.toList());
+        long totalCheckins = habitIds.isEmpty() ? 0 : planHabitRecordMapper.selectCount(
                 new LambdaQueryWrapper<PlanHabitRecord>()
-                        .eq(PlanHabitRecord::getUserId, userId));
+                        .eq(PlanHabitRecord::getUserId, userId)
+                        .in(PlanHabitRecord::getHabitId, habitIds));
 
         // 今日打卡数
         Calendar cal = Calendar.getInstance();
@@ -68,9 +71,10 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
         cal.add(Calendar.DAY_OF_MONTH, 1);
         long todayEnd = cal.getTimeInMillis();
 
-        long todayCheckins = planHabitRecordMapper.selectCount(
+        long todayCheckins = habitIds.isEmpty() ? 0 : planHabitRecordMapper.selectCount(
                 new LambdaQueryWrapper<PlanHabitRecord>()
                         .eq(PlanHabitRecord::getUserId, userId)
+                        .in(PlanHabitRecord::getHabitId, habitIds)
                         .ge(PlanHabitRecord::getRecordDate, todayStart)
                         .lt(PlanHabitRecord::getRecordDate, todayEnd));
 
@@ -137,19 +141,13 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
         }
 
         long now = System.currentTimeMillis();
-        // 归一化到当天0点（如果没传日期则使用当前时间）
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.setTimeInMillis(recordDate != null ? recordDate : now);
-        cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
-        cal.set(java.util.Calendar.MINUTE, 0);
-        cal.set(java.util.Calendar.SECOND, 0);
-        cal.set(java.util.Calendar.MILLISECOND, 0);
-        long dayStart = cal.getTimeInMillis();
+        long dayStart = normalizeDayStart(recordDate != null ? recordDate : now);
 
         // 检查是否已打卡
         Long exists = planHabitRecordMapper.selectCount(
                 new LambdaQueryWrapper<PlanHabitRecord>()
                         .eq(PlanHabitRecord::getHabitId, habitId)
+                        .eq(PlanHabitRecord::getUserId, userId)
                         .eq(PlanHabitRecord::getRecordDate, dayStart));
         if (exists != null && exists > 0) {
             return false; // 已打卡，防止重复
@@ -165,15 +163,49 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
         planHabitRecordMapper.insert(record);
 
         // 更新习惯统计
-        habit.setTotalDays(habit.getTotalDays() + 1);
-        habit.setCurrentDays(calculateStreak(habitId, dayStart));
+        habit.setTotalDays(countHabitRecords(habitId));
+        habit.setCurrentDays(calculateStreak(habitId, normalizeDayStart(now)));
         habit.setUpdateTime(now);
 
         // 检查是否达成目标
-        if (habit.getTotalDays() >= habit.getTargetDays()) {
+        if (habit.getTargetDays() != null && habit.getTotalDays() >= habit.getTargetDays()) {
             habit.setStatus(1); // 已完成
         }
 
+        planHabitMapper.updateById(habit);
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean uncheckin(Long habitId, Long userId, Long recordDate) {
+        PlanHabit habit = planHabitMapper.selectById(habitId);
+        if (habit == null) {
+            return false;
+        }
+
+        long now = System.currentTimeMillis();
+        long dayStart = normalizeDayStart(recordDate != null ? recordDate : now);
+        PlanHabitRecord record = planHabitRecordMapper.selectOne(
+                new LambdaQueryWrapper<PlanHabitRecord>()
+                        .eq(PlanHabitRecord::getHabitId, habitId)
+                        .eq(PlanHabitRecord::getUserId, userId)
+                        .eq(PlanHabitRecord::getRecordDate, dayStart)
+                        .last("LIMIT 1"));
+        if (record == null) {
+            return false;
+        }
+
+        planHabitRecordMapper.deleteById(record.getId());
+        habit.setTotalDays(countHabitRecords(habitId));
+        habit.setCurrentDays(calculateStreak(habitId, normalizeDayStart(now)));
+        if (habit.getStatus() != null
+                && habit.getStatus() == 1
+                && habit.getTargetDays() != null
+                && habit.getTotalDays() < habit.getTargetDays()) {
+            habit.setStatus(0);
+        }
+        habit.setUpdateTime(now);
         planHabitMapper.updateById(habit);
         return true;
     }
@@ -210,5 +242,22 @@ public class PlanHabitServiceImpl extends ServiceImpl<PlanHabitMapper, PlanHabit
         }
 
         return streak;
+    }
+
+    private long normalizeDayStart(long timestamp) {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTimeInMillis(timestamp);
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        cal.set(java.util.Calendar.MINUTE, 0);
+        cal.set(java.util.Calendar.SECOND, 0);
+        cal.set(java.util.Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
+    }
+
+    private int countHabitRecords(Long habitId) {
+        Long count = planHabitRecordMapper.selectCount(
+                new LambdaQueryWrapper<PlanHabitRecord>()
+                        .eq(PlanHabitRecord::getHabitId, habitId));
+        return count == null ? 0 : count.intValue();
     }
 }

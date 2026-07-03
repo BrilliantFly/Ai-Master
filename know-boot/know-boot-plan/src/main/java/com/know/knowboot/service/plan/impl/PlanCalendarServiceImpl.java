@@ -67,6 +67,26 @@ public class PlanCalendarServiceImpl implements IPlanCalendarService {
             habitInfo.put("habitId", habit.getId());
             habitInfo.put("description", habit.getDescription() != null ? habit.getDescription() : "");
             habitInfo.put("currentDays", habit.getCurrentDays() != null ? habit.getCurrentDays() : 0);
+            habitInfo.put("totalDays", habit.getTotalDays() != null ? habit.getTotalDays() : 0);
+            habitInfo.put("icon", habit.getIcon());
+            habitInfo.put("color", habit.getColor());
+            habitInfo.put("category", habit.getCategory());
+            habitInfo.put("targetValue", habit.getTargetValue());
+            habitInfo.put("targetUnit", habit.getTargetUnit());
+            habitInfo.put("trackingType", habit.getTrackingType());
+            habitInfo.put("note", habit.getNote());
+            habitInfo.put("motto", habit.getMotto());
+            habitInfo.put("timePeriod", habit.getTimePeriod());
+            habitInfo.put("allowBackfill", habit.getAllowBackfill());
+            habitInfo.put("endDate", habit.getEndDate());
+            habitInfo.put("restDays", habit.getRestDays());
+            habitInfo.put("secondReminder", habit.getSecondReminder());
+            habitInfo.put("targetDays", habit.getTargetDays());
+            habitInfo.put("frequencyType", habit.getFrequencyType());
+            habitInfo.put("frequencyRule", habit.getFrequencyRule());
+            habitInfo.put("startDate", habit.getStartDate());
+            habitInfo.put("reminderTime", habit.getReminderTime());
+            habitInfo.put("status", habit.getStatus());
             List<Integer> days = new ArrayList<>();
             for (PlanHabitRecord record : allRecords) {
                 if (record.getHabitId().equals(habit.getId())) {

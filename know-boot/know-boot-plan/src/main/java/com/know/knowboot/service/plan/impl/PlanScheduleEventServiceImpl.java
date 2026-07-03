@@ -1,6 +1,7 @@
 package com.know.knowboot.service.plan.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -141,6 +142,9 @@ public class PlanScheduleEventServiceImpl extends ServiceImpl<PlanScheduleEventM
         if (event.getStatus() == null) {
             event.setStatus(0);
         }
+        if (event.getProgress() == null) {
+            event.setProgress(0);
+        }
         return save(event);
     }
 
@@ -160,7 +164,28 @@ public class PlanScheduleEventServiceImpl extends ServiceImpl<PlanScheduleEventM
         }
         event.setStatus(1);
         event.setCompletedTime(System.currentTimeMillis());
+        event.setProgress(100);
         return updateById(event);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean uncomplete(Long id) {
+        PlanScheduleEvent event = planScheduleEventMapper.selectById(id);
+        if (event == null) {
+            return false;
+        }
+        event.setStatus(0);
+        Integer progress = event.getProgress();
+        if (progress == null || progress >= 100) {
+            progress = 0;
+        }
+        return update(new LambdaUpdateWrapper<PlanScheduleEvent>()
+                .eq(PlanScheduleEvent::getId, id)
+                .set(PlanScheduleEvent::getStatus, 0)
+                .set(PlanScheduleEvent::getCompletedTime, null)
+                .set(PlanScheduleEvent::getProgress, progress)
+                .set(PlanScheduleEvent::getUpdateTime, System.currentTimeMillis()));
     }
 
     @Override
