@@ -81,9 +81,20 @@ public class PlanHabitController {
     @PostMapping("/{id}/checkin")
     public AjaxResult<Boolean> checkin(
             @PathVariable Long id,
-            @RequestParam(required = false) Long recordDate) {
+            @RequestParam(required = false) Long recordDate,
+            @RequestBody(required = false) Map<String, Object> body) {
         Long userId = 1L;
-        return AjaxResult.success(planHabitService.checkin(id, userId, recordDate));
+        return AjaxResult.success(planHabitService.checkin(id, userId, resolveRecordDate(recordDate, body)));
+    }
+
+    @ApiOperation("取消打卡")
+    @PostMapping("/{id}/uncheckin")
+    public AjaxResult<Boolean> uncheckin(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long recordDate,
+            @RequestBody(required = false) Map<String, Object> body) {
+        Long userId = 1L;
+        return AjaxResult.success(planHabitService.uncheckin(id, userId, resolveRecordDate(recordDate, body)));
     }
 
     @ApiOperation("查询打卡记录")
@@ -99,5 +110,23 @@ public class PlanHabitController {
             @RequestParam Integer year,
             @RequestParam Integer month) {
         return AjaxResult.success(planHabitRecordService.getMonthlyStats(habitId, year, month));
+    }
+
+    private Long resolveRecordDate(Long recordDate, Map<String, Object> body) {
+        if (recordDate != null) {
+            return recordDate;
+        }
+        if (body == null || body.get("recordDate") == null) {
+            return null;
+        }
+        Object value = body.get("recordDate");
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        try {
+            return Long.parseLong(String.valueOf(value));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

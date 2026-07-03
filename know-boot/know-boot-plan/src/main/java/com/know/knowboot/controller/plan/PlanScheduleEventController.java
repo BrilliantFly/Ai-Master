@@ -110,6 +110,12 @@ public class PlanScheduleEventController {
         return AjaxResult.success(planScheduleEventService.complete(id));
     }
 
+    @ApiOperation("取消完成日程")
+    @PutMapping("/{id}/uncomplete")
+    public AjaxResult<Boolean> uncomplete(@PathVariable Long id) {
+        return AjaxResult.success(planScheduleEventService.uncomplete(id));
+    }
+
     @ApiOperation("删除日程")
     @DeleteMapping("/{id}")
     public AjaxResult<Boolean> delete(@PathVariable Long id) {
