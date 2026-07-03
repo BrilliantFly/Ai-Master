@@ -688,7 +688,7 @@ onBeforeUnmount(() => {
 
 .timeline-dot.break,
 .timeline-dot.longBreak {
-    background: #34d399;
+    background: var(--color-success);
 }
 
 .timeline-copy {

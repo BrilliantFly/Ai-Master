@@ -218,7 +218,7 @@
                 <span class="tool-chip" @tap="go('/pages/plan/schedule/index')"><span class="dot" style="background:var(--color-primary);"></span> 📅 日程计划</span>
                 <span class="tool-chip" @tap="go('/pages/plan/habit/index')"><span class="dot" style="background:var(--color-success);"></span> 🎯 习惯打卡</span>
                 <span class="tool-chip" @tap="go('/pages/plan/focus/index')"><span class="dot" style="background:var(--color-warning);"></span> 🍅 专注 {{ focusSummary.totalFocusMinutes }}m</span>
-                <span class="tool-chip" @tap="go('/pages/plan/stats/index')"><span class="dot" style="background:#a855f7;"></span> 📊 统计洞察</span>
+                <span class="tool-chip" @tap="go('/pages/plan/stats/index')"><span class="dot" style="background:var(--color-minor);"></span> 📊 统计洞察</span>
             </view>
         </view>
 
