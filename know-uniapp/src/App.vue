@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { onLaunch } from '@dcloudio/uni-app'
 import { useAppStore } from './stores/app'
 import { useUserStore } from './stores/user'

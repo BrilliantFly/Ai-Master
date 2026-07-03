@@ -1,5 +1,5 @@
 import { getDecorate } from '@/api/shop'
-import { generateVars } from '@/utils/theme'
+import { generateVars, mergeServerColors } from '@/utils/theme'
 import { defineStore } from 'pinia'
 
 export const VISUAL_THEMES = [
@@ -459,9 +459,19 @@ export const useThemeStore = defineStore({
         currentThemeConfig: (state) => {
             return VISUAL_THEMES.find((t) => t.key === state.currentVisualTheme) || VISUAL_THEMES[0]
         },
-        /** 当前主题的 CSS 变量对象（用于非 H5 端内联样式） */
+        /** 当前主题的 CSS 变量对象（全端适用）
+         *  1. 取视觉主题的完整色值表（THEME_COLORS）
+         *  2. 若有服务端配色（getDecorate），覆盖 primary / minor / btn-text
+         */
         themeInlineVars: (state): Record<string, string> => {
-            return THEME_COLORS[state.currentVisualTheme] || THEME_COLORS.white
+            const base = THEME_COLORS[state.currentVisualTheme] || THEME_COLORS.white
+            const server = {
+                primaryColor: state.primaryColor,
+                minorColor: state.minorColor,
+                btnColor: state.btnColor
+            }
+            // 有服务端配色时才合并覆盖
+            return server.primaryColor ? mergeServerColors(base, server) : base
         }
     },
     actions: {
