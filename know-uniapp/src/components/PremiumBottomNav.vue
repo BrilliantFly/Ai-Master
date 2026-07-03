@@ -37,11 +37,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
 import { useRouter } from 'uniapp-router-next'
 import { getTabbarMenu } from '@/api/system/menu'
+import { useHoverEffect } from '@/hooks/useHoverEffect'
 
 type NavItem = {
     key: string
@@ -232,28 +233,8 @@ onShow(() => {
     fetchTabbar()
 })
 
-// uni-app view 元素不支持任何鼠标事件，改用 document-level capture 监听器
-let navHoverEl = null
-function onDocNavMove (e) {
-    const nav = e.target.closest('.premium-bottom-nav')
-    if (!nav) {
-        if (navHoverEl) { navHoverEl.classList.remove('hover-active'); navHoverEl = null }
-        return
-    }
-    const el = e.target.closest('.nav-item')
-    if (el !== navHoverEl) {
-        if (navHoverEl) navHoverEl.classList.remove('hover-active')
-        navHoverEl = el
-        if (navHoverEl) navHoverEl.classList.add('hover-active')
-    }
-}
-onMounted(() => {
-    document.addEventListener('mousemove', onDocNavMove, { capture: true })
-})
-onUnmounted(() => {
-    document.removeEventListener('mousemove', onDocNavMove, { capture: true })
-    if (navHoverEl) { navHoverEl.classList.remove('hover-active'); navHoverEl = null }
-})
+// Hover 系统 — 通过 useHoverEffect composable 管理
+useHoverEffect('.nav-item', '.premium-bottom-nav')
 </script>
 
 <style scoped lang="scss">

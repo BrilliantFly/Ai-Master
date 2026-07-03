@@ -30,7 +30,7 @@
             </view>
 
             <view class="home-content">
-                <view class="asset-card premium-anim-fade-up">
+                <view class="asset-card premium-fade-in">
                     <view
                         class="asset-left asset-left-inline"
                         @tap="goLink('/pages/plan/schedule/index')"
@@ -60,7 +60,7 @@
                     </view>
                 </view>
 
-                <view class="search-row premium-anim-fade-up premium-anim-delay-1">
+                <view class="search-row premium-fade-in premium-d1">
                     <view class="search-input" @tap="goSearch">
                         <text class="search-input-icon">🔍</text>
                         <text class="search-input-text">搜索功能、设备、文档...</text>
@@ -69,7 +69,7 @@
                 </view>
 
                 <view class="content-shell">
-                    <view class="carousel-wrap premium-anim-fade-up premium-anim-delay-1">
+                    <view class="carousel-wrap premium-fade-in premium-d1">
                         <swiper
                             class="carousel-swiper"
                             :indicator-dots="false"
@@ -104,7 +104,7 @@
                     </view>
 
                     <view
-                        class="notice-strip premium-anim-fade-up premium-anim-delay-2"
+                        class="notice-strip premium-fade-in premium-d2"
                         @tap="goNotice"
                     >
                         <text class="notice-icon">📢</text>
@@ -131,11 +131,11 @@
                         <text class="notice-arrow">›</text>
                     </view>
 
-                    <view class="section-hdr premium-anim-fade-up premium-anim-delay-3">
+                    <view class="section-hdr premium-fade-in premium-d3">
                         <text class="section-title">快捷功能</text>
                         <text class="section-more" @tap="goMore('quick')">全部 →</text>
                     </view>
-                    <view class="quick-grid premium-anim-fade-up premium-anim-delay-3">
+                    <view class="quick-grid premium-fade-in premium-d3">
                         <view
                             v-for="item in quickTiles"
                             :key="item.id"
@@ -161,12 +161,12 @@
                         </view>
                     </view>
 
-                    <view class="section-hdr premium-anim-fade-up premium-anim-delay-3">
+                    <view class="section-hdr premium-fade-in premium-d3">
                         <text class="section-title">热门推荐</text>
                         <text class="section-more" @tap="goMore('recommend')">查看全部</text>
                     </view>
                     <scroll-view
-                        class="recommend-scroll premium-anim-fade-up premium-anim-delay-3"
+                        class="recommend-scroll premium-fade-in premium-d3"
                         scroll-x
                     >
                         <view class="recommend-track">
@@ -200,11 +200,11 @@
                         </view>
                     </scroll-view>
 
-                    <view class="section-hdr premium-anim-fade-up premium-anim-delay-3">
+                    <view class="section-hdr premium-fade-in premium-d3">
                         <text class="section-title">常用工具</text>
                         <text class="section-more" @tap="goMore('tools')">更多 →</text>
                     </view>
-                    <view class="tools-grid premium-anim-fade-up premium-anim-delay-3">
+                    <view class="tools-grid premium-fade-in premium-d3">
                         <view
                             v-for="item in dashboardTools"
                             :key="item.id"
@@ -245,13 +245,13 @@
                     </view>
 
                     <view
-                        class="section-hdr premium-anim-fade-up premium-anim-delay-3 section-hdr-tight"
+                        class="section-hdr premium-fade-in premium-d3 section-hdr-tight"
                     >
                         <text class="section-title">便捷工具</text>
                         <text class="section-more" @tap="goMore('tools')">更多 →</text>
                     </view>
                     <scroll-view
-                        class="tool-strip premium-anim-fade-up premium-anim-delay-3"
+                        class="tool-strip premium-fade-in premium-d3"
                         scroll-x
                     >
                         <view class="tool-strip-track">

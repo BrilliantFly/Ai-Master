@@ -177,17 +177,6 @@
 .premium-icon-gw { color: #fff; }
 
 /* ===== 动画 ===== */
-@keyframes premiumFadeUp {
-  from { opacity: 0; transform: translateY(32rpx); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.premium-anim-fade-up {
-  animation: premiumFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-.premium-anim-delay-1 { animation-delay: 0.05s; }
-.premium-anim-delay-2 { animation-delay: 0.10s; }
-.premium-anim-delay-3 { animation-delay: 0.15s; }
-
 /* ============================================
    交互效果系统 (移植自首页预览_v3)
    ============================================ */
@@ -578,3 +567,59 @@
 }
 
 /* uni-app view 元素不响应 CSS :hover，已改用 JS toggle(.hover-active) 方案在组件内实现 */
+
+/* ============================================
+   Hover 系统 — 配合 useHoverEffect composable
+   在组件 scoped style 中定义具体样式，此处仅为通用工具
+   ============================================ */
+
+/* 卡片悬浮提升 (配合 hover-active 类) */
+.hover-lift {
+  transition: transform 0.25s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease) !important;
+}
+.hover-lift.hover-active {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+  border-color: transparent !important;
+}
+.hover-lift:active {
+  transform: scale(0.97) !important;
+}
+
+/* 悬浮阴影 (无位移) */
+.hover-shadow {
+  transition: box-shadow 0.3s var(--ease) !important;
+}
+.hover-shadow.hover-active {
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* 悬浮缩放图标 */
+.hover-scale-icon {
+  transition: transform 0.2s ease !important;
+}
+.hover-scale-icon.hover-active {
+  transform: scale(1.1) !important;
+}
+
+/* 悬浮轻微上移 + 阴影 */
+.hover-raise {
+  transition: transform 0.25s var(--ease), box-shadow 0.3s var(--ease) !important;
+}
+.hover-raise.hover-active {
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* 通用按压缩放 */
+.hover-press:active {
+  transform: scale(0.97) !important;
+}
+
+/* 专注态高亮边框 */
+.hover-border {
+  transition: border-color 0.25s var(--ease) !important;
+}
+.hover-border.hover-active {
+  border-color: var(--color-primary) !important;
+}

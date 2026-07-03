@@ -235,6 +235,7 @@ import { getHabitStats } from '@/api/plan/habit'
 import { quadrantColor } from '@/components/calendar-grid/calendar-utils.js'
 import { getTodayFocusStats } from '@/api/plan/focus'
 import { getTodayFocusSummary } from '@/utils/focus'
+import { useHoverEffect } from '@/hooks/useHoverEffect'
 
 const now = new Date()
 const currentYear = ref(now.getFullYear())
@@ -374,35 +375,20 @@ const startNoticeRotation = () => {
     }, 3000)
 }
 
-// uni-app view 元素不支持任何鼠标事件（CSS :hover、JS mouseover/mousemove 均不触发）
-// 改用 document-level capture 监听器，完全绕过 uni-app 事件系统
-let hoverEl = null
-const hoverTargets = '.quick-item,.recommend-card,.tool-card,.tool-chip,.notice-strip,.search-input,.search-qr,.asset-card,.hero-icon'
-function onDocHoverMove (e) {
-    const page = e.target.closest('.plan-home-page') || e.target.closest('.premium-bottom-nav')
-    if (!page) {
-        if (hoverEl) { hoverEl.classList.remove('hover-active'); hoverEl = null }
-        return
-    }
-    const el = e.target.closest(hoverTargets)
-    if (el !== hoverEl) {
-        if (hoverEl) hoverEl.classList.remove('hover-active')
-        hoverEl = el
-        if (hoverEl) hoverEl.classList.add('hover-active')
-    }
-}
+// Hover 系统 — 通过 useHoverEffect composable 管理
+useHoverEffect(
+    '.quick-item,.recommend-card,.tool-card,.tool-chip,.notice-strip,.search-input,.search-qr,.asset-card,.hero-icon',
+    '.plan-home-page'
+)
 
 onMounted(async () => {
     await Promise.all([loadTodaySchedule(), loadScheduleStats(), loadHabitStats()])
     await loadFocusSummaryWithFallback()
     startNoticeRotation()
-    document.addEventListener('mousemove', onDocHoverMove, { capture: true })
 })
 
 onUnmounted(() => {
     if (noticeTimer) clearInterval(noticeTimer)
-    document.removeEventListener('mousemove', onDocHoverMove, { capture: true })
-    if (hoverEl) { hoverEl.classList.remove('hover-active'); hoverEl = null }
 })
 </script>
 
