@@ -21,6 +21,8 @@
   /* 边框 */
   --color-border: #e2e4ea;
   --color-border-light: #e4e7ed;
+  --color-border-hover: #c8ccd8;
+  --color-surface-hover: #f2f4f8;
 
   /* 语义色 */
   --color-success: #22b573;
@@ -45,6 +47,12 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 26px;
+
+  /* 交互 */
+  --scale-active: 0.97;
+
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-mist) 100%);
 
   /* 动效 */
   --duration: 0.25s;
