@@ -287,6 +287,8 @@ import { computed, reactive, ref, watch } from 'vue'
 import { formatYYYYMMDD } from '@/components/calendar-grid/calendar-utils.js'
 import { addHabit, getHabitDetail, updateHabit } from '@/api/plan/habit'
 import { useHoverEffect } from '@/hooks/useHoverEffect'
+import { useThemeStore } from '@/stores/theme'
+const themeStore = useThemeStore()
 
 useHoverEffect('.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.icon-preview-row,.icon-chip,.track-type-opt,.color-opt,.slider-toggle,.more-summary,.rd-btn,.btn-save,.btn-cancel,.btn-primary,.btn-secondary')
 
@@ -363,7 +365,7 @@ const form = reactive({
     description: '',
     motto: '',
     themeKey: 'goal',
-    color: '#5b5bd6',
+    color: themeStore.primaryColor || '#5b5bd6',
     category: '健康',
     targetValue: 1,
     targetUnit: '次',
@@ -406,7 +408,7 @@ const resetForm = () => {
     form.description = ''
     form.motto = ''
     form.themeKey = 'goal'
-    form.color = '#5b5bd6'
+    form.color = themeStore.primaryColor || '#5b5bd6'
     form.category = '健康'
     form.targetValue = 1
     form.targetUnit = '次'
@@ -471,7 +473,7 @@ const loadDetail = async (id) => {
             habitThemes.find((item) => item.color === detail.color) ||
             habitThemes[9]
         form.themeKey = matchedTheme.key
-        form.color = detail.color || matchedTheme.color || '#5b5bd6'
+        form.color = detail.color || matchedTheme.color || themeStore.primaryColor || '#5b5bd6'
         form.targetDays = detail.targetDays || 30
         form.category = detail.category || '健康'
         form.targetValue = detail.targetValue || 1
@@ -506,7 +508,7 @@ watch(() => props.visible, async (val) => {
             form.name = edit.name || ''
             form.description = edit.description || ''
             form.motto = edit.motto || ''
-            form.color = edit.color || '#5b5bd6'
+            form.color = edit.color || themeStore.primaryColor || '#5b5bd6'
             form.category = edit.category || '健康'
             form.targetValue = edit.targetValue || 1
             form.targetUnit = edit.targetUnit || '次'
