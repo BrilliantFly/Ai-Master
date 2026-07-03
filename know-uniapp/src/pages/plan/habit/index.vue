@@ -184,7 +184,7 @@
                         <text class="mi-name">{{ habit.habitName || habit.name || '未命名习惯' }}</text>
                         <text class="mi-sub">已结束 · {{ habit.category || '健康' }}</text>
                     </view>
-                    <button class="mi-action" type="button" @tap.stop="editHabitFromManage(habit)">恢复</button>
+                    <button class="mi-action" type="button" @tap.stop="restoreHabitFromManage(habit)">恢复</button>
                 </view>
                 <view style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;border-top:1px solid var(--color-border-light);padding-top:12px">
                     <button type="button" @tap="goAddHabit" class="manage-bottom-btn">📋 习惯模板</button>
@@ -304,7 +304,7 @@
                         class="detail-action-btn detail-action-btn-primary"
                         @tap="handleDetailCheckin"
                     >
-                        {{ detailModal.checked ? '今日已完成' : '立即打卡' }}
+                        {{ detailModal.checked ? '取消打卡' : '立即打卡' }}
                     </button>
                 </view>
                 <view class="habit-detail-secondary-actions">
@@ -350,13 +350,22 @@ import { onShow } from '@dcloudio/uni-app'
 import PremiumBottomNav from '@/components/PremiumBottomNav.vue'
 import CalendarGrid from '@/components/calendar-grid/CalendarGrid.vue'
 import HabitFormSheet from './components/HabitFormSheet.vue'
-import { checkinHabit, getCalendarMonthly, getHabitStats } from '@/api/plan/habit'
+import {
+    checkinHabit,
+    getCalendarMonthly,
+    getHabitStats,
+    uncheckinHabit,
+    updateHabit
+} from '@/api/plan/habit'
 import { getHolidays } from '@/api/holiday'
 import {
     formatYYYYMMDD,
     generateWeeks,
     quadrantColor
 } from '@/components/calendar-grid/calendar-utils.js'
+import { useHoverEffect } from '@/hooks/useHoverEffect'
+
+useHoverEffect('.manage-item,.mi-action,.swipe-action,.goal-card,.checkin-btn,.floating-add')
 
 const MILESTONES = [
     { days: 7, icon: '🌱', title: '初露锋芒', desc: '坚持了一周，好的开始已经形成。' },
@@ -463,6 +472,11 @@ const todayDate = computed(() => {
     const now = new Date()
     return formatYYYYMMDD(now.getFullYear(), now.getMonth() + 1, now.getDate())
 })
+const selectedRecordDate = () => {
+    const dateStr = selectedDateLabel.value || todayDate.value
+    const parts = dateStr.split('-').map((item) => Number(item))
+    return new Date(parts[0], parts[1] - 1, parts[2]).getTime()
+}
 const bestHabit = computed(() => {
     if (!allHabits.value.length) return null
     return [...allHabits.value].sort((a, b) => (b.currentDays || 0) - (a.currentDays || 0))[0]
@@ -825,13 +839,9 @@ const maybeShowMilestone = (previousDays, habit) => {
 const handleQuickCheckin = async (item) => {
     try {
         const previousDays = item.currentDays || 0
-        await checkinHabit(item.habitId, {})
+        await checkinHabit(item.habitId, { recordDate: selectedRecordDate() })
         uni.showToast({ title: '打卡成功', icon: 'success' })
-        await fetchStats()
-        await fetchCalendarData()
-        if (selectedDateLabel.value) {
-            dayHabitRecords.value = mapHabitRecordsForDay(selectedDateLabel.value)
-        }
+        await refreshHabitPage()
         const updatedHabit = allHabits.value.find(
             (habit) => String(habit.habitId || habit.id) === String(item.habitId)
         )
@@ -841,14 +851,30 @@ const handleQuickCheckin = async (item) => {
     }
 }
 
+const handleQuickUncheckin = async (item) => {
+    try {
+        await uncheckinHabit(item.habitId, { recordDate: selectedRecordDate() })
+        uni.showToast({ title: '已取消打卡', icon: 'success' })
+        await refreshHabitPage()
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 const onHabitSwipeAction = (item) => {
     closeHabitSwipe(item.habitId)
-    if (item.checked) return
+    if (item.checked) {
+        handleQuickUncheckin(item)
+        return
+    }
     handleQuickCheckin(item)
 }
 
 const handleDetailCheckin = async () => {
     if (detailModal.value.checked) {
+        await handleQuickUncheckin({
+            habitId: detailModal.value.habitId
+        })
         closeHabitDetail()
         return
     }
@@ -879,12 +905,13 @@ const getCardWeekData = (item) => {
         const date = new Date(base)
         date.setDate(base.getDate() - 6 + index)
         const dayNum = date.getDate()
+        const dateStr = formatYYYYMMDD(date.getFullYear(), date.getMonth() + 1, date.getDate())
         return {
-            date: date.toISOString().slice(0, 10),
+            date: dateStr,
             label: labels[date.getDay()],
             dayNumber: dayNum,
             checked: checkedDays.has(dayNum),
-            isToday: date.toISOString().slice(0, 10) === todayDate.value
+            isToday: dateStr === todayDate.value
         }
     })
     const completed = weekDays.filter((day) => day.checked).length
@@ -904,7 +931,7 @@ const editHabitFromCheckin = (item) => {
 }
 
 const archiveHabit = (item) => {
-    uni.showToast({ title: '归档功能已预留', icon: 'none' })
+    archiveHabitFromManage(item)
 }
 
 const moveHabit = (habit, dir, cat) => {
@@ -929,14 +956,34 @@ const archiveHabitFromManage = (habit) => {
     uni.showModal({
         title: '结束目标',
         content: `确定要结束「${habit.habitName || habit.name || '未命名习惯'}」吗？`,
-        success: (res) => {
+        success: async (res) => {
             if (res.confirm) {
-                // Toggle archived state locally by setting endDate
-                habit.endDate = habit.endDate ? '' : new Date().toISOString().slice(0, 10)
-                uni.showToast({ title: habit.endDate ? '已结束' : '已恢复', icon: 'success' })
+                await updateHabit({
+                    id: habitId,
+                    endDate: Date.now(),
+                    status: 2
+                })
+                uni.showToast({ title: '已结束', icon: 'success' })
+                await refreshHabitPage()
             }
         }
     })
+}
+
+const restoreHabitFromManage = async (habit) => {
+    const habitId = habit.habitId || habit.id
+    if (!habitId) return
+    try {
+        await updateHabit({
+            id: habitId,
+            endDate: 0,
+            status: 0
+        })
+        uni.showToast({ title: '已恢复', icon: 'success' })
+        await refreshHabitPage()
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 const editHabitFromManage = (habit) => {
@@ -944,8 +991,17 @@ const editHabitFromManage = (habit) => {
     showForm.value = true
 }
 
-const handleBackfillEntry = () => {
-    uni.showToast({ title: '补卡入口已预留', icon: 'none' })
+const handleBackfillEntry = async () => {
+    if (!detailModal.value.habitId) return
+    if (detailModal.value.checked) {
+        uni.showToast({ title: '该日已打卡', icon: 'none' })
+        return
+    }
+    await handleQuickCheckin({
+        habitId: detailModal.value.habitId,
+        currentDays: detailModal.value.currentDays
+    })
+    closeHabitDetail()
 }
 
 const handleShareEntry = () => {
@@ -1078,7 +1134,7 @@ onShow(async () => {
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     animation: cardSlideIn 0.4s ease both;
 }
-.manage-item:hover {
+.manage-item.hover-active {
     box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 .manage-item:active {
@@ -1118,7 +1174,7 @@ onShow(async () => {
     cursor: pointer;
     flex-shrink: 0;
 }
-.mi-action:hover {
+.mi-action.hover-active {
     background: var(--color-danger, #ff3b30);
     color: #fff;
 }
@@ -1136,7 +1192,7 @@ onShow(async () => {
     background: var(--color-surface-soft, #f5f5f7);
     color: var(--color-text-tertiary);
 }
-.mi-action.move-btn:hover {
+.mi-action.move-btn.hover-active {
     background: var(--color-border-light, #d1d1d6);
     color: var(--color-text-secondary);
 }
@@ -1444,7 +1500,7 @@ onShow(async () => {
     background: var(--color-text-tertiary, #8e8e93);
 }
 
-.goal-card-wrap .swipe-action:hover {
+.goal-card-wrap .swipe-action.hover-active {
     opacity: 0.9;
 }
 
@@ -1479,7 +1535,7 @@ onShow(async () => {
     animation: cardSlideIn 0.4s ease both;
 }
 
-.goal-card:hover {
+.goal-card.hover-active {
     box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
 }
 
@@ -1644,7 +1700,7 @@ onShow(async () => {
     padding: 0;
 }
 
-.checkin-btn:hover {
+.checkin-btn.hover-active {
     transform: scale(1.05);
 }
 
@@ -1676,7 +1732,7 @@ onShow(async () => {
     box-shadow: var(--shadow-glow);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.floating-add:hover {
+.floating-add.hover-active {
     transform: scale(1.08);
     box-shadow: 0 12rpx 40rpx rgba(var(--color-primary-rgb, 255, 135, 0), 0.3);
 }

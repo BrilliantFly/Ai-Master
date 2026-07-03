@@ -85,7 +85,7 @@
                             <view class="fg-select">{{ categoryOptions[categoryIndex] }}</view>
                         </picker>
                     </view>
-                    <view class="fgs-cell">
+                    <view class="fgs-cell" style="display:none">
                         <text class="fg-label">单位</text>
                         <view class="fg-input-wrap">
                             <input
@@ -286,6 +286,9 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { formatYYYYMMDD } from '@/components/calendar-grid/calendar-utils.js'
 import { addHabit, getHabitDetail, updateHabit } from '@/api/plan/habit'
+import { useHoverEffect } from '@/hooks/useHoverEffect'
+
+useHoverEffect('.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.icon-preview-row,.icon-chip,.track-type-opt,.color-opt,.slider-toggle,.more-summary,.rd-btn,.btn-save,.btn-cancel,.btn-primary,.btn-secondary')
 
 const props = defineProps({
     visible: { type: Boolean, default: false },
@@ -513,6 +516,9 @@ watch(() => props.visible, async (val) => {
         } else {
             editId.value = ''
             resetForm()
+            if (props.selectedDate) {
+                form.startDate = props.selectedDate
+            }
         }
     }
 })
@@ -721,7 +727,7 @@ const saveAsTemplate = () => {
     animation: cardSlideIn 0.4s ease both;
 }
 
-.form-card-schedule:hover {
+.form-card-schedule.hover-active {
     transform: translateY(-2rpx);
     box-shadow: 0 12rpx 36rpx rgba(15, 23, 42, 0.08);
 }
@@ -795,9 +801,9 @@ const saveAsTemplate = () => {
     transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
 }
 
-.fg-input:hover,
-.fg-select:hover,
-.fg-textarea:hover {
+.fg-input.hover-active,
+.fg-select.hover-active,
+.fg-textarea.hover-active {
     border-color: var(--color-border-hover, #c8ccd8);
     background: var(--color-surface);
 }
@@ -856,7 +862,7 @@ const saveAsTemplate = () => {
     cursor: pointer;
 }
 
-.icon-preview-row:hover {
+.icon-preview-row.hover-active {
     border-color: var(--color-border-hover, #c8ccd8);
     background: var(--color-surface-hover, #f2f4f8);
 }
@@ -895,7 +901,7 @@ const saveAsTemplate = () => {
     transition: transform 0.3s ease;
 }
 
-.icon-preview-row:hover .ip-arrow {
+.icon-preview-row.hover-active .ip-arrow {
     transform: translateX(3rpx);
 }
 
@@ -921,7 +927,7 @@ const saveAsTemplate = () => {
     cursor: pointer;
 }
 
-.icon-chip:hover {
+.icon-chip.hover-active {
     border-color: var(--color-primary);
     background: var(--color-surface-hover, #f2f4f8);
 }
@@ -962,7 +968,7 @@ const saveAsTemplate = () => {
     cursor: pointer;
 }
 
-.track-type-opt:hover {
+.track-type-opt.hover-active {
     border-color: var(--color-primary);
 }
 
@@ -1012,7 +1018,7 @@ const saveAsTemplate = () => {
     cursor: pointer;
 }
 
-.color-opt:hover {
+.color-opt.hover-active {
     transform: scale(1.12);
     box-shadow: 0 2rpx 12rpx rgba(15, 23, 42, 0.16);
 }
@@ -1068,7 +1074,7 @@ const saveAsTemplate = () => {
     cursor: pointer;
 }
 
-.slider-toggle:hover {
+.slider-toggle.hover-active {
     transform: scale(1.04);
 }
 
@@ -1120,7 +1126,7 @@ const saveAsTemplate = () => {
     align-items: center;
 }
 
-.more-summary:hover {
+.more-summary.hover-active {
     color: var(--color-primary);
 }
 
@@ -1146,12 +1152,6 @@ const saveAsTemplate = () => {
 
 .more-body {
     margin-top: 18rpx;
-    opacity: 0;
-    transition: opacity 0.35s ease, margin-top 0.35s ease;
-}
-
-.more-body.open {
-    opacity: 1;
 }
 
 .rest-days-strip {
@@ -1175,7 +1175,7 @@ const saveAsTemplate = () => {
     transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
 }
 
-.rd-btn:hover {
+.rd-btn.hover-active {
     border-color: var(--color-primary);
 }
 
@@ -1218,7 +1218,7 @@ const saveAsTemplate = () => {
     box-shadow: var(--shadow-glow);
 }
 
-.btn-save:hover {
+.btn-save.hover-active {
     transform: translateY(-1rpx);
     box-shadow: 0 8rpx 32rpx rgba(var(--color-primary-rgb), 0.3);
 }
@@ -1234,7 +1234,7 @@ const saveAsTemplate = () => {
     border: 2rpx solid var(--color-border-light);
 }
 
-.btn-cancel:hover {
+.btn-cancel.hover-active {
     background: var(--color-border-light);
     color: var(--color-text);
 }
@@ -1303,7 +1303,7 @@ const saveAsTemplate = () => {
     box-shadow: var(--shadow-glow);
 }
 
-.btn-primary:hover {
+.btn-primary.hover-active {
     transform: translateY(-1rpx);
     box-shadow: 0 6rpx 28rpx rgba(var(--color-primary-rgb), 0.3);
 }
@@ -1324,7 +1324,7 @@ const saveAsTemplate = () => {
     border: 2rpx solid var(--color-border-light);
 }
 
-.btn-secondary:hover {
+.btn-secondary.hover-active {
     background: var(--color-border-light);
     color: var(--color-text);
 }
