@@ -1214,7 +1214,7 @@ const saveAsTemplate = () => {
 .btn-save {
     flex: 1.15;
     color: #fff;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
     box-shadow: var(--shadow-glow);
 }
 
@@ -1299,7 +1299,7 @@ const saveAsTemplate = () => {
 .btn-primary {
     flex: 1.15;
     color: #fff;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
     box-shadow: var(--shadow-glow);
 }
 

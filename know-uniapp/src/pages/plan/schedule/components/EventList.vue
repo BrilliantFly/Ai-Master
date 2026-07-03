@@ -568,15 +568,15 @@ const onSwipeAction = (action, item) => {
 }
 
 .swipe-action.action-done {
-    background-image: linear-gradient(135deg, #22b573, #4dd499);
+    background-image: linear-gradient(135deg, var(--color-success), #4dd499);
 }
 
 .swipe-action.action-edit {
-    background-image: linear-gradient(135deg, #5b5bd6, #8b8bf0);
+    background-image: linear-gradient(135deg, var(--color-primary), #8b8bf0);
 }
 
 .swipe-action.action-delete {
-    background-image: linear-gradient(135deg, #e85a5a, #f08080);
+    background-image: linear-gradient(135deg, var(--color-danger), #f08080);
 }
 
 .swipe-action:last-child {
