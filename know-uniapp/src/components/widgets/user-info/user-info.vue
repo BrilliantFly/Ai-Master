@@ -221,8 +221,7 @@ watch(
         left: 0;
         right: 0;
         bottom: 0;
-        background: url(../../../static/images/user/my_topbg.png),
-            linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: url(../../../static/images/user/my_topbg.png), var(--gradient-primary);
         background-repeat: no-repeat;
         background-position: bottom;
         background-size: 100%;

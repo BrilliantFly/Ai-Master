@@ -17,7 +17,7 @@
                 :data-theme="theme.key"
                 @tap.stop="selectTheme(theme.key)"
             >
-                <text class="swatch" :class="'sw-' + theme.key"></text>
+                <text class="swatch" :style="{ background: swatchBg(theme.key) }"></text>
                 <text class="theme-name">{{ theme.name }}</text>
                 <text class="check">✓</text>
             </view>
@@ -27,13 +27,19 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useThemeStore, VISUAL_THEMES } from '@/stores/theme'
+import { useThemeStore, VISUAL_THEMES, THEME_COLORS } from '@/stores/theme'
 
 const themeStore = useThemeStore()
 const isOpen = ref(false)
 
 const themes = VISUAL_THEMES
 const current = computed(() => themeStore.currentVisualTheme)
+
+/** 从 THEME_COLORS 取主色用于 swatch 显示 */
+const swatchBg = (key: string) => {
+    const colors = THEME_COLORS[key]
+    return colors ? colors['--color-primary'] : '#5b5bd6'
+}
 
 const togglePanel = () => {
     isOpen.value = !isOpen.value
@@ -152,74 +158,7 @@ const selectTheme = (key: string) => {
     flex-shrink: 0;
     border: 1.5px solid var(--color-border-light);
     position: relative;
-}
-
-.swatch::after {
-    content: '';
-    position: absolute;
-    inset: 3px;
-    border-radius: 50%;
-}
-
-.sw-white::after {
-    background: #5b5bd6;
-}
-.sw-dark::after {
-    background: #6b6be0;
-}
-.sw-warm::after {
-    background: #d4956b;
-}
-.sw-aurora::after {
-    background: #6366f1;
-}
-.sw-purple::after {
-    background: #7c3aed;
-}
-.sw-glass::after {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-}
-.sw-orangold::after {
-    background: linear-gradient(135deg, #e87a5d, #d4a04a);
-}
-.sw-macaron::after {
-    background: #ff8ba7;
-}
-.sw-mint::after {
-    background: #34d399;
-}
-.sw-lavender::after {
-    background: #a78bfa;
-}
-.sw-milky::after {
-    background: #f59e0b;
-}
-.sw-matcha::after {
-    background: #65a30d;
-}
-.sw-berry::after {
-    background: #ec4899;
-}
-.sw-ocean::after {
-    background: #0ea5e9;
-}
-.sw-cream::after {
-    background: #d97706;
-}
-.sw-chocolate::after {
-    background: #8d6e63;
-}
-.sw-neon::after {
-    background: #00ff88;
-}
-.sw-sakura::after {
-    background: #ff69b4;
-}
-.sw-forest::after {
-    background: #4caf50;
-}
-.sw-sunset::after {
-    background: #ff6b35;
+    /* 背景色由内联 :style 驱动 */
 }
 
 .theme-option.active .swatch {

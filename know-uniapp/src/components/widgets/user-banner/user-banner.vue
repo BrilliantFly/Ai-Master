@@ -60,7 +60,7 @@ const handleClick = () => {
     width: 72rpx;
     height: 72rpx;
     border-radius: 18rpx;
-    background: linear-gradient(135deg, #f59e0b, #f97316);
+    background: var(--gradient-primary);
     display: flex;
     align-items: center;
     justify-content: center;
