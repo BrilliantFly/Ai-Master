@@ -868,7 +868,7 @@ const saveAsTemplate = () => {
 }
 
 .icon-preview-row:active {
-    transform: scale(0.98);
+    transform: scale(var(--scale-active));
 }
 
 .icon-preview-row:focus-visible {
@@ -933,7 +933,7 @@ const saveAsTemplate = () => {
 }
 
 .icon-chip:active {
-    transform: scale(0.95);
+    transform: scale(var(--scale-active));
 }
 
 .icon-chip.active {
@@ -973,7 +973,7 @@ const saveAsTemplate = () => {
 }
 
 .track-type-opt:active {
-    transform: scale(0.96);
+    transform: scale(var(--scale-active));
 }
 
 .track-type-opt.active {
@@ -1024,7 +1024,7 @@ const saveAsTemplate = () => {
 }
 
 .color-opt:active {
-    transform: scale(0.92);
+    transform: scale(var(--scale-active));
 }
 
 .color-opt.active {
@@ -1079,7 +1079,7 @@ const saveAsTemplate = () => {
 }
 
 .slider-toggle:active {
-    transform: scale(0.94);
+    transform: scale(var(--scale-active));
 }
 
 .slider-toggle:focus-visible {
@@ -1107,7 +1107,7 @@ const saveAsTemplate = () => {
 }
 
 .slider-toggle:active .knob {
-    transform: scale(0.92);
+    transform: scale(var(--scale-active));
 }
 
 .more-card {
@@ -1180,7 +1180,7 @@ const saveAsTemplate = () => {
 }
 
 .rd-btn:active {
-    transform: scale(0.92);
+    transform: scale(var(--scale-active));
 }
 
 .rd-btn.active {
@@ -1224,7 +1224,7 @@ const saveAsTemplate = () => {
 }
 
 .btn-save:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
     box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
 }
 
@@ -1240,7 +1240,7 @@ const saveAsTemplate = () => {
 }
 
 .btn-cancel:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
 }
 
 .btn-save[disabled] {
@@ -1309,7 +1309,7 @@ const saveAsTemplate = () => {
 }
 
 .btn-primary:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
     box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
 }
 
@@ -1330,7 +1330,7 @@ const saveAsTemplate = () => {
 }
 
 .btn-secondary:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
 }
 
 .btn-secondary:focus-visible {

@@ -868,7 +868,7 @@ const handleSave = async () => {
 }
 
 .action-btn.cancel:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
 }
 
 .action-btn.submit {
@@ -883,7 +883,7 @@ const handleSave = async () => {
 }
 
 .action-btn.submit:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
     box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
 }
 
@@ -1063,7 +1063,7 @@ const handleSave = async () => {
 }
 
 .quad-option:active {
-    transform: scale(0.95);
+    transform: scale(var(--scale-active));
 }
 
 .quad-option.active {
@@ -1112,7 +1112,7 @@ const handleSave = async () => {
 }
 
 .check-chip:active {
-    transform: scale(0.93);
+    transform: scale(var(--scale-active));
 }
 
 .check-chip.active {
@@ -1242,7 +1242,7 @@ const handleSave = async () => {
 }
 
 .subtask-del:active {
-    transform: scale(0.88);
+    transform: scale(var(--scale-active));
 }
 
 .subtask-del:focus-visible {
@@ -1273,7 +1273,7 @@ const handleSave = async () => {
 }
 
 .btn-add-sub:active {
-    transform: scale(0.96);
+    transform: scale(var(--scale-active));
 }
 
 .btn-add-sub:focus-visible {
@@ -1337,7 +1337,7 @@ const handleSave = async () => {
 }
 
 .btn-primary:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
     box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
 }
 
@@ -1357,7 +1357,7 @@ const handleSave = async () => {
 }
 
 .btn-secondary:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
 }
 
 .btn-secondary:focus-visible {

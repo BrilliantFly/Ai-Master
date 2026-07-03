@@ -1134,7 +1134,7 @@ onShow(async () => {
 }
 
 .hero-icon:active {
-    transform: scale(0.94);
+    transform: scale(var(--scale-active));
 }
 
 .hero-icon-text {
@@ -1317,7 +1317,7 @@ onShow(async () => {
 
 .search-input:active,
 .search-qr:active {
-    transform: scale(0.98);
+    transform: scale(var(--scale-active));
 }
 
 .search-input-icon {
@@ -1531,7 +1531,7 @@ onShow(async () => {
 }
 
 .quick-item:active {
-    transform: scale(0.94);
+    transform: scale(var(--scale-active));
 }
 
 .quick-icon {
@@ -1585,7 +1585,7 @@ onShow(async () => {
 }
 
 .recommend-card:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
 }
 
 .recommend-thumb {
@@ -1666,7 +1666,7 @@ onShow(async () => {
 }
 
 .tool-card:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
 }
 
 .tool-top {
@@ -1757,7 +1757,7 @@ onShow(async () => {
 }
 
 .tool-chip:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
 }
 
 .tool-chip-dot {

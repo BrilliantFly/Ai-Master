@@ -325,7 +325,7 @@ const onSwipeAction = (action, item) => {
     color: var(--color-text, #1d1d1f);
 }
 .filter-pill:active {
-    transform: scale(0.95);
+    transform: scale(var(--scale-active));
 }
 .filter-pill.active {
     font-weight: 600;
@@ -357,7 +357,7 @@ const onSwipeAction = (action, item) => {
 }
 
 .s-card:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-active));
 }
 
 .s-card.done {
@@ -564,7 +564,7 @@ const onSwipeAction = (action, item) => {
 }
 .swipe-action:active {
     filter: brightness(1.12);
-    transform: scale(0.92);
+    transform: scale(var(--scale-active));
 }
 
 .swipe-action.action-done {
