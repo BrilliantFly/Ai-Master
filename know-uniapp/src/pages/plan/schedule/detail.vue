@@ -71,6 +71,18 @@
                     <text class="label">优先级</text>
                     <text class="value">{{ priorityLabel(event.priority) }}</text>
                 </view>
+                <view class="detail-row detail-progress-row" v-if="hasProgress">
+                    <text class="label">进度</text>
+                    <view class="value detail-progress-value">
+                        <view class="detail-progress-bar">
+                            <view
+                                class="detail-progress-fill"
+                                :style="{ width: progressValue + '%' }"
+                            ></view>
+                        </view>
+                        <text class="detail-progress-text">{{ progressValue }}%</text>
+                    </view>
+                </view>
                 <view class="detail-row" v-if="categoryDisplay">
                     <text class="label">分类</text>
                     <text class="value">{{ categoryDisplay }}</text>
@@ -156,11 +168,10 @@
             <view class="detail-action-swipe">
                 <view class="detail-swipe-actions">
                     <view
-                        v-if="event.status === 0"
                         class="detail-swipe-btn detail-swipe-btn-complete"
-                        @tap.stop="onDetailSwipeAction('complete')"
+                        @tap.stop="onDetailSwipeAction(event.status === 1 ? 'uncomplete' : 'complete')"
                     >
-                        <text class="detail-swipe-label">完成</text>
+                        <text class="detail-swipe-label">{{ event.status === 1 ? '取消' : '完成' }}</text>
                     </view>
                     <view
                         class="detail-swipe-btn detail-swipe-btn-delete"
@@ -201,7 +212,8 @@ import {
     completeSchedule,
     deleteSchedule,
     getCategoryList,
-    getScheduleDetail
+    getScheduleDetail,
+    uncompleteSchedule
 } from '@/api/plan/schedule'
 
 const event = ref(null)
@@ -215,9 +227,7 @@ const detailSwipe = ref({
     translateX: 0
 })
 
-const detailActionMax = computed(() =>
-    event.value?.status === 0 ? DETAIL_ACTION_WIDTH * 2 : DETAIL_ACTION_WIDTH
-)
+const detailActionMax = computed(() => DETAIL_ACTION_WIDTH * 2)
 
 const categoryDisplay = computed(() => {
     if (!event.value?.categoryId) return ''
@@ -258,6 +268,18 @@ const subtaskList = computed(() => {
     }
     return []
 })
+
+const clampProgress = (value) => {
+    const progress = Number(value)
+    if (!Number.isFinite(progress)) return 0
+    return Math.max(0, Math.min(100, Math.round(progress)))
+}
+
+const hasProgress = computed(
+    () => event.value?.progress !== null && event.value?.progress !== undefined
+)
+
+const progressValue = computed(() => clampProgress(event.value?.progress))
 
 const closeDetailSwipe = () => {
     detailSwipe.value.translateX = 0
@@ -315,7 +337,6 @@ const repeatLabel = (repeatType) => {
 
 const priorityLabel = (priority) => {
     const labels = {
-        4: 'P0 最高',
         3: 'P1 高',
         2: 'P2 中',
         1: 'P3 低'
@@ -324,7 +345,7 @@ const priorityLabel = (priority) => {
 }
 
 const remindLabel = (minutes) => {
-    if (minutes === null || minutes === undefined || minutes === '') return '不提醒'
+    if (minutes === null || minutes === undefined || minutes === '' || Number(minutes) < 0) return '不提醒'
     if (Number(minutes) === 0) return '准时提醒'
     if (Number(minutes) < 60) return `提前 ${minutes} 分钟`
     return `提前 ${Math.round(Number(minutes) / 60)} 小时`
@@ -332,7 +353,7 @@ const remindLabel = (minutes) => {
 
 const formatDateTime = (ts) => {
     if (!ts) return ''
-    const d = new Date(ts)
+    const d = new Date(Number(ts))
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
         d.getDate()
     ).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(
@@ -369,6 +390,23 @@ const handleComplete = async () => {
         uni.showToast({ title: '已完成', icon: 'success' })
         event.value.status = 1
         event.value.completedTime = Date.now()
+        event.value.progress = 100
+        closeDetailSwipe()
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+const handleUncomplete = async () => {
+    if (!event.value) return
+    try {
+        await uncompleteSchedule(event.value.id, {})
+        uni.showToast({ title: '已取消完成', icon: 'success' })
+        event.value.status = 0
+        event.value.completedTime = null
+        if (!event.value.progress || event.value.progress >= 100) {
+            event.value.progress = 0
+        }
         closeDetailSwipe()
     } catch (error) {
         console.error(error)
@@ -394,6 +432,10 @@ const goEdit = () => {
 const onDetailSwipeAction = (action) => {
     if (action === 'complete') {
         handleComplete()
+        return
+    }
+    if (action === 'uncomplete') {
+        handleUncomplete()
         return
     }
     if (action === 'delete') {
@@ -620,6 +662,36 @@ onMounted(() => {
     font-size: 26rpx;
     color: var(--color-text);
     line-height: 1.6;
+}
+
+.detail-progress-value {
+    display: flex;
+    align-items: center;
+    gap: 18rpx;
+    min-width: 0;
+}
+
+.detail-progress-bar {
+    flex: 1;
+    height: 12rpx;
+    border-radius: 999rpx;
+    background: var(--color-border-light);
+    overflow: hidden;
+}
+
+.detail-progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--color-primary), #5ac8a0);
+}
+
+.detail-progress-text {
+    flex-shrink: 0;
+    min-width: 72rpx;
+    text-align: right;
+    font-size: 24rpx;
+    font-weight: 800;
+    color: var(--color-primary);
 }
 
 .tag-list {

@@ -60,10 +60,12 @@
             <!-- 卡片内容 -->
             <view
                 class="swipe-content"
+                :data-swipe-id="item.id"
                 :style="swipeStyle(item.id)"
                 @touchstart="onTouchStart($event, item.id)"
                 @touchmove="onTouchMove($event, item.id)"
                 @touchend="onTouchEnd($event, item.id)"
+                @touchcancel="onTouchCancel($event, item.id)"
                 @tap="onCardTap(item)"
             >
                 <view class="s-card premium-hover-lift" :class="{ done: completedMap[item.id] }">
@@ -101,6 +103,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { QUADRANT_COLORS, quadrantColor } from '@/components/calendar-grid/calendar-utils.js'
+import { useHoverEffect } from '@/hooks/useHoverEffect'
+
+useHoverEffect('.filter-pill,.s-card')
 
 const props = defineProps({
     selectedDateLabel: { type: String, default: '' },
@@ -139,11 +144,10 @@ const repeatIconMap = REPEAT_ICON
 
 // ===== 左滑逻辑 =====
 const SWIPE_THRESHOLD = 50 // 超过此距离触发
-const SWIPE_MAX = 210 // 最大滑动距离（三按钮宽度 70*3）
+const SWIPE_MAX = 216 // 最大滑动距离（三按钮宽度 72*3）
 
-// 每个项的滑动偏移量
+// 使用 ref({}) — 与打卡页面左滑实现一致的工作模式
 const offsets = ref({})
-
 // 当前打开项
 const openId = ref(null)
 
@@ -156,7 +160,8 @@ const onTouchStart = (e, id) => {
     offsets.value[id] = {
         startX: touch.clientX,
         currentX: touch.clientX,
-        translateX: openId.value === id ? -SWIPE_MAX : 0
+        translateX: openId.value === id ? -SWIPE_MAX : 0,
+        wasSwiped: false
     }
 }
 
@@ -166,17 +171,24 @@ const onTouchMove = (e, id) => {
     const touch = e.touches[0]
     const delta = touch.clientX - data.startX
 
-    // 只允许左滑（delta < 0）
+    data.wasSwiped = true
+
+    // 只允许左滑（delta < 0），不允许右拉
     if (delta > 0 && data.translateX >= 0) {
-        data.translateX = 0
         return
     }
 
     let targetX = data.translateX + (touch.clientX - data.currentX)
-    // 限制范围：-SWIPE_MAX ~ 0
     targetX = Math.max(-SWIPE_MAX, Math.min(0, targetX))
     data.translateX = targetX
     data.currentX = touch.clientX
+
+    // 直接操作 DOM — 绕过 scroll-view 内的 Vue 渲染节流
+    const el = (typeof document !== 'undefined') ? document.querySelector(`[data-swipe-id="${id}"]`) : null
+    if (el) {
+        el.style.transform = `translateX(${targetX}px)`
+        el.style.transition = 'none'
+    }
 }
 
 const onTouchEnd = (e, id) => {
@@ -185,18 +197,41 @@ const onTouchEnd = (e, id) => {
 
     const absTranslate = Math.abs(data.translateX)
 
+    // 已打开卡片上轻点（非滑动），关闭左滑并允许 tap 事件导航
+    if (!data.wasSwiped && openId.value === id) {
+        data.translateX = 0
+        openId.value = null
+        applySwipeX(id, 0, true)
+        return
+    }
+
     if (absTranslate > SWIPE_THRESHOLD) {
-        // 超过阈值 → 打开
         openId.value = id
-        // 弹到最大位置
         data.translateX = -SWIPE_MAX
+        applySwipeX(id, -SWIPE_MAX, true)
     } else {
-        // 未超过阈值 → 关闭
         data.translateX = 0
         if (openId.value === id) {
             openId.value = null
         }
+        applySwipeX(id, 0, true)
     }
+}
+
+/**
+ * 直接操作 DOM 设置 translateX（带 transition）。
+ * 这是关键修复：scroll-view 内的 :style 绑定在 uni-app H5 中可能不触发重绘。
+ */
+const applySwipeX = (id, x, smooth) => {
+    const el = (typeof document !== 'undefined') ? document.querySelector(`[data-swipe-id="${id}"]`) : null
+    if (el) {
+        el.style.transition = smooth ? 'transform 0.25s cubic-bezier(.22,1,.36,1)' : 'none'
+        el.style.transform = `translateX(${x}px)`
+    }
+}
+
+const onTouchCancel = (e, id) => {
+    if (id) applySwipeX(id, 0, false)
 }
 
 const closeSwipe = (id) => {
@@ -206,12 +241,12 @@ const closeSwipe = (id) => {
     if (openId.value === id) {
         openId.value = null
     }
+    applySwipeX(id, 0, true)
 }
 
 const swipeStyle = (id) => {
     const data = offsets.value[id]
     const x = data ? data.translateX : openId.value === id ? -SWIPE_MAX : 0
-    // 用 transition 让回弹平滑
     return `transform: translateX(${x}px); transition: transform 0.25s cubic-bezier(.22,1,.36,1);`
 }
 
@@ -285,7 +320,7 @@ const onSwipeAction = (action, item) => {
     cursor: pointer;
     transition: color 0.25s ease, background 0.25s ease, transform 0.2s ease;
 }
-.filter-pill:hover {
+.filter-pill.hover-active {
     background: rgba(0,0,0,0.08);
     color: var(--color-text, #1d1d1f);
 }
@@ -307,16 +342,16 @@ const onSwipeAction = (action, item) => {
     display: flex;
     gap: 10px;
     padding: 14px;
-    border-radius: 12px;
+    border-radius: 14px;
     background: var(--color-surface, #ffffff);
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid var(--color-border-light, #e4e7ed);
     cursor: pointer;
     transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
     position: relative;
     overflow: hidden;
 }
 
-.s-card:hover {
+.s-card.hover-active {
     box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
     border-color: transparent;
 }
@@ -498,8 +533,9 @@ const onSwipeAction = (action, item) => {
 /* ===== 左滑容器 ===== */
 .swipe-wrap {
     position: relative;
-    margin: 0 20px 10px;
+    margin: 0 20px 8px;
     overflow: hidden;
+    border-radius: var(--radius-sm, 8px);
 }
 
 .swipe-actions {
@@ -513,7 +549,7 @@ const onSwipeAction = (action, item) => {
 }
 
 .swipe-action {
-    width: 70px;
+    width: 72px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -522,33 +558,41 @@ const onSwipeAction = (action, item) => {
     cursor: pointer;
     transition: opacity 0.2s, transform 0.2s;
     color: #fff;
+    border: none;
+    font-family: inherit;
+    letter-spacing: .02em;
 }
 .swipe-action:active {
-    opacity: 0.85;
-    transform: scale(0.95);
+    filter: brightness(1.12);
+    transform: scale(0.92);
 }
 
 .swipe-action.action-done {
-    background: var(--color-primary, #ff8700);
+    background-image: linear-gradient(135deg, #22b573, #4dd499);
 }
 
 .swipe-action.action-edit {
-    background: var(--color-primary, #ff8700);
-    opacity: 0.85;
+    background-image: linear-gradient(135deg, #5b5bd6, #8b8bf0);
 }
 
 .swipe-action.action-delete {
-    background: var(--color-danger, #ff3b30);
+    background-image: linear-gradient(135deg, #e85a5a, #f08080);
+}
+
+.swipe-action:last-child {
+    border-radius: 0 var(--radius-sm, 8px) var(--radius-sm, 8px) 0;
 }
 
 .swipe-action .sa-icon {
-    font-size: 16px;
+    font-size: 20px;
     line-height: 1;
+    margin-bottom: 2px;
 }
 
 .swipe-action .sa-label {
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: .02em;
 }
 
 /* 卡片内容（可滑出） */
@@ -556,34 +600,14 @@ const onSwipeAction = (action, item) => {
     position: relative;
     z-index: 2;
     background: var(--color-surface, #ffffff);
-    border-radius: 12px;
-    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 14px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     transition: box-shadow 0.25s ease, border-color 0.25s ease;
     will-change: transform;
-    animation: cardSlideIn 0.4s ease both;
 }
 .swipe-content:active {
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Staggered card entrance */
-.swipe-wrap:nth-child(1) .swipe-content { animation-delay: 0s; }
-.swipe-wrap:nth-child(2) .swipe-content { animation-delay: 0.04s; }
-.swipe-wrap:nth-child(3) .swipe-content { animation-delay: 0.08s; }
-.swipe-wrap:nth-child(4) .swipe-content { animation-delay: 0.12s; }
-.swipe-wrap:nth-child(5) .swipe-content { animation-delay: 0.16s; }
-.swipe-wrap:nth-child(6) .swipe-content { animation-delay: 0.20s; }
-.swipe-wrap:nth-child(7) .swipe-content { animation-delay: 0.24s; }
 
-@keyframes cardSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 </style>

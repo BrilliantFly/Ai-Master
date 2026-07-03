@@ -157,6 +157,26 @@
                             <view class="picker-pill">{{ remindLabels[form.remindIndex] }}</view>
                         </picker>
                     </view>
+
+                    <view class="field-block field-block-compact progress-row">
+                        <view class="progress-head">
+                            <view class="field-copy">
+                                <text class="field-label">完成进度</text>
+                                <text class="field-help">用于列表、详情和完成状态回显</text>
+                            </view>
+                            <text class="progress-value">{{ form.progress }}%</text>
+                        </view>
+                        <slider
+                            :value="form.progress"
+                            min="0"
+                            max="100"
+                            activeColor="var(--color-primary)"
+                            backgroundColor="var(--color-border)"
+                            block-size="20"
+                            @change="onProgressChange"
+                            @changing="onProgressChange"
+                        />
+                    </view>
                 </view>
 
                 <view class="section-card">
@@ -232,10 +252,10 @@ const quadrantCards = [
     { value: 3, label: '紧急不重要', icon: '⚡' },
     { value: 4, label: '不紧急不重要', icon: '🫧' }
 ]
-const priorityOptions = ['P0 最高', 'P1 高', 'P2 中', 'P3 低']
+const priorityOptions = ['P1 高', 'P2 中', 'P3 低']
 const repeatOptions = ['不重复', '每天', '每周', '每月', '每年']
 const remindOptions = [
-    { label: '不提醒', minutes: null },
+    { label: '不提醒', minutes: -1 },
     { label: '准时提醒', minutes: 0 },
     { label: '提前 5 分钟', minutes: 5 },
     { label: '提前 15 分钟', minutes: 15 },
@@ -264,6 +284,7 @@ const form = reactive({
     endClock: '10:00',
     repeatType: 0,
     remindIndex: 0,
+    progress: 0,
     eventType: 1
 })
 
@@ -279,10 +300,9 @@ const selectedCategoryName = computed(() => {
 })
 
 const priorityIndex = computed(() => {
-    if (form.priority === 3) return 1
-    if (form.priority === 2) return 2
-    if (form.priority === 1) return 3
-    return 2
+    if (form.priority === 3) return 0
+    if (form.priority === 1) return 2
+    return 1
 })
 
 const repeatPickerValue = computed(() => {
@@ -297,7 +317,7 @@ const repeatSummary = computed(() => {
 })
 
 const remindSummary = computed(() => {
-    return remindOptions[form.remindIndex].minutes === null
+    return remindOptions[form.remindIndex].minutes < 0
         ? '保存后不会发送提醒'
         : '将在开始前按设定时间提醒'
 })
@@ -320,7 +340,7 @@ const buildTimestamp = (dateStr, clock) => {
 }
 
 const formatDateTimeText = (timestamp) => {
-    const date = new Date(timestamp)
+    const date = new Date(Number(timestamp))
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
@@ -331,7 +351,7 @@ const formatDateTimeText = (timestamp) => {
 
 const formatClock = (timestamp) => {
     if (!timestamp) return ''
-    const date = new Date(timestamp)
+    const date = new Date(Number(timestamp))
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(
         2,
         '0'
@@ -376,6 +396,12 @@ const normalizeTags = (text) => {
         .join(',')
 }
 
+const clampProgress = (value) => {
+    const progress = Number(value)
+    if (!Number.isFinite(progress)) return 0
+    return Math.max(0, Math.min(100, Math.round(progress)))
+}
+
 const loadCategories = async () => {
     try {
         const list = await getCategoryList({})
@@ -406,9 +432,12 @@ const loadDetail = async (id) => {
         form.startClock = detail.startTime ? formatClock(detail.startTime) : form.startClock
         form.endClock = detail.endTime ? formatClock(detail.endTime) : form.endClock
         form.repeatType = detail.isRepeat ? detail.repeatType || 0 : 0
-        const remindIndex = remindOptions.findIndex(
-            (item) => String(item.minutes) === String(detail.remindMinutes)
-        )
+        form.progress = clampProgress(detail.progress)
+        const remindIndex = !detail.remindTime
+            ? 0
+            : remindOptions.findIndex(
+                  (item) => String(item.minutes) === String(detail.remindMinutes)
+              )
         form.remindIndex = remindIndex >= 0 ? remindIndex : 0
     } catch (error) {
         console.error('加载日程详情失败', error)
@@ -437,7 +466,7 @@ const onCategoryChange = (e) => {
 
 const onPriorityChange = (e) => {
     const index = Number(e.detail.value)
-    form.priority = [3, 3, 2, 1][index] || 2
+    form.priority = [3, 2, 1][index] || 2
 }
 
 const onStartDateChange = (e) => {
@@ -460,6 +489,10 @@ const onRemindChange = (e) => {
     form.remindIndex = Number(e.detail.value)
 }
 
+const onProgressChange = (e) => {
+    form.progress = clampProgress(e.detail.value)
+}
+
 const goBack = () => {
     uni.navigateBack()
 }
@@ -470,7 +503,7 @@ const buildPayload = () => {
     const remindConfig = remindOptions[form.remindIndex]
     const remindMinutes = remindConfig.minutes
     const remindTime =
-        remindMinutes === null ? '' : formatDateTimeText(startTime - remindMinutes * 60 * 1000)
+        remindMinutes < 0 ? '' : formatDateTimeText(startTime - remindMinutes * 60 * 1000)
 
     return {
         id: editId.value || undefined,
@@ -491,6 +524,7 @@ const buildPayload = () => {
         repeatRule: form.repeatType > 0 ? JSON.stringify({ repeatType: form.repeatType }) : '',
         remindTime,
         remindMinutes,
+        progress: form.progress,
         location: form.location.trim()
     }
 }
@@ -518,7 +552,7 @@ const handleSave = async () => {
             await updateSchedule(payload)
             uni.showToast({ title: '更新成功', icon: 'success' })
         } else {
-            await addSchedule(payload, {})
+            await addSchedule(payload)
             uni.showToast({ title: '添加成功', icon: 'success' })
         }
         setTimeout(() => uni.navigateBack(), 500)
@@ -706,6 +740,28 @@ const handleSave = async () => {
     flex: 1;
     display: flex;
     flex-direction: column;
+}
+
+.progress-row {
+    padding-top: 22rpx;
+    border-top: 2rpx solid var(--color-border-light);
+}
+
+.progress-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24rpx;
+    margin-bottom: 8rpx;
+}
+
+.progress-value {
+    flex-shrink: 0;
+    min-width: 96rpx;
+    text-align: right;
+    font-size: 28rpx;
+    font-weight: 800;
+    color: var(--color-primary);
 }
 
 .field-help {

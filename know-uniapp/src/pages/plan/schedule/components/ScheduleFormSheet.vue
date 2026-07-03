@@ -19,20 +19,9 @@
                     </view>
                 </view>
 
-                <view class="fgs-full">
-                    <text class="fg-label">📖 描述</text>
-                    <textarea
-                        :value="form.content"
-                        class="fg-textarea"
-                        placeholder="补充说明，可选"
-                        placeholder-class="field-placeholder"
-                        @input="onContentInput"
-                    />
-                </view>
-
                     <view class="fgs-row">
                         <view class="fgs-cell">
-                            <text class="fg-label">📅 开始日期</text>
+                            <text class="fg-label">📅 开始日期 <text class="required">*</text></text>
                             <picker mode="date" :value="form.startDate" @change="onStartDateChange">
                                 <view class="fg-select">{{
                                     form.startDate || '选择日期'
@@ -138,14 +127,14 @@
                     </view>
 
                     <view class="fgs-full">
-                        <text class="fg-label">提醒设置</text>
+                        <text class="fg-label">🔔 提醒设置</text>
                         <view class="check-grid">
                             <view
-                                v-for="(item, index) in remindOptions"
+                                v-for="item in remindOptions"
                                 :key="item.label"
                                 class="check-chip"
-                                :class="{ active: form.remindIndex === index }"
-                                @tap="form.remindIndex = index"
+                                :class="{ active: form.remindMinutes.includes(item.minutes) }"
+                                @tap="toggleRemind(item.minutes)"
                             >
                                 {{ item.label }}
                             </view>
@@ -171,7 +160,7 @@
                     <view class="more-summary" @tap="moreOpen = !moreOpen">
                         <text><text class="arrow">{{ moreOpen ? '▼' : '▶' }}</text> 更多设置</text>
                     </view>
-                    <view v-if="moreOpen" class="section-body">
+                    <view class="section-body" :class="{ open: moreOpen }">
 
                     <view class="fgs-full">
                         <text class="fg-label">标签</text>
@@ -221,12 +210,6 @@
             <view class="btn-row">
                 <button class="btn-secondary" type="button" @tap="onCancel">取消</button>
                 <button
-                    v-if="isEdit"
-                    class="btn-secondary danger"
-                    type="button"
-                    @tap="handleDeleteFromForm"
-                >删除</button>
-                <button
                     class="btn-primary"
                     type="button"
                     :disabled="submitting"
@@ -235,6 +218,8 @@
                     {{ submitting ? '保存中...' : isEdit ? '更新日程' : '保存日程' }}
                 </button>
             </view>
+
+
         </view>
     </view>
 </template>
@@ -243,12 +228,14 @@
 import { computed, reactive, ref, watch } from 'vue'
 import {
     addSchedule,
-    deleteSchedule,
     getCategoryList,
     getScheduleDetail,
     updateSchedule
 } from '@/api/plan/schedule'
 import { formatYYYYMMDD } from '@/components/calendar-grid/calendar-utils.js'
+import { useHoverEffect } from '@/hooks/useHoverEffect'
+
+useHoverEffect('.action-btn.cancel,.action-btn.submit,.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.quad-option,.check-chip,.more-summary,.subtask-del,.btn-add-sub,.btn-primary,.btn-secondary')
 
 const props = defineProps({
     visible: { type: Boolean, default: false },
@@ -259,22 +246,23 @@ const props = defineProps({
 const emit = defineEmits(['close', 'saved'])
 
 const quadrantCards = [
-    { value: 1, label: '重要紧急', icon: '🔥' },
-    { value: 2, label: '重要不紧急', icon: '📘' },
-    { value: 3, label: '紧急不重要', icon: '⚡' },
-    { value: 4, label: '不紧急不重要', icon: '🫧' }
+    { value: 1, label: '重要紧急', icon: '🔴' },
+    { value: 2, label: '重要不紧急', icon: '🟡' },
+    { value: 3, label: '紧急不重要', icon: '🔵' },
+    { value: 4, label: '不紧急不重要', icon: '⚪' }
 ]
 const priorityOptions = ['P0 最高', 'P1 高', 'P2 中', 'P3 低']
-const repeatOptions = ['不重复', '每天', '每周', '每月', '每年']
+const repeatOptions = ['不重复', '每天', '每周', '每月', '每年', '自定义']
 const remindOptions = [
-    { label: '不提醒', minutes: null },
-    { label: '准时提醒', minutes: 0 },
+    { label: '准时', minutes: 0 },
     { label: '提前 5 分钟', minutes: 5 },
     { label: '提前 15 分钟', minutes: 15 },
     { label: '提前 30 分钟', minutes: 30 },
-    { label: '提前 1 小时', minutes: 60 }
+    { label: '提前 1 小时', minutes: 60 },
+    { label: '提前 2 小时', minutes: 120 },
+    { label: '提前 1 天', minutes: 1440 },
+    { label: '提前 1 周', minutes: 10080 }
 ]
-const remindLabels = remindOptions.map((item) => item.label)
 
 const submitting = ref(false)
 const editId = ref('')
@@ -298,7 +286,8 @@ const form = reactive({
     startClock: '09:00',
     endClock: '10:00',
     repeatType: 0,
-    remindIndex: 0,
+    remindMinutes: [],
+    cronExpr: '',
     eventType: 1
 })
 
@@ -313,12 +302,7 @@ const selectedCategoryName = computed(() => {
     return categoryOptions.value[categoryIndex.value]?.name || '未分类'
 })
 
-const priorityIndex = computed(() => {
-    if (form.priority === 3) return 1
-    if (form.priority === 2) return 2
-    if (form.priority === 1) return 3
-    return 2
-})
+const priorityIndex = computed(() => form.priority)
 
 const repeatPickerValue = computed(() => {
     if (!form.repeatType) return 0
@@ -332,15 +316,15 @@ const repeatSummary = computed(() => {
 })
 
 const remindSummary = computed(() => {
-    return remindOptions[form.remindIndex].minutes === null
-        ? '保存后不会发送提醒'
-        : '将在开始前按设定时间提醒'
+    return form.remindMinutes.length > 0
+        ? '将在开始前按设定时间提醒'
+        : '保存后不会发送提醒'
 })
 
 const resetForm = () => {
     const now = new Date()
     form.title = ''
-    form.content = ''
+
     form.tags = ''
     form.subtasks = []
     form.note = ''
@@ -353,7 +337,8 @@ const resetForm = () => {
     form.startClock = '09:00'
     form.endClock = '10:00'
     form.repeatType = 0
-    form.remindIndex = 0
+    form.remindMinutes = []
+    form.cronExpr = ''
     form.eventType = 1
     editId.value = ''
     editDataCache.value = null
@@ -386,7 +371,7 @@ const buildTimestamp = (dateStr, clock) => {
 }
 
 const formatDateTimeText = (timestamp) => {
-    const date = new Date(timestamp)
+    const date = new Date(Number(timestamp))
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
@@ -397,7 +382,7 @@ const formatDateTimeText = (timestamp) => {
 
 const formatClock = (timestamp) => {
     if (!timestamp) return ''
-    const date = new Date(timestamp)
+    const date = new Date(Number(timestamp))
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
@@ -456,7 +441,7 @@ const loadDetail = async (id) => {
         const detail = await getScheduleDetail(id)
         if (!detail) return
         form.title = detail.title || ''
-        form.content = detail.content || ''
+
         form.tags = detail.tags || ''
         form.subtasks = parseSubtasks(detail.subtasks)
         form.note = detail.note || ''
@@ -471,18 +456,18 @@ const loadDetail = async (id) => {
         form.startClock = detail.startTime ? formatClock(detail.startTime) : form.startClock
         form.endClock = detail.endTime ? formatClock(detail.endTime) : form.endClock
         form.repeatType = detail.isRepeat ? detail.repeatType || 0 : 0
-        const remindIndex = remindOptions.findIndex(
-            (item) => String(item.minutes) === String(detail.remindMinutes)
-        )
-        form.remindIndex = remindIndex >= 0 ? remindIndex : 0
+        form.cronExpr = detail.cronExpr || ''
+        if (detail.remindMinutesList) {
+            try { form.remindMinutes = JSON.parse(detail.remindMinutesList) }
+            catch { form.remindMinutes = [] }
+        } else if (detail.remindMinutes !== undefined && detail.remindMinutes !== null) {
+            form.remindMinutes = [Number(detail.remindMinutes)]
+        } else {
+            form.remindMinutes = []
+        }
     } catch (error) {
         console.error('加载日程详情失败', error)
     }
-}
-
-const onContentInput = (e) => {
-    const value = e.detail ? e.detail.value : e.target.value
-    form.content = value || ''
 }
 
 const onNoteInput = (e) => {
@@ -497,7 +482,7 @@ const onCategoryChange = (e) => {
 
 const onPriorityChange = (e) => {
     const index = Number(e.detail.value)
-    form.priority = [3, 3, 2, 1][index] || 2
+    form.priority = index
 }
 
 const onStartDateChange = (e) => {
@@ -516,8 +501,12 @@ const onRepeatChange = (e) => {
     form.repeatType = Number(e.detail.value)
 }
 
-const onRemindChange = (e) => {
-    form.remindIndex = Number(e.detail.value)
+const toggleRemind = (minutes) => {
+    if (form.remindMinutes.includes(minutes)) {
+        form.remindMinutes = form.remindMinutes.filter(m => m !== minutes)
+    } else {
+        form.remindMinutes = [...form.remindMinutes, minutes]
+    }
 }
 
 const onProgressChange = (e) => {
@@ -543,15 +532,14 @@ const onCancel = () => {
 const buildPayload = () => {
     const startTime = buildTimestamp(form.startDate, form.startClock)
     const endTime = buildTimestamp(form.startDate, form.endClock)
-    const remindConfig = remindOptions[form.remindIndex]
-    const remindMinutes = remindConfig.minutes
+    const remindMinutes = form.remindMinutes.length > 0 ? Math.min(...form.remindMinutes) : -1
     const remindTime =
-        remindMinutes === null ? '' : formatDateTimeText(startTime - remindMinutes * 60 * 1000)
+        remindMinutes < 0 ? '' : formatDateTimeText(startTime - remindMinutes * 60 * 1000)
 
     return {
         id: editId.value || undefined,
         title: form.title.trim(),
-        content: form.content.trim(),
+
         tags: normalizeTags(form.tags),
         subtasks: serializeSubtasks(form.subtasks),
         note: form.note.trim(),
@@ -568,16 +556,10 @@ const buildPayload = () => {
         repeatRule: form.repeatType > 0 ? JSON.stringify({ repeatType: form.repeatType }) : '',
         remindTime,
         remindMinutes,
+        remindMinutesList: form.remindMinutes.length > 0 ? JSON.stringify(form.remindMinutes) : '',
+        cronExpr: form.cronExpr || '',
         location: form.location.trim()
     }
-}
-
-const handleDeleteFromForm = async () => {
-    if (!editId.value) return
-    await deleteSchedule(editId.value)
-    uni.showToast({ title: '删除成功', icon: 'success' })
-    emit('saved')
-    emit('close')
 }
 
 const handleSave = async () => {
@@ -603,7 +585,7 @@ const handleSave = async () => {
             await updateSchedule(payload)
             uni.showToast({ title: '更新成功', icon: 'success' })
         } else {
-            await addSchedule(payload, {})
+            await addSchedule(payload)
             uni.showToast({ title: '添加成功', icon: 'success' })
         }
         emit('saved')
@@ -880,7 +862,7 @@ const handleSave = async () => {
     border: 2rpx solid var(--color-border-light);
 }
 
-.action-btn.cancel:hover {
+.action-btn.cancel.hover-active {
     background: var(--color-border-light);
     color: var(--color-text);
 }
@@ -895,7 +877,7 @@ const handleSave = async () => {
     box-shadow: var(--shadow-glow);
 }
 
-.action-btn.submit:hover {
+.action-btn.submit.hover-active {
     transform: translateY(-1rpx);
     box-shadow: 0 8rpx 32rpx rgba(var(--color-primary-rgb), 0.3);
 }
@@ -944,7 +926,11 @@ const handleSave = async () => {
     animation: cardSlideIn 0.4s ease both;
 }
 
-.form-card-schedule:hover {
+.form-card-schedule:nth-child(1) { animation-delay: 0s; }
+.form-card-schedule:nth-child(2) { animation-delay: 0.06s; }
+.form-card-schedule:nth-child(3) { animation-delay: 0.12s; }
+
+.form-card-schedule.hover-active {
     transform: translateY(-2rpx);
     box-shadow: 0 12rpx 36rpx rgba(15, 23, 42, 0.08);
 }
@@ -1011,9 +997,9 @@ const handleSave = async () => {
     transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
 }
 
-.fg-input:hover,
-.fg-select:hover,
-.fg-textarea:hover {
+.fg-input.hover-active,
+.fg-select.hover-active,
+.fg-textarea.hover-active {
     border-color: var(--color-border-hover, #c8ccd8);
     background: var(--color-surface-hover, #f2f4f8);
 }
@@ -1071,7 +1057,7 @@ const handleSave = async () => {
     user-select: none;
 }
 
-.quad-option:hover {
+.quad-option.hover-active {
     border-color: var(--color-primary);
     background: rgba(var(--color-primary-rgb), 0.06);
 }
@@ -1098,7 +1084,7 @@ const handleSave = async () => {
 
 .check-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10rpx;
 }
 
@@ -1121,7 +1107,7 @@ const handleSave = async () => {
     position: relative;
 }
 
-.check-chip:hover {
+.check-chip.hover-active {
     border-color: var(--color-primary);
 }
 
@@ -1176,7 +1162,7 @@ const handleSave = async () => {
     transition: color 0.25s;
 }
 
-.more-summary:hover {
+.more-summary.hover-active {
     color: var(--color-primary);
 }
 
@@ -1201,11 +1187,13 @@ const handleSave = async () => {
 
 .section-body {
     margin-top: 16rpx;
+    max-height: 0;
+    overflow: hidden;
     opacity: 0;
-    transition: opacity 0.35s ease, margin-top 0.35s ease;
+    transition: max-height 0.35s ease, opacity 0.35s ease, padding 0.35s ease;
 }
-
 .section-body.open {
+    max-height: 800px;
     opacity: 1;
 }
 
@@ -1248,7 +1236,7 @@ const handleSave = async () => {
     transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 
-.subtask-del:hover {
+.subtask-del.hover-active {
     background: rgba(var(--color-danger-rgb), 0.15);
     color: var(--color-danger);
 }
@@ -1277,7 +1265,7 @@ const handleSave = async () => {
     gap: 6rpx;
 }
 
-.btn-add-sub:hover {
+.btn-add-sub.hover-active {
     border-color: var(--color-primary);
     color: var(--color-primary);
     background: rgba(var(--color-primary-rgb), 0.06);
@@ -1308,7 +1296,7 @@ const handleSave = async () => {
     border: none;
     border-radius: 18rpx;
     font-size: 28rpx;
-    font-weight: 800;
+    font-weight: 600;
     position: relative;
     overflow: hidden;
     transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s, background 0.25s, color 0.25s;
@@ -1343,7 +1331,7 @@ const handleSave = async () => {
     box-shadow: var(--shadow-glow);
 }
 
-.btn-primary:hover {
+.btn-primary.hover-active {
     transform: translateY(-1rpx);
     box-shadow: 0 6rpx 28rpx rgba(var(--color-primary-rgb), 0.3);
 }
@@ -1363,7 +1351,7 @@ const handleSave = async () => {
     color: var(--color-text-secondary);
 }
 
-.btn-secondary:hover {
+.btn-secondary.hover-active {
     background: var(--color-border-light);
     color: var(--color-text);
 }
@@ -1438,4 +1426,5 @@ const handleSave = async () => {
         transform: translateY(0);
     }
 }
+
 </style>
