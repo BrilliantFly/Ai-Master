@@ -29,7 +29,7 @@
                 @toggle-collapse="toggleCollapse"
             />
 
-            <view class="stats-row premium-anim-fade-up premium-anim-delay-1">
+            <view class="stats-row premium-fade-in premium-d1">
                 <view class="stat-card accent">
                     <text class="stat-num">{{ todayStats.completedCount }}</text>
                     <text class="stat-label">已完成</text>
@@ -144,8 +144,8 @@
                         <text class="detail-row-text">{{ detailItem.location }}</text>
                     </view>
                     <view v-if="hasRelevantMeta(detailItem)" class="detail-meta-row">
-                        <text v-if="detailItem?.priority && detailItem.priority !== 'medium'" class="detail-meta-chip" :class="detailItem.priority === 'high' || detailItem.priority === 'p0' ? 'priority-high' : 'priority-low'">
-                            {{ detailItem.priority === 'high' || detailItem.priority === 'p0' ? '🔴 高' : '🟢 低' }}
+                        <text v-if="priorityMeta(detailItem).visible" class="detail-meta-chip" :class="priorityMeta(detailItem).className">
+                            {{ priorityMeta(detailItem).label }}
                         </text>
                         <text v-if="detailItem?.duration" class="detail-meta-chip">⏱ {{ detailItem.duration }}分钟</text>
                         <text v-if="detailItem?.remind && detailItem.remind.length" class="detail-meta-chip">🔔 {{ detailItem.remind.length > 1 ? detailItem.remind.length + '次提醒' : '1次提醒' }}</text>
@@ -167,7 +167,7 @@
                 </view>
                 <view class="detail-actions">
                     <view class="detail-action-btn" :class="{ primary: !completedMap[detailItem?.id] }" @tap="toggleCompleteFromDetail">
-                        <text>{{ completedMap[detailItem?.id] ? '↩ 取消完成' : '✅ 打卡' }}</text>
+                        <text>{{ completedMap[detailItem?.id] ? '↩ 取消完成' : '✅ 完成' }}</text>
                     </view>
                     <view class="detail-action-btn secondary" @tap="editFromDetail">
                         <text>✏️ 编辑</text>
@@ -199,6 +199,9 @@ import EventList from './components/EventList.vue'
 import ScheduleFormSheet from './components/ScheduleFormSheet.vue'
 import { useSchedule } from './composables/useSchedule'
 import { deleteSchedule, getTodayStats } from '@/api/plan/schedule'
+import { useHoverEffect } from '@/hooks/useHoverEffect'
+
+useHoverEffect('.stat-card,.detail-action-btn')
 
 const quadrants = [
     { value: 0, label: '全部', color: '#999999' },
@@ -240,7 +243,17 @@ const formatDetailTime = (item) => {
 }
 const hasRelevantMeta = (item) => {
     if (!item) return false
-    return !!(item.priority && item.priority !== 'medium') || !!item.duration || !!(item.remind?.length) || !!(item.tags?.length)
+    return priorityMeta(item).visible || !!item.duration || !!item.remind?.length || !!item.tags?.length
+}
+const priorityMeta = (item) => {
+    const priority = item?.priority
+    if (!priority || Number(priority) === 2 || priority === 'medium') {
+        return { visible: false, label: '', className: '' }
+    }
+    if (Number(priority) === 3 || priority === 'high' || priority === 'p0') {
+        return { visible: true, label: '🔴 高', className: 'priority-high' }
+    }
+    return { visible: true, label: '🟢 低', className: 'priority-low' }
 }
 const getQuadrantLabel = (q) => {
     return quadrants.find((item) => item.value === q)?.label || ''
@@ -462,7 +475,7 @@ onShow(async () => {
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
-.stat-card:hover {
+.stat-card.hover-active {
     background: var(--color-surface-soft);
     box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
 }
@@ -938,7 +951,7 @@ onShow(async () => {
     cursor: pointer;
     transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
 }
-.detail-action-btn:hover {
+.detail-action-btn.hover-active {
     transform: translateY(-1px);
 }
 .detail-action-btn:active {

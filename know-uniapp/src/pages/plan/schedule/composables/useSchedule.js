@@ -3,7 +3,8 @@ import {
     getScheduleByDate,
     getCalendarMonthly,
     getCategoryList,
-    completeSchedule
+    completeSchedule,
+    uncompleteSchedule
 } from '@/api/plan/schedule'
 import { getHolidays } from '@/api/holiday'
 import {
@@ -44,6 +45,72 @@ export function useSchedule() {
         if (!ts) return ''
         const d = new Date(ts)
         return formatYYYYMMDD(d.getFullYear(), d.getMonth() + 1, d.getDate())
+    }
+
+    const parseTags = (raw) => {
+        if (Array.isArray(raw)) return raw
+        return String(raw || '')
+            .split(/[,，]/)
+            .map((item) => item.trim())
+            .filter(Boolean)
+    }
+
+    const parseSubtasks = (raw) => {
+        if (Array.isArray(raw)) return raw
+        if (!raw) return []
+        try {
+            const parsed = JSON.parse(raw)
+            if (Array.isArray(parsed)) {
+                return parsed
+                    .map((item) => {
+                        if (typeof item === 'string') return item
+                        if (item && typeof item === 'object') {
+                            return {
+                                text: item.text || item.title || item.name || '',
+                                done: !!item.done
+                            }
+                        }
+                        return ''
+                    })
+                    .filter((item) => (typeof item === 'string' ? item : item.text))
+            }
+        } catch (error) {
+            return String(raw)
+                .split(/\r?\n/)
+                .map((item) => item.trim())
+                .filter(Boolean)
+        }
+        return []
+    }
+
+    const normalizeEvent = (event) => {
+        const startTime = Number(event.startTime || 0)
+        const endTime = Number(event.endTime || 0)
+        return {
+            ...event,
+            startTime,
+            endTime,
+            description: event.description || event.content || '',
+            tags: parseTags(event.tags),
+            subtasks: parseSubtasks(event.subtasks),
+            progress:
+                event.progress === undefined || event.progress === null
+                    ? event.status === 1
+                        ? 100
+                        : 0
+                    : Number(event.progress),
+            duration:
+                startTime && endTime && endTime > startTime
+                    ? Math.round((endTime - startTime) / 60000)
+                    : 0,
+            remind:
+                event.remindMinutes === null ||
+                event.remindMinutes === undefined ||
+                Number(event.remindMinutes) < 0
+                    ? []
+                    : [event.remindMinutes],
+            categoryName: categories.value.find((c) => c.id === event.categoryId)?.name || ''
+        }
     }
 
     const filteredDayEvents = computed(() => {
@@ -133,10 +200,7 @@ export function useSchedule() {
             ).getTime()
             const res = await getScheduleByDate({ date: ts })
             const events = res || []
-            dayEvents.value = events.map((e) => ({
-                ...e,
-                categoryName: categories.value.find((c) => c.id === e.categoryId)?.name || ''
-            }))
+            dayEvents.value = events.map(normalizeEvent)
             // 同步 completedMap
             const map = {}
             for (const e of events) {
@@ -150,13 +214,20 @@ export function useSchedule() {
 
     // --- 完成/取消完成 ---
     const handleCheck = async (item) => {
-        completedMap.value = { ...completedMap.value, [item.id]: true }
+        const wasCompleted = item.status === 1 || completedMap.value[item.id]
+        completedMap.value = { ...completedMap.value, [item.id]: !wasCompleted }
         renderKey.value++
         try {
-            await completeSchedule(item.id, {})
-            uni.showToast({ title: '已完成', icon: 'success' })
+            if (wasCompleted) {
+                await uncompleteSchedule(item.id, {})
+                uni.showToast({ title: '已取消完成', icon: 'success' })
+            } else {
+                await completeSchedule(item.id, {})
+                uni.showToast({ title: '已完成', icon: 'success' })
+            }
             fetchCalendarMonthly()
         } catch (e) {
+            completedMap.value = { ...completedMap.value, [item.id]: wasCompleted }
             console.error(e)
         }
     }
