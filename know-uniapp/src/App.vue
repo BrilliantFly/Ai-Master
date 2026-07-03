@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { onLaunch } from '@dcloudio/uni-app'
 import { useAppStore } from './stores/app'
 import { useUserStore } from './stores/user'
@@ -69,7 +70,27 @@ onLaunch(async () => {
 })
 </script>
 <style lang="scss">
+/* 主题变量通过 v-bind 注入 page 元素（全端兼容）*/
 page {
+    --color-bg: v-bind('themeStore.themeInlineVars["--color-bg"]');
+    --color-bg-app: v-bind('themeStore.themeInlineVars["--color-bg-app"]');
+    --color-surface: v-bind('themeStore.themeInlineVars["--color-surface"]');
+    --color-surface-soft: v-bind('themeStore.themeInlineVars["--color-surface-soft"]');
+    --color-surface-hover: v-bind('themeStore.themeInlineVars["--color-surface-hover"]');
+    --color-text: v-bind('themeStore.themeInlineVars["--color-text"]');
+    --color-text-secondary: v-bind('themeStore.themeInlineVars["--color-text-secondary"]');
+    --color-text-tertiary: v-bind('themeStore.themeInlineVars["--color-text-tertiary"]');
+    --color-border: v-bind('themeStore.themeInlineVars["--color-border"]');
+    --color-border-light: v-bind('themeStore.themeInlineVars["--color-border-light"]');
+    --color-border-hover: v-bind('themeStore.themeInlineVars["--color-border-hover"]');
+    --color-primary: v-bind('themeStore.themeInlineVars["--color-primary"]');
+    --color-primary-rgb: v-bind('themeStore.themeInlineVars["--color-primary-rgb"]');
+    --color-primary-soft: v-bind('themeStore.themeInlineVars["--color-primary-soft"]');
+    --color-primary-mist: v-bind('themeStore.themeInlineVars["--color-primary-mist"]');
+    --color-minor: v-bind('themeStore.themeInlineVars["--color-minor"]');
+    --color-btn-text: v-bind('themeStore.themeInlineVars["--color-btn-text"]');
+    --gradient-primary: v-bind('themeStore.themeInlineVars["--gradient-primary"]');
+
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
