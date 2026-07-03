@@ -72,6 +72,11 @@ public interface IPlanScheduleEventService {
     boolean complete(Long id);
 
     /**
+     * 取消完成日程
+     */
+    boolean uncomplete(Long id);
+
+    /**
      * 删除日程
      */
     boolean delete(Long id);

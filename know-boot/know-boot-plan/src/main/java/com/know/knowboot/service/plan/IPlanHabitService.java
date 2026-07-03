@@ -58,6 +58,11 @@ public interface IPlanHabitService {
     boolean checkin(Long habitId, Long userId, Long recordDate);
 
     /**
+     * 取消打卡（指定日期，时间戳；为空则取消当天）
+     */
+    boolean uncheckin(Long habitId, Long userId, Long recordDate);
+
+    /**
      * 查询打卡记录
      */
     List<PlanHabitRecord> getRecords(Long habitId);
