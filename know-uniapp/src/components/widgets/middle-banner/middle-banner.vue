@@ -6,7 +6,7 @@
         <swiper
             class="swiper h-full"
             :indicator-dots="showList.length > 1"
-            indicator-active-color="#4173ff"
+            indicator-active-color="var(--color-primary)"
             :autoplay="true"
         >
             <swiper-item
