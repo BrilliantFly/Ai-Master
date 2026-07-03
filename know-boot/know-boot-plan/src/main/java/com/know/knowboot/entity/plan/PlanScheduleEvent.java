@@ -39,6 +39,9 @@ public class PlanScheduleEvent implements Serializable {
     @ApiModelProperty("备注")
     private String note;
 
+    @ApiModelProperty("完成进度(0-100)")
+    private Integer progress;
+
     @ApiModelProperty("日程类型(1:日程 2:待办 3:提醒)")
     private Integer eventType;
 

@@ -42,6 +42,7 @@ public class PlanSchemaMigration {
             ensureColumnExists("plan_schedule_event", "tags", "varchar(500) DEFAULT NULL COMMENT '标签(逗号分隔)' AFTER `content`");
             ensureColumnExists("plan_schedule_event", "subtasks", "text DEFAULT NULL COMMENT '子任务JSON' AFTER `tags`");
             ensureColumnExists("plan_schedule_event", "note", "varchar(500) DEFAULT NULL COMMENT '备注' AFTER `subtasks`");
+            ensureColumnExists("plan_schedule_event", "progress", "int DEFAULT 0 COMMENT '完成进度(0-100)' AFTER `note`");
             ensureColumnExists("plan_schedule_event", "priority", "tinyint DEFAULT 2 COMMENT '优先级(1:低 2:中 3:高)' AFTER `quadrant`");
             ensureColumnExists("plan_schedule_event", "category_id", "bigint DEFAULT NULL COMMENT '分类ID' AFTER `priority`");
             ensureColumnExists("plan_schedule_event", "plan_id", "bigint DEFAULT NULL COMMENT '关联计划ID' AFTER `category_id`");
@@ -72,6 +73,10 @@ public class PlanSchemaMigration {
             ensureColumnExists("plan_habit", "delete_time", "bigint DEFAULT NULL COMMENT '删除时间' AFTER `update_time`");
             ensureColumnExists("plan_schedule_category", "delete_time", "bigint DEFAULT NULL COMMENT '删除时间' AFTER `update_time`");
 
+
+            ensureBigintTimestampColumn("plan_habit", "start_date", "bigint DEFAULT NULL COMMENT 'start date timestamp'");
+            ensureBigintTimestampColumn("plan_habit", "end_date", "bigint DEFAULT NULL COMMENT 'end date timestamp'");
+            ensureBigintTimestampColumn("plan_habit_record", "record_date", "bigint NOT NULL COMMENT 'record date timestamp'");
 
             seedQuadrantData();
             seedPlanTypeData();
@@ -209,6 +214,7 @@ public class PlanSchemaMigration {
                 "  `tags` varchar(500) DEFAULT NULL COMMENT '标签(逗号分隔)'," +
                 "  `subtasks` text COMMENT '子任务JSON'," +
                 "  `note` varchar(500) DEFAULT NULL COMMENT '备注'," +
+                "  `progress` int DEFAULT 0 COMMENT '完成进度(0-100)'," +
                 "  `event_type` tinyint DEFAULT 1 COMMENT '日程类型(1:日程 2:待办 3:提醒)'," +
                 "  `quadrant` tinyint DEFAULT 2 COMMENT '四象限(1:重要紧急 2:重要不紧急 3:紧急不重要 4:不紧急不重要)'," +
                 "  `priority` tinyint DEFAULT 2 COMMENT '优先级(1:低 2:中 3:高)'," +
@@ -457,6 +463,35 @@ public class PlanSchemaMigration {
             }
         } catch (Exception e) {
             System.out.println("[PlanSchemaMigrate] 检查列 " + tableName + "." + columnName + ": " + e.getMessage());
+        }
+    }
+
+    private void ensureBigintTimestampColumn(String tableName, String columnName, String columnDefinition) {
+        try {
+            String dataType = jdbcTemplate.queryForObject(
+                "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS " +
+                "WHERE TABLE_SCHEMA = (SELECT DATABASE()) AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+                String.class, tableName, columnName);
+            if ("bigint".equalsIgnoreCase(dataType)) {
+                return;
+            }
+
+            jdbcTemplate.execute(
+                "ALTER TABLE `" + tableName + "` MODIFY COLUMN `" + columnName + "` " + columnDefinition);
+            jdbcTemplate.execute(
+                "UPDATE `" + tableName + "` SET `" + columnName + "` = CASE " +
+                    "WHEN `" + columnName + "` IS NULL THEN NULL " +
+                    "WHEN `" + columnName + "` BETWEEN 10000101000000 AND 99991231235959 " +
+                        "THEN UNIX_TIMESTAMP(STR_TO_DATE(CAST(`" + columnName + "` AS CHAR), '%Y%m%d%H%i%s')) * 1000 " +
+                    "WHEN `" + columnName + "` BETWEEN 10000101 AND 99991231 " +
+                        "THEN UNIX_TIMESTAMP(STR_TO_DATE(CAST(`" + columnName + "` AS CHAR), '%Y%m%d')) * 1000 " +
+                    "WHEN `" + columnName + "` BETWEEN 1000000000 AND 9999999999 " +
+                        "THEN `" + columnName + "` * 1000 " +
+                    "ELSE `" + columnName + "` END " +
+                "WHERE `" + columnName + "` IS NOT NULL AND `" + columnName + "` < 1000000000000");
+            System.out.println("[PlanSchemaMigrate] Fixed timestamp column " + tableName + "." + columnName);
+        } catch (Exception e) {
+            System.out.println("[PlanSchemaMigrate] Fix timestamp column " + tableName + "." + columnName + ": " + e.getMessage());
         }
     }
 }
