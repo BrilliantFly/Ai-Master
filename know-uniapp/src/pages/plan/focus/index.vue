@@ -184,8 +184,8 @@ const timerRingStyle = computed(() => {
         phase.value === 'focus'
             ? 'var(--color-primary)'
             : phase.value === 'longBreak'
-            ? '#f59e0b'
-            : '#34d399'
+            ? 'var(--color-warning)'
+            : 'var(--color-success)'
     const trackColor = 'rgba(15, 23, 42, 0.08)'
     return {
         background: `conic-gradient(${activeColor} ${progressPercent.value}%, ${trackColor} 0%)`

@@ -103,10 +103,7 @@
                         </view>
                     </view>
 
-                    <view
-                        class="notice-strip premium-fade-in premium-d2"
-                        @tap="goNotice"
-                    >
+                    <view class="notice-strip premium-fade-in premium-d2" @tap="goNotice">
                         <text class="notice-icon">📢</text>
                         <view class="notice-wrap">
                             <swiper
@@ -165,10 +162,7 @@
                         <text class="section-title">热门推荐</text>
                         <text class="section-more" @tap="goMore('recommend')">查看全部</text>
                     </view>
-                    <scroll-view
-                        class="recommend-scroll premium-fade-in premium-d3"
-                        scroll-x
-                    >
+                    <scroll-view class="recommend-scroll premium-fade-in premium-d3" scroll-x>
                         <view class="recommend-track">
                             <view
                                 v-for="item in recommendTiles"
@@ -244,16 +238,11 @@
                         </view>
                     </view>
 
-                    <view
-                        class="section-hdr premium-fade-in premium-d3 section-hdr-tight"
-                    >
+                    <view class="section-hdr premium-fade-in premium-d3 section-hdr-tight">
                         <text class="section-title">便捷工具</text>
                         <text class="section-more" @tap="goMore('tools')">更多 →</text>
                     </view>
-                    <scroll-view
-                        class="tool-strip premium-fade-in premium-d3"
-                        scroll-x
-                    >
+                    <scroll-view class="tool-strip premium-fade-in premium-d3" scroll-x>
                         <view class="tool-strip-track">
                             <view
                                 v-for="item in utilityChips"
@@ -708,13 +697,13 @@ const utilityChips = computed<UtilityChip[]>(() => [
     {
         id: 'chip-todo',
         label: `📋 今日待办 ${todayStats.value.todoCount}`,
-        dotColor: '#f0a020',
+        dotColor: 'var(--color-warning)',
         path: '/pages/plan/schedule/index'
     },
     {
         id: 'chip-device',
         label: `🛡️ 在线设备 ${deviceOverview.value.online}`,
-        dotColor: '#22b573',
+        dotColor: 'var(--color-success)',
         path: '/pages/camera/index'
     },
     {
