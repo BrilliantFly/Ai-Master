@@ -1,0 +1,80 @@
+/* ============================================
+   Shared Keyframes / Animations
+   统一动画定义，所有页面共用
+   ============================================ */
+
+/* Fade */
+@keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide */
+@keyframes slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes slide-down {
+    from { transform: translateY(-20px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+
+@keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+
+@keyframes slide-out-right {
+    from { transform: translateX(0); }
+    to   { transform: translateX(100%); }
+}
+
+/* Scale */
+@keyframes scale-in {
+    from { transform: scale(0.9); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes scale-out {
+    from { transform: scale(1);   opacity: 1; }
+    to   { transform: scale(0.9); opacity: 0; }
+}
+
+@keyframes scale-in-bounce {
+    from { transform: scale(0.8); opacity: 0; }
+    60%  { transform: scale(1.05); }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Spin / Rotate */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Skeleton shimmer */
+@keyframes skeleton-loading {
+    0%   { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
