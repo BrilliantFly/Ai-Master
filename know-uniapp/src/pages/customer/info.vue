@@ -22,7 +22,7 @@
             </view>
         </view>
 
-        <view class="stats-row premium-anim-fade-up premium-anim-delay-1">
+        <view class="stats-row premium-fade-in premium-d1">
             <view class="stat-card accent">
                 <text class="stat-num">{{ customerStats.total }}</text>
                 <text class="stat-label">总客户</text>
@@ -49,7 +49,7 @@
             </view>
         </scroll-view>
 
-        <view class="client-list premium-anim-fade-up premium-anim-delay-2">
+        <view class="client-list premium-fade-in premium-d2">
             <template v-if="groupedCustomers.length">
                 <view v-for="group in groupedCustomers" :key="group.letter">
                     <view class="group-header">{{ group.letter }}</view>

@@ -21,7 +21,7 @@
             </view>
         </view>
 
-        <view class="overview-cards premium-anim-fade-up premium-anim-delay-1">
+        <view class="overview-cards premium-fade-in premium-d1">
             <view class="ov-card accent">
                 <view class="ov-icon premium-icon-g1 premium-icon-gw">📹</view>
                 <text class="ov-num">{{ overview.total }}</text>
@@ -46,7 +46,7 @@
 
         <view
             v-if="filteredDevices.length || loading"
-            class="premium-segment-alt segment-alt premium-anim-fade-up premium-anim-delay-2"
+            class="premium-segment-alt segment-alt premium-fade-in premium-d2"
         >
             <scroll-view class="premium-filter-tabs filter-tabs" scroll-x>
                 <view
