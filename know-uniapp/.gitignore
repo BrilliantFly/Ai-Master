@@ -30,3 +30,7 @@ coverage
 # .env
 .env.development
 .env.production
+
+# Server run artifacts
+.server-*.txt
+.server-pid.txt
