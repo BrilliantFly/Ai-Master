@@ -95,5 +95,18 @@ page {
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.45;
     letter-spacing: 0.01em;
+
+    /* 主题切换过渡（平滑切换背景、文字、边框色） */
+    transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        color 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 页内容器级元素继承主题过渡 */
+page view,
+page scroll-view,
+page swiper,
+page cover-view,
+page cover-image {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.25s ease;
 }
 </style>
