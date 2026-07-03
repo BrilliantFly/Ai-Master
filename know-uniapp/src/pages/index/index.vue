@@ -973,7 +973,7 @@ onShow(async () => {
     color: #fff;
     font-size: 22rpx;
     font-weight: 600;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
     position: relative;
     z-index: 10;
 }
@@ -1020,7 +1020,7 @@ onShow(async () => {
     overflow: hidden;
     border-radius: 0;
     padding: 34rpx 40rpx 56rpx;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
     box-shadow: none;
 }
 
@@ -1153,7 +1153,7 @@ onShow(async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #ef4444;
+    background: var(--color-danger);
     color: #fff;
     font-size: 18rpx;
     font-weight: 700;
@@ -1243,11 +1243,11 @@ onShow(async () => {
 }
 
 .metric-icon-red {
-    background: linear-gradient(135deg, #ef4444, #f87171);
+    background: linear-gradient(135deg, var(--color-danger), #f87171);
 }
 
 .metric-icon-green {
-    background: linear-gradient(135deg, #22b573, #4dd499);
+    background: linear-gradient(135deg, var(--color-success), #4dd499);
 }
 
 .asset-right {
@@ -1662,7 +1662,7 @@ onShow(async () => {
     right: 20rpx;
     height: 5rpx;
     border-radius: 0 0 999rpx 999rpx;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
 }
 
 .tool-card:active {
@@ -1732,7 +1732,7 @@ onShow(async () => {
 .tool-bar-in {
     height: 100%;
     border-radius: 999rpx;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
 }
 
 .tool-bar-label {
@@ -1801,7 +1801,7 @@ onShow(async () => {
     bottom: auto;
     top: 0;
     height: 4rpx;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
 }
 
 :deep(.premium-bottom-nav .nav-label) {
