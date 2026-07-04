@@ -1220,7 +1220,7 @@ onShow(async () => {
     align-items: center;
     padding: 14px 16px;
     border-radius: var(--radius-md, 12px);
-    background: var(--color-surface);
+    background: var(--color-surface, #ffffff);
     border: 1px solid var(--color-border-light);
     margin-bottom: 8px;
     cursor: pointer;
@@ -1384,7 +1384,7 @@ onShow(async () => {
     font-size: 22rpx;
     font-weight: 700;
     color: var(--color-primary);
-    background: var(--color-primary-soft);
+    background: var(--color-primary-soft, #eef2ff);
     padding: 8rpx 16rpx;
     border-radius: 999rpx;
 }
@@ -1417,7 +1417,7 @@ onShow(async () => {
     min-height: 148rpx;
     padding: 18rpx 12rpx;
     border-radius: 24rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     border: 2rpx solid transparent;
     display: flex;
     flex-direction: column;
@@ -1483,7 +1483,7 @@ onShow(async () => {
 .overview-chip {
     font-size: 22rpx;
     color: var(--color-text-secondary);
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     padding: 6rpx 16rpx;
     border-radius: 999rpx;
 }
@@ -1499,14 +1499,14 @@ onShow(async () => {
     flex: 1;
     height: 6rpx;
     border-radius: 999rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     overflow: hidden;
 }
 
 .overview-fill {
     height: 100%;
     border-radius: 999rpx;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0);
 }
 
 .overview-rate {
@@ -1522,12 +1522,12 @@ onShow(async () => {
     align-items: center;
     padding: 30rpx 10rpx 26rpx;
     border-radius: var(--radius-md);
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     border: 2rpx solid transparent;
 }
 
 .stat-card.accent {
-    background: var(--color-primary-soft);
+    background: var(--color-primary-soft, #eef2ff);
     border-color: var(--color-primary-mist);
 }
 
@@ -1614,13 +1614,13 @@ onShow(async () => {
 .goal-card-wrap .swipe-content {
     position: relative;
     z-index: 2;
-    background: var(--color-surface);
+    background: var(--color-surface, #ffffff);
     will-change: transform;
 }
 
 .goal-card {
     border-radius: 12px;
-    background: var(--color-surface);
+    background: var(--color-surface, #ffffff);
     border: 1px solid var(--color-border-light);
     padding: 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -1822,13 +1822,13 @@ onShow(async () => {
     width: 104rpx;
     height: 104rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary, #ff8700), #8980f0);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 64rpx;
-    box-shadow: var(--shadow-glow);
+    box-shadow: var(--shadow-glow, 0 8rpx 32rpx rgba(255, 135, 0, 0.2));
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .floating-add.hover-active {
@@ -1899,9 +1899,9 @@ onShow(async () => {
     max-width: 100%;
     max-height: 85vh;
     overflow-y: auto;
-    padding: 18rpx 24px calc(28rpx + env(safe-area-inset-bottom));
+    padding: 18rpx 24rpx calc(28rpx + env(safe-area-inset-bottom));
     border-radius: 32rpx 32rpx 0 0;
-    background: var(--color-surface);
+    background: var(--color-surface, #ffffff);
     box-shadow: 0 -8rpx 40rpx rgba(15, 23, 42, 0.12);
 }
 
@@ -1933,7 +1933,7 @@ onShow(async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     font-size: 54rpx;
 }
 
@@ -1957,7 +1957,7 @@ onShow(async () => {
 .habit-streak-badge {
     padding: 8rpx 24rpx;
     border-radius: 12rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     font-size: 24rpx;
     font-weight: 800;
 }
@@ -1972,7 +1972,7 @@ onShow(async () => {
 .habit-detail-stat {
     padding: 22rpx 12rpx;
     border-radius: 18rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     text-align: center;
 }
 
@@ -2002,12 +2002,12 @@ onShow(async () => {
     margin-top: 20rpx;
     padding: 18rpx 24rpx;
     border-radius: 18rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     text-align: center;
 }
 
 .habit-detail-note-card.primary-mist {
-    background: var(--color-primary-soft);
+    background: var(--color-primary-soft, #eef2ff);
     text-align: left;
 }
 
@@ -2102,7 +2102,7 @@ onShow(async () => {
     flex: 1;
     min-height: 88rpx;
     border-radius: 16rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2111,12 +2111,12 @@ onShow(async () => {
 }
 
 .habit-week-day.checked {
-    background: var(--color-primary-mist);
-    border-color: rgba(var(--color-primary-rgb), 0.3);
+    background: var(--color-primary-mist, #eef2ff);
+    border-color: rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
 }
 
 .habit-week-day.today {
-    box-shadow: inset 0 0 0 2rpx var(--color-primary);
+    box-shadow: inset 0 0 0 2rpx var(--color-primary, #6366f1);
 }
 
 .habit-week-name {
@@ -2161,13 +2161,14 @@ onShow(async () => {
 }
 
 .detail-action-btn-muted {
-    background: var(--color-surface-soft);
-    color: var(--color-text-secondary);
+    background: var(--color-surface-soft, #f8fafc);
+    color: var(--color-text-secondary, #64748b);
     border: 1rpx solid var(--color-border-light);
 }
 
-.detail-action-btn-primary {
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+.detail-action-btn-primary,
+button.detail-action-btn-primary {
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0);
     color: #fff;
     box-shadow: var(--shadow-glow);
 }
@@ -2176,8 +2177,8 @@ onShow(async () => {
     height: 70rpx;
     border-radius: 999rpx;
     border: 1rpx solid var(--color-border-light);
-    background: var(--color-surface-soft);
-    color: var(--color-text-secondary);
+    background: var(--color-surface-soft, #f8fafc);
+    color: var(--color-text-secondary, #64748b);
     font-size: 24rpx;
     font-weight: 700;
 }
@@ -2218,7 +2219,7 @@ onShow(async () => {
     height: 88rpx;
     border: none;
     border-radius: 999rpx;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0);
     color: #fff;
     font-size: 28rpx;
     font-weight: 700;

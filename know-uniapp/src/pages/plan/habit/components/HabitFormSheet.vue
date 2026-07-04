@@ -264,12 +264,12 @@
                 </view>
             </view>
 
-            <view class="btn-row">
-                <button class="btn-secondary" type="button" @tap="emit('close')">取消</button>
-                <button class="btn-secondary template-btn" type="button" @tap="saveAsTemplate">
+            <view class="form-actions">
+                <button class="action-btn cancel" type="button" @tap="emit('close')">取消</button>
+                <button class="action-btn cancel template-btn" type="button" @tap="saveAsTemplate">
                     💾 存为模板
                 </button>
-                <button class="btn-primary" type="button" :disabled="submitting" @tap="handleSave">
+                <button class="action-btn submit" type="button" :disabled="submitting" @tap="handleSave">
                     {{ submitting ? '保存中...' : '保存打卡' }}
                 </button>
             </view>
@@ -286,7 +286,7 @@ import { useThemeStore } from '@/stores/theme'
 const themeStore = useThemeStore()
 
 useHoverEffect(
-    '.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.icon-preview-row,.icon-chip,.track-type-opt,.color-opt,.slider-toggle,.more-summary,.rd-btn,.btn-save,.btn-cancel,.btn-primary,.btn-secondary'
+    '.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.icon-preview-row,.icon-chip,.track-type-opt,.color-opt,.slider-toggle,.more-summary,.rd-btn,.btn-save,.btn-cancel,.action-btn'
 )
 
 const props = defineProps({
@@ -697,7 +697,7 @@ const saveAsTemplate = () => {
     overflow-y: auto;
     padding: 18rpx 18rpx calc(30rpx + env(safe-area-inset-bottom));
     border-radius: 32rpx 32rpx 0 0;
-    background: var(--color-bg-app);
+    background: var(--color-bg-app, #ffffff);
     box-shadow: 0 -8rpx 40rpx rgba(15, 23, 42, 0.12);
     animation: sheetSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -731,8 +731,9 @@ const saveAsTemplate = () => {
     margin-bottom: 18rpx;
     padding: 22rpx;
     border-radius: 24rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface, #ffffff);
     border: 2rpx solid var(--color-border-light);
+    box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
     animation: cardSlideIn 0.4s ease both;
 }
@@ -1176,7 +1177,7 @@ const saveAsTemplate = () => {
     height: 42rpx;
     border-radius: 12rpx;
     border: 2rpx solid var(--color-border-light);
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     color: var(--color-text-secondary);
     font-size: 20rpx;
     font-weight: 800;
@@ -1260,7 +1261,7 @@ const saveAsTemplate = () => {
     box-shadow: none !important;
 }
 
-.btn-row {
+.form-actions {
     display: flex;
     gap: 14rpx;
     margin-top: 22rpx;
@@ -1268,96 +1269,55 @@ const saveAsTemplate = () => {
     border-top: 1rpx solid var(--color-border-light);
 }
 
-.btn-primary,
-.btn-secondary {
+.action-btn {
     flex: 1;
     min-height: 86rpx;
     border-radius: 18rpx;
-    border: none;
     font-size: 27rpx;
     font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s,
         background 0.25s, color 0.25s;
 }
 
-.btn-primary::after,
-.btn-secondary::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 100%;
-    padding-bottom: 100%;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.22);
-    transform: translate(-50%, -50%) scale(0);
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.btn-primary:active::after,
-.btn-secondary:active::after {
-    transform: translate(-50%, -50%) scale(2.5);
-    opacity: 1;
-    transition-duration: 0s;
-}
-
-.btn-primary {
+.action-btn.submit {
     flex: 1.15;
     color: #fff;
     background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
     box-shadow: var(--shadow-glow);
+    border: none;
 }
 
-.btn-primary.hover-active {
-    transform: translateY(-1rpx);
-    box-shadow: 0 6rpx 28rpx rgba(var(--color-primary-rgb), 0.3);
-}
-
-.btn-primary:active {
+.action-btn.submit:active {
     transform: scale(var(--scale-active));
     box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
 }
 
-.btn-primary:focus-visible {
-    outline: 2rpx solid var(--color-primary);
-    outline-offset: 1rpx;
+.action-btn.submit[disabled] {
+    opacity: 0.65;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-.btn-secondary {
+.action-btn.cancel {
     color: var(--color-text-secondary);
-    background: var(--color-surface);
+    background: var(--color-surface, #ffffff);
     border: 2rpx solid var(--color-border-light);
 }
 
-.btn-secondary.hover-active {
+.action-btn.cancel:active {
+    transform: scale(var(--scale-active));
+}
+
+.action-btn.cancel.hover-active {
     background: var(--color-border-light);
     color: var(--color-text);
 }
 
-.btn-secondary:active {
-    transform: scale(var(--scale-active));
-}
-
-.btn-secondary:focus-visible {
-    outline: 2rpx solid var(--color-primary);
-    outline-offset: 1rpx;
-}
-
 .template-btn {
     flex: 1.05;
-}
-
-.btn-primary[disabled] {
-    opacity: 0.65;
-    transform: none !important;
-    box-shadow: none !important;
 }
 
 .form-sheet::-webkit-scrollbar {
@@ -1378,8 +1338,7 @@ const saveAsTemplate = () => {
         grid-template-columns: 1fr;
     }
 
-    .form-actions,
-    .btn-row {
+    .form-actions {
         flex-direction: column;
     }
 }
