@@ -1,11 +1,16 @@
 <template>
     <view v-if="visible" class="form-overlay" @tap="onOverlayTap">
         <view class="form-sheet" @tap.stop>
-            <view class="modal-handle"></view>
-            <text class="modal-title">{{ isEdit ? '编辑日程' : '新建日程' }}</text>
+            <view class="sheet-handle"></view>
+            <view class="sheet-header">
+                <text class="sheet-kicker">日程计划</text>
+                <text class="sheet-title">{{ isEdit ? '编辑日程' : '新建日程' }}</text>
+                <text class="sheet-subtitle">高效管理你的每一项安排</text>
+            </view>
 
-            <view class="form-card-schedule">
-                <text class="form-card-header">基本信息</text>
+            <view class="form-card">
+            <view class="section-card">
+                <text class="section-card-title">基本信息</text>
                 <view class="fgs-full">
                     <text class="fg-label">📝 日程标题 <text class="required">*</text></text>
                     <view class="fg-input-wrap">
@@ -41,13 +46,13 @@
 
                 <view class="fgs-row mt-10">
                     <view class="fgs-cell">
-                        <text class="fg-label">🕘 开始时间</text>
+                        <text class="fg-label">🕐 开始时间</text>
                         <picker mode="time" :value="form.startClock" @change="onStartClockChange">
                             <view class="fg-select">{{ form.startClock || '选择时间' }}</view>
                         </picker>
                     </view>
                     <view class="fgs-cell">
-                        <text class="fg-label">🕙 结束时间</text>
+                        <text class="fg-label">🕐 结束时间</text>
                         <picker mode="time" :value="form.endClock" @change="onEndClockChange">
                             <view class="fg-select">{{ form.endClock || '选择时间' }}</view>
                         </picker>
@@ -68,11 +73,11 @@
                 </view>
             </view>
 
-            <view class="form-card-schedule">
-                <text class="form-card-header">优先级设置</text>
+            <view class="section-card">
+                <text class="section-card-title">优先级设置</text>
 
                 <view class="fgs-full">
-                    <text class="fg-label">四象限</text>
+                    <text class="fg-label">📊 四象限</text>
                 </view>
 
                 <view class="quad-grid">
@@ -89,7 +94,7 @@
                 </view>
 
                 <view class="fgs-full">
-                    <text class="fg-label">优先级</text>
+                    <text class="fg-label">⚡ 优先级</text>
                     <picker
                         :value="priorityIndex"
                         :range="priorityOptions"
@@ -100,11 +105,11 @@
                 </view>
             </view>
 
-            <view class="form-card-schedule">
-                <text class="form-card-header">时间与提醒</text>
+            <view class="section-card">
+                <text class="section-card-title">时间与提醒</text>
 
                 <view class="fgs-full">
-                    <text class="fg-label">重复设置</text>
+                    <text class="fg-label">🔄 重复设置</text>
                     <picker
                         :value="repeatPickerValue"
                         :range="repeatOptions"
@@ -130,7 +135,7 @@
                 </view>
 
                 <view class="fgs-full progress-row">
-                    <text class="fg-label">完成进度</text>
+                    <text class="fg-label">📈 完成进度</text>
                     <slider
                         :value="form.progress"
                         min="0"
@@ -144,7 +149,7 @@
                 </view>
             </view>
 
-            <view class="form-section-sch">
+            <view class="section-card">
                 <view class="more-summary" @tap="moreOpen = !moreOpen">
                     <text
                         ><text class="arrow">{{ moreOpen ? '▼' : '▶' }}</text> 更多设置</text
@@ -152,7 +157,7 @@
                 </view>
                 <view class="section-body" :class="{ open: moreOpen }">
                     <view class="fgs-full">
-                        <text class="fg-label">标签</text>
+                        <text class="fg-label">🏷️ 标签</text>
                         <view class="fg-input-wrap">
                             <input
                                 v-model="form.tags"
@@ -166,7 +171,7 @@
 
                     <view class="fgs-full">
                         <view class="subtask-head">
-                            <text class="fg-label">子任务</text>
+                            <text class="fg-label">📋 子任务</text>
                             <text class="subtask-count">{{ form.subtasks.length }} 项</text>
                         </view>
                         <view class="subtask-list">
@@ -196,7 +201,7 @@
                     </view>
 
                     <view class="fgs-full">
-                        <text class="fg-label">备注</text>
+                        <text class="fg-label">💬 备注</text>
                         <textarea
                             :value="form.note"
                             class="fg-textarea"
@@ -207,10 +212,11 @@
                     </view>
                 </view>
             </view>
+            </view>
 
-            <view class="btn-row">
-                <button class="btn-secondary" type="button" @tap="onCancel">取消</button>
-                <button class="btn-primary" type="button" :disabled="submitting" @tap="handleSave">
+            <view class="form-actions">
+                <button class="action-btn cancel" type="button" @tap="onCancel">取消</button>
+                <button class="action-btn submit" type="button" :disabled="submitting" @tap="handleSave">
                     {{ submitting ? '保存中...' : isEdit ? '更新日程' : '保存日程' }}
                 </button>
             </view>
@@ -230,7 +236,7 @@ import { formatYYYYMMDD } from '@/components/calendar-grid/calendar-utils.js'
 import { useHoverEffect } from '@/hooks/useHoverEffect'
 
 useHoverEffect(
-    '.action-btn.cancel,.action-btn.submit,.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.quad-option,.check-chip,.more-summary,.subtask-del,.btn-add-sub,.btn-primary,.btn-secondary'
+    '.action-btn.cancel,.action-btn.submit,.section-card,.fg-input,.fg-select,.fg-textarea,.quad-option,.check-chip,.more-summary,.subtask-del,.btn-add-sub'
 )
 
 const props = defineProps({
@@ -715,7 +721,7 @@ const handleSave = async () => {
 .field-input,
 .field-textarea,
 .picker-pill {
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     border: 2rpx solid var(--color-border-light);
     border-radius: 20rpx;
     box-sizing: border-box;
@@ -814,7 +820,7 @@ const handleSave = async () => {
     padding: 18rpx 16rpx;
     border-radius: 22rpx;
     border: 2rpx solid var(--color-border-light);
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -823,9 +829,9 @@ const handleSave = async () => {
 }
 
 .quadrant-card.active {
-    border-color: var(--color-primary);
-    background: var(--color-primary-mist);
-    box-shadow: 0 10rpx 24rpx rgba(var(--color-primary-rgb), 0.12);
+    border-color: var(--color-primary, #6366f1);
+    background: var(--color-primary-mist, #eef2ff);
+    box-shadow: 0 10rpx 24rpx rgba(var(--color-primary-rgb, 99, 102, 241), 0.12);
 }
 
 .quadrant-icon {
@@ -842,6 +848,8 @@ const handleSave = async () => {
     display: flex;
     gap: 20rpx;
     margin-top: 28rpx;
+    padding-top: 14rpx;
+    border-top: 2rpx solid var(--color-border-light);
 }
 
 .action-btn {
@@ -858,8 +866,8 @@ const handleSave = async () => {
 }
 
 .action-btn.cancel {
-    background: var(--color-surface);
-    color: var(--color-text-secondary);
+    background: var(--color-surface, #ffffff);
+    color: var(--color-text-secondary, #64748b);
     border: 2rpx solid var(--color-border-light);
 }
 
@@ -872,20 +880,27 @@ const handleSave = async () => {
     transform: scale(var(--scale-active));
 }
 
+button.action-btn.submit,
 .action-btn.submit {
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0);
     color: #fff;
     box-shadow: var(--shadow-glow);
 }
 
+.action-btn.submit[disabled],
+button.action-btn.submit[disabled] {
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0);
+    color: #fff;
+}
+
 .action-btn.submit.hover-active {
     transform: translateY(-1rpx);
-    box-shadow: 0 8rpx 32rpx rgba(var(--color-primary-rgb), 0.3);
+    box-shadow: 0 8rpx 32rpx rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
 }
 
 .action-btn.submit:active {
     transform: scale(var(--scale-active));
-    box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
+    box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb, 99, 102, 241), 0.15);
 }
 
 .action-btn[disabled] {
@@ -899,69 +914,12 @@ const handleSave = async () => {
     outline-offset: 1rpx;
 }
 
-.modal-handle {
-    width: 72rpx;
-    height: 8rpx;
-    border-radius: 999rpx;
-    background: var(--color-border);
-    margin: 4rpx auto 22rpx;
-}
-
-.modal-title {
-    display: block;
-    margin: 0 4rpx 24rpx;
-    font-size: 36rpx;
-    font-weight: 800;
-    color: var(--color-text);
-}
-
-.form-card-schedule,
-.form-section-sch {
-    margin-bottom: 18rpx;
-    padding: 24rpx;
-    border-radius: 24rpx;
+.form-card {
     background: var(--color-surface, #ffffff);
     border: 2rpx solid var(--color-border-light);
+    border-radius: 24rpx;
+    padding: 24rpx;
     box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.05);
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-    animation: cardSlideIn 0.4s ease both;
-}
-
-.form-card-schedule:nth-child(1) {
-    animation-delay: 0s;
-}
-.form-card-schedule:nth-child(2) {
-    animation-delay: 0.06s;
-}
-.form-card-schedule:nth-child(3) {
-    animation-delay: 0.12s;
-}
-
-.form-card-schedule.hover-active {
-    transform: translateY(-2rpx);
-    box-shadow: 0 12rpx 36rpx rgba(15, 23, 42, 0.08);
-}
-
-.form-card-schedule:active {
-    transform: translateY(0);
-    box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.04);
-}
-
-.form-card-header {
-    display: flex;
-    align-items: center;
-    gap: 12rpx;
-    margin-bottom: 18rpx;
-    font-size: 27rpx;
-    font-weight: 800;
-    color: var(--color-primary);
-}
-
-.form-card-header::after {
-    content: '';
-    flex: 1;
-    height: 2rpx;
-    background: var(--color-border-light);
 }
 
 .fgs-full {
@@ -998,7 +956,7 @@ const handleSave = async () => {
     box-sizing: border-box;
     border: 2rpx solid var(--color-border);
     border-radius: 16rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     color: var(--color-text);
     font-size: 27rpx;
     transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
@@ -1014,15 +972,15 @@ const handleSave = async () => {
 .fg-input:focus,
 .fg-select:focus,
 .fg-textarea:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 4rpx rgba(var(--color-primary-rgb), 0.12);
-    background: var(--color-surface);
+    border-color: var(--color-primary, #6366f1);
+    box-shadow: 0 0 0 4rpx rgba(var(--color-primary-rgb, 99, 102, 241), 0.12);
+    background: var(--color-surface, #ffffff);
 }
 
 .fg-input:focus-visible,
 .fg-select:focus-visible,
 .fg-textarea:focus-visible {
-    outline: 2rpx solid var(--color-primary);
+    outline: 2rpx solid var(--color-primary, #6366f1);
     outline-offset: 1rpx;
 }
 
@@ -1050,7 +1008,7 @@ const handleSave = async () => {
     min-height: 86rpx;
     border: 2rpx solid var(--color-border);
     border-radius: 16rpx;
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     color: var(--color-text-secondary);
     font-size: 23rpx;
     font-weight: 700;
@@ -1065,8 +1023,8 @@ const handleSave = async () => {
 }
 
 .quad-option.hover-active {
-    border-color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.06);
+    border-color: var(--color-primary, #6366f1);
+    background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.06);
 }
 
 .quad-option:active {
@@ -1074,14 +1032,14 @@ const handleSave = async () => {
 }
 
 .quad-option.active {
-    border-color: var(--color-primary);
-    background: var(--color-primary);
+    border-color: var(--color-primary, #6366f1);
+    background: var(--color-primary, #6366f1);
     color: #fff;
     font-weight: 800;
 }
 
 .quad-option:focus-visible {
-    outline: 2rpx solid var(--color-primary);
+    outline: 2rpx solid var(--color-primary, #6366f1);
     outline-offset: 1rpx;
 }
 
@@ -1100,7 +1058,7 @@ const handleSave = async () => {
     padding: 0 8rpx;
     border-radius: 16rpx;
     border: 2rpx solid var(--color-border);
-    background: var(--color-surface-soft);
+    background: var(--color-surface-soft, #f8fafc);
     color: var(--color-text-secondary);
     font-size: 22rpx;
     font-weight: 700;
@@ -1123,9 +1081,9 @@ const handleSave = async () => {
 }
 
 .check-chip.active {
-    border-color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.1);
-    color: var(--color-primary);
+    border-color: var(--color-primary, #6366f1);
+    background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
+    color: var(--color-primary, #6366f1);
     font-weight: 800;
 }
 
@@ -1273,9 +1231,9 @@ const handleSave = async () => {
 }
 
 .btn-add-sub.hover-active {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.06);
+    border-color: var(--color-primary, #6366f1);
+    color: var(--color-primary, #6366f1);
+    background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.06);
     gap: 10rpx;
 }
 
@@ -1284,106 +1242,9 @@ const handleSave = async () => {
 }
 
 .btn-add-sub:focus-visible {
-    outline: 2rpx solid var(--color-primary);
+    outline: 2rpx solid var(--color-primary, #6366f1);
     outline-offset: 1rpx;
 }
-
-.btn-row {
-    display: flex;
-    gap: 18rpx;
-    margin-top: 26rpx;
-    padding-top: 18rpx;
-    border-top: 2rpx solid var(--color-border-light);
-}
-
-.btn-primary,
-.btn-secondary {
-    flex: 1;
-    min-height: 88rpx;
-    border: none;
-    border-radius: 18rpx;
-    font-size: 28rpx;
-    font-weight: 600;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s,
-        background 0.25s, color 0.25s;
-}
-
-.btn-primary::after,
-.btn-secondary::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 100%;
-    padding-bottom: 100%;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.22);
-    transform: translate(-50%, -50%) scale(0);
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.btn-primary:active::after,
-.btn-secondary:active::after {
-    transform: translate(-50%, -50%) scale(2.5);
-    opacity: 1;
-    transition-duration: 0s;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
-    color: #fff;
-    box-shadow: var(--shadow-glow);
-}
-
-.btn-primary.hover-active {
-    transform: translateY(-1rpx);
-    box-shadow: 0 6rpx 28rpx rgba(var(--color-primary-rgb), 0.3);
-}
-
-.btn-primary:active {
-    transform: scale(var(--scale-active));
-    box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb), 0.15);
-}
-
-.btn-primary:focus-visible {
-    outline: 2rpx solid var(--color-primary);
-    outline-offset: 1rpx;
-}
-
-.btn-secondary {
-    background: var(--color-surface-soft);
-    color: var(--color-text-secondary);
-}
-
-.btn-secondary.hover-active {
-    background: var(--color-border-light);
-    color: var(--color-text);
-}
-
-.btn-secondary:active {
-    transform: scale(var(--scale-active));
-}
-
-.btn-secondary:focus-visible {
-    outline: 2rpx solid var(--color-primary);
-    outline-offset: 1rpx;
-}
-
-.btn-secondary.danger {
-    color: var(--color-danger);
-    background: var(--color-danger-soft);
-}
-
-.btn-primary[disabled] {
-    opacity: 0.55;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
 /* ===== Focus bar for input wraps ===== */
 .fg-input-wrap {
     position: relative;
@@ -1396,7 +1257,7 @@ const handleSave = async () => {
     bottom: 0;
     width: 4rpx;
     border-radius: 2rpx;
-    background: var(--color-primary);
+    background: var(--color-primary, #6366f1);
     opacity: 0;
     transition: opacity 0.22s ease;
     pointer-events: none;

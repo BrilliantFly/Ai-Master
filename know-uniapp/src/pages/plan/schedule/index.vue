@@ -710,13 +710,13 @@ onShow(async () => {
     width: 104rpx;
     height: 104rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary, #ff8700), #8980f0);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 64rpx;
-    box-shadow: var(--shadow-glow);
+    box-shadow: var(--shadow-glow, 0 8rpx 32rpx rgba(255, 135, 0, 0.2));
 }
 
 /* Matrix Modal */
