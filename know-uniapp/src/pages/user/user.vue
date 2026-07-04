@@ -1,6 +1,10 @@
 <template>
-    <view class="user" :style="pageStyle">
-        <view v-for="(item, index) in state.pages" :key="index">
+    <view class="user premium-fade-in" :style="pageStyle">
+        <view
+            v-for="(item, index) in state.pages"
+            :key="index"
+            :class="'premium-fade-in premium-d' + Math.min(index + 1, 7)"
+        >
             <template v-if="item.name === 'user-info'">
                 <w-user-info
                     :pageMeta="state.meta"
@@ -63,10 +67,10 @@ const pageStyle = computed(() => {
     const { bg_type, bg_color, bg_image } = state.meta[0]?.content ?? {}
     if (bg_type !== undefined) {
         return bg_type === 1
-            ? { 'background-color': bg_color }
+            ? { 'background-color': bg_color || 'var(--color-bg-app)' }
             : { 'background-image': `url(${bg_image})` }
     }
-    return ''
+    return { 'background-color': 'var(--color-bg-app)' }
 })
 
 const navColor = computed(() => {
@@ -94,7 +98,8 @@ getData()
     background-size: 100% auto;
     overflow: hidden;
     width: 100%;
-    transition: all 1s;
+    transition: background-color var(--duration) var(--ease),
+        background-image var(--duration) var(--ease);
     min-height: calc(100vh - env(safe-area-inset-bottom));
     padding-bottom: 140rpx;
 }
