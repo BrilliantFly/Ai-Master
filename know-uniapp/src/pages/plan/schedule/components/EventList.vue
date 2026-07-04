@@ -10,14 +10,22 @@
             </view>
 
             <!-- 四象限筛选 -->
-            <scroll-view scroll-x class="filter-scroll premium-fade-in premium-d3" show-scrollbar="false">
+            <scroll-view
+                scroll-x
+                class="filter-scroll premium-fade-in premium-d3"
+                show-scrollbar="false"
+            >
                 <view class="filter-list">
                     <view
                         v-for="q in quadrants"
                         :key="q.value"
                         class="filter-pill"
                         :class="{ active: currentQuadrant === q.value }"
-                        :style="currentQuadrant === q.value ? { background: q.color + '26', color: q.color } : {}"
+                        :style="
+                            currentQuadrant === q.value
+                                ? { background: q.color + '26', color: q.color }
+                                : {}
+                        "
                         @tap="$emit('quadrantChange', q.value)"
                     >
                         <view class="pill-dot" :style="{ background: q.color }"></view>
@@ -69,28 +77,57 @@
                 @tap="onCardTap(item)"
             >
                 <view class="s-card premium-hover-lift" :class="{ done: completedMap[item.id] }">
-                    <view class="quadrant-bar" :style="{ background: getQuadrantColor(item.quadrant) }"></view>
+                    <view
+                        class="quadrant-bar"
+                        :style="{ background: getQuadrantColor(item.quadrant) }"
+                    ></view>
                     <view class="time-col">
                         <text class="t">{{ formatTime(item.startTime) }}</text>
-                        <text v-if="item.endTime" class="t sub">{{ formatTime(item.endTime) }}</text>
+                        <text v-if="item.endTime" class="t sub">{{
+                            formatTime(item.endTime)
+                        }}</text>
                     </view>
                     <view class="content">
                         <view class="ctitle">
                             <text>{{ item.title }}</text>
-                            <text v-if="item.categoryName" class="tag">{{ item.categoryName }}</text>
+                            <text v-if="item.categoryName" class="tag">{{
+                                item.categoryName
+                            }}</text>
                         </view>
-                        <view v-if="item.location || item.description || (item.subtasks && item.subtasks.length) || (item.progress !== undefined && item.progress !== null)" class="meta-row">
+                        <view
+                            v-if="
+                                item.location ||
+                                item.description ||
+                                (item.subtasks && item.subtasks.length) ||
+                                (item.progress !== undefined && item.progress !== null)
+                            "
+                            class="meta-row"
+                        >
                             <text v-if="item.location" class="m-item">📍 {{ item.location }}</text>
-                            <text v-if="item.tags && item.tags.length" class="m-item"># {{ item.tags.join(', ') }}</text>
+                            <text v-if="item.tags && item.tags.length" class="m-item"
+                                ># {{ item.tags.join(', ') }}</text
+                            >
                         </view>
                         <view v-if="item.subtasks && item.subtasks.length" class="st-row">
-                            <text v-for="(st, stIdx) in item.subtasks" :key="stIdx" class="st-item" :class="{ done: st.done }">
+                            <text
+                                v-for="(st, stIdx) in item.subtasks"
+                                :key="stIdx"
+                                class="st-item"
+                                :class="{ done: st.done }"
+                            >
                                 {{ st.done ? '●' : '○' }} {{ st.text || st }}
                             </text>
-                            <text v-if="item.subtasks.length > 3" class="st-item">{{ item.subtasks.filter(s => s.done).length }}/{{ item.subtasks.length }}</text>
+                            <text v-if="item.subtasks.length > 3" class="st-item"
+                                >{{ item.subtasks.filter((s) => s.done).length }}/{{
+                                    item.subtasks.length
+                                }}</text
+                            >
                         </view>
                         <text v-if="item.description" class="cdesc">{{ item.description }}</text>
-                        <view v-if="item.progress !== undefined && item.progress !== null" class="progress-micro">
+                        <view
+                            v-if="item.progress !== undefined && item.progress !== null"
+                            class="progress-micro"
+                        >
                             <view class="pm-fill" :style="{ width: item.progress + '%' }"></view>
                         </view>
                     </view>
@@ -184,7 +221,8 @@ const onTouchMove = (e, id) => {
     data.currentX = touch.clientX
 
     // 直接操作 DOM — 绕过 scroll-view 内的 Vue 渲染节流
-    const el = (typeof document !== 'undefined') ? document.querySelector(`[data-swipe-id="${id}"]`) : null
+    const el =
+        typeof document !== 'undefined' ? document.querySelector(`[data-swipe-id="${id}"]`) : null
     if (el) {
         el.style.transform = `translateX(${targetX}px)`
         el.style.transition = 'none'
@@ -223,7 +261,8 @@ const onTouchEnd = (e, id) => {
  * 这是关键修复：scroll-view 内的 :style 绑定在 uni-app H5 中可能不触发重绘。
  */
 const applySwipeX = (id, x, smooth) => {
-    const el = (typeof document !== 'undefined') ? document.querySelector(`[data-swipe-id="${id}"]`) : null
+    const el =
+        typeof document !== 'undefined' ? document.querySelector(`[data-swipe-id="${id}"]`) : null
     if (el) {
         el.style.transition = smooth ? 'transform 0.25s cubic-bezier(.22,1,.36,1)' : 'none'
         el.style.transform = `translateX(${x}px)`
@@ -311,7 +350,7 @@ const onSwipeAction = (action, item) => {
     gap: 6px;
     padding: 6px 14px;
     border-radius: 12px;
-    background: rgba(0,0,0,0.04);
+    background: rgba(0, 0, 0, 0.04);
     font-size: 12px;
     color: var(--color-text-secondary, #8e8e93);
     font-weight: 500;
@@ -321,7 +360,7 @@ const onSwipeAction = (action, item) => {
     transition: color 0.25s ease, background 0.25s ease, transform 0.2s ease;
 }
 .filter-pill.hover-active {
-    background: rgba(0,0,0,0.08);
+    background: rgba(0, 0, 0, 0.08);
     color: var(--color-text, #1d1d1f);
 }
 .filter-pill:active {
@@ -352,7 +391,7 @@ const onSwipeAction = (action, item) => {
 }
 
 .s-card.hover-active {
-    box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
     border-color: transparent;
 }
 
@@ -365,9 +404,15 @@ const onSwipeAction = (action, item) => {
 }
 
 @keyframes donePop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.04); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+    40% {
+        transform: scale(1.04);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* 已完成 */
@@ -479,7 +524,7 @@ const onSwipeAction = (action, item) => {
     gap: 4px;
     margin-top: 4px;
     padding-top: 4px;
-    border-top: 1px dashed var(--color-border-light, rgba(0,0,0,0.06));
+    border-top: 1px dashed var(--color-border-light, rgba(0, 0, 0, 0.06));
 }
 
 .st-row .st-item {
@@ -560,7 +605,7 @@ const onSwipeAction = (action, item) => {
     color: #fff;
     border: none;
     font-family: inherit;
-    letter-spacing: .02em;
+    letter-spacing: 0.02em;
 }
 .swipe-action:active {
     filter: brightness(1.12);
@@ -592,7 +637,7 @@ const onSwipeAction = (action, item) => {
 .swipe-action .sa-label {
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: .02em;
+    letter-spacing: 0.02em;
 }
 
 /* 卡片内容（可滑出） */
@@ -601,13 +646,11 @@ const onSwipeAction = (action, item) => {
     z-index: 2;
     background: var(--color-surface, #ffffff);
     border-radius: 14px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     transition: box-shadow 0.25s ease, border-color 0.25s ease;
     will-change: transform;
 }
 .swipe-content:active {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
-
-
 </style>

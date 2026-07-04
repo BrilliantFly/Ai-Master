@@ -85,7 +85,7 @@
                             <view class="fg-select">{{ categoryOptions[categoryIndex] }}</view>
                         </picker>
                     </view>
-                    <view class="fgs-cell" style="display:none">
+                    <view class="fgs-cell" style="display: none">
                         <text class="fg-label">单位</text>
                         <view class="fg-input-wrap">
                             <input
@@ -269,12 +269,7 @@
                 <button class="btn-secondary template-btn" type="button" @tap="saveAsTemplate">
                     💾 存为模板
                 </button>
-                <button
-                    class="btn-primary"
-                    type="button"
-                    :disabled="submitting"
-                    @tap="handleSave"
-                >
+                <button class="btn-primary" type="button" :disabled="submitting" @tap="handleSave">
                     {{ submitting ? '保存中...' : '保存打卡' }}
                 </button>
             </view>
@@ -290,7 +285,9 @@ import { useHoverEffect } from '@/hooks/useHoverEffect'
 import { useThemeStore } from '@/stores/theme'
 const themeStore = useThemeStore()
 
-useHoverEffect('.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.icon-preview-row,.icon-chip,.track-type-opt,.color-opt,.slider-toggle,.more-summary,.rd-btn,.btn-save,.btn-cancel,.btn-primary,.btn-secondary')
+useHoverEffect(
+    '.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.icon-preview-row,.icon-chip,.track-type-opt,.color-opt,.slider-toggle,.more-summary,.rd-btn,.btn-save,.btn-cancel,.btn-primary,.btn-secondary'
+)
 
 const props = defineProps({
     visible: { type: Boolean, default: false },
@@ -493,37 +490,40 @@ const loadDetail = async (id) => {
     }
 }
 
-watch(() => props.visible, async (val) => {
-    if (val) {
-        const edit = props.editData
-        if (edit && edit.habitId) {
-            editId.value = edit.habitId
-            await loadDetail(edit.habitId)
-        } else if (edit && edit.id) {
-            editId.value = edit.id
-            await loadDetail(edit.id)
-        } else if (edit && edit.habitId === undefined && edit.id === undefined && edit.name) {
-            editId.value = ''
-            resetForm()
-            form.name = edit.name || ''
-            form.description = edit.description || ''
-            form.motto = edit.motto || ''
-            form.color = edit.color || themeStore.primaryColor || '#5b5bd6'
-            form.category = edit.category || '健康'
-            form.targetValue = edit.targetValue || 1
-            form.targetUnit = edit.targetUnit || '次'
-            form.trackingType = edit.trackingType || 'boolean'
-            form.icon = edit.icon || ''
-            form.themeKey = habitThemes.find((t) => t.icon === edit.icon)?.key || 'goal'
-        } else {
-            editId.value = ''
-            resetForm()
-            if (props.selectedDate) {
-                form.startDate = props.selectedDate
+watch(
+    () => props.visible,
+    async (val) => {
+        if (val) {
+            const edit = props.editData
+            if (edit && edit.habitId) {
+                editId.value = edit.habitId
+                await loadDetail(edit.habitId)
+            } else if (edit && edit.id) {
+                editId.value = edit.id
+                await loadDetail(edit.id)
+            } else if (edit && edit.habitId === undefined && edit.id === undefined && edit.name) {
+                editId.value = ''
+                resetForm()
+                form.name = edit.name || ''
+                form.description = edit.description || ''
+                form.motto = edit.motto || ''
+                form.color = edit.color || themeStore.primaryColor || '#5b5bd6'
+                form.category = edit.category || '健康'
+                form.targetValue = edit.targetValue || 1
+                form.targetUnit = edit.targetUnit || '次'
+                form.trackingType = edit.trackingType || 'boolean'
+                form.icon = edit.icon || ''
+                form.themeKey = habitThemes.find((t) => t.icon === edit.icon)?.key || 'goal'
+            } else {
+                editId.value = ''
+                resetForm()
+                if (props.selectedDate) {
+                    form.startDate = props.selectedDate
+                }
             }
         }
     }
-})
+)
 
 const toggleIconPicker = () => {
     iconPickerVisible.value = !iconPickerVisible.value
@@ -683,8 +683,12 @@ const saveAsTemplate = () => {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .form-sheet {
@@ -695,12 +699,16 @@ const saveAsTemplate = () => {
     border-radius: 32rpx 32rpx 0 0;
     background: var(--color-bg-app);
     box-shadow: 0 -8rpx 40rpx rgba(15, 23, 42, 0.12);
-    animation: sheetSlideUp 0.3s cubic-bezier(.22,1,.36,1);
+    animation: sheetSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes sheetSlideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
 }
 
 .modal-handle {
@@ -725,7 +733,7 @@ const saveAsTemplate = () => {
     border-radius: 24rpx;
     background: var(--color-surface-soft);
     border: 2rpx solid var(--color-border-light);
-    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
     animation: cardSlideIn 0.4s ease both;
 }
 
@@ -1098,8 +1106,9 @@ const saveAsTemplate = () => {
     height: 42rpx;
     border-radius: 999rpx;
     background: #fff;
-    box-shadow: 0 1rpx 4rpx rgba(0,0,0,0.15);
-    transition: left 0.35s cubic-bezier(.34,1.56,.64,1), transform 0.35s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.15);
+    transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     left: 4rpx;
 }
@@ -1144,7 +1153,7 @@ const saveAsTemplate = () => {
 .arrow {
     margin-right: 8rpx;
     color: var(--color-primary);
-    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: inline-block;
 }
 
@@ -1272,7 +1281,8 @@ const saveAsTemplate = () => {
     justify-content: center;
     position: relative;
     overflow: hidden;
-    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s, background 0.25s, color 0.25s;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s,
+        background 0.25s, color 0.25s;
 }
 
 .btn-primary::after,
@@ -1284,16 +1294,16 @@ const saveAsTemplate = () => {
     width: 100%;
     padding-bottom: 100%;
     border-radius: 50%;
-    background: rgba(255,255,255,0.22);
-    transform: translate(-50%,-50%) scale(0);
-    transition: transform 0.5s cubic-bezier(.22,1,.36,1), opacity 0.35s;
+    background: rgba(255, 255, 255, 0.22);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s;
     opacity: 0;
     pointer-events: none;
 }
 
 .btn-primary:active::after,
 .btn-secondary:active::after {
-    transform: translate(-50%,-50%) scale(2.5);
+    transform: translate(-50%, -50%) scale(2.5);
     opacity: 1;
     transition-duration: 0s;
 }
@@ -1405,13 +1415,21 @@ const saveAsTemplate = () => {
 
 /* ===== Keyframe animations ===== */
 @keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes sheetSlideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
 }
 
 @keyframes cardSlideIn {

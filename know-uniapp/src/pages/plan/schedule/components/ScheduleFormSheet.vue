@@ -9,168 +9,157 @@
                 <view class="fgs-full">
                     <text class="fg-label">📝 日程标题 <text class="required">*</text></text>
                     <view class="fg-input-wrap">
-                    <input
-                        v-model="form.title"
-                        class="fg-input"
-                        placeholder="输入日程标题"
-                        placeholder-class="field-placeholder"
-                    />
+                        <input
+                            v-model="form.title"
+                            class="fg-input"
+                            placeholder="输入日程标题"
+                            placeholder-class="field-placeholder"
+                        />
                         <view class="focus-bar"></view>
                     </view>
                 </view>
 
-                    <view class="fgs-row">
-                        <view class="fgs-cell">
-                            <text class="fg-label">📅 开始日期 <text class="required">*</text></text>
-                            <picker mode="date" :value="form.startDate" @change="onStartDateChange">
-                                <view class="fg-select">{{
-                                    form.startDate || '选择日期'
-                                }}</view>
-                            </picker>
-                        </view>
-                        <view class="fgs-cell">
-                            <text class="fg-label">🏷️ 分类</text>
-                            <picker
-                                :value="categoryIndex"
-                                :range="categoryOptions"
-                                range-key="name"
-                                @change="onCategoryChange"
-                            >
-                                <view class="fg-select">{{
-                                    selectedCategoryName
-                                }}</view>
-                            </picker>
-                        </view>
+                <view class="fgs-row">
+                    <view class="fgs-cell">
+                        <text class="fg-label">📅 开始日期 <text class="required">*</text></text>
+                        <picker mode="date" :value="form.startDate" @change="onStartDateChange">
+                            <view class="fg-select">{{ form.startDate || '选择日期' }}</view>
+                        </picker>
                     </view>
-
-                    <view class="fgs-row mt-10">
-                        <view class="fgs-cell">
-                            <text class="fg-label">🕘 开始时间</text>
-                            <picker
-                                mode="time"
-                                :value="form.startClock"
-                                @change="onStartClockChange"
-                            >
-                                <view class="fg-select">{{
-                                    form.startClock || '选择时间'
-                                }}</view>
-                            </picker>
-                        </view>
-                        <view class="fgs-cell">
-                            <text class="fg-label">🕙 结束时间</text>
-                            <picker mode="time" :value="form.endClock" @change="onEndClockChange">
-                                <view class="fg-select">{{
-                                    form.endClock || '选择时间'
-                                }}</view>
-                            </picker>
-                        </view>
+                    <view class="fgs-cell">
+                        <text class="fg-label">🏷️ 分类</text>
+                        <picker
+                            :value="categoryIndex"
+                            :range="categoryOptions"
+                            range-key="name"
+                            @change="onCategoryChange"
+                        >
+                            <view class="fg-select">{{ selectedCategoryName }}</view>
+                        </picker>
                     </view>
+                </view>
 
-                    <view class="fgs-full">
-                        <text class="fg-label">📍 地点</text>
-                        <view class="fg-input-wrap">
+                <view class="fgs-row mt-10">
+                    <view class="fgs-cell">
+                        <text class="fg-label">🕘 开始时间</text>
+                        <picker mode="time" :value="form.startClock" @change="onStartClockChange">
+                            <view class="fg-select">{{ form.startClock || '选择时间' }}</view>
+                        </picker>
+                    </view>
+                    <view class="fgs-cell">
+                        <text class="fg-label">🕙 结束时间</text>
+                        <picker mode="time" :value="form.endClock" @change="onEndClockChange">
+                            <view class="fg-select">{{ form.endClock || '选择时间' }}</view>
+                        </picker>
+                    </view>
+                </view>
+
+                <view class="fgs-full">
+                    <text class="fg-label">📍 地点</text>
+                    <view class="fg-input-wrap">
                         <input
                             v-model="form.location"
                             class="fg-input"
                             placeholder="添加地点，可选"
                             placeholder-class="field-placeholder"
                         />
-                            <view class="focus-bar"></view>
-                        </view>
+                        <view class="focus-bar"></view>
+                    </view>
+                </view>
+            </view>
+
+            <view class="form-card-schedule">
+                <text class="form-card-header">优先级设置</text>
+
+                <view class="fgs-full">
+                    <text class="fg-label">四象限</text>
+                </view>
+
+                <view class="quad-grid">
+                    <view
+                        v-for="item in quadrantCards"
+                        :key="item.value"
+                        class="quad-option"
+                        :class="{ active: form.quadrant === item.value }"
+                        @tap="form.quadrant = item.value"
+                    >
+                        <text class="q-icon">{{ item.icon }}</text>
+                        <text>{{ item.label }}</text>
                     </view>
                 </view>
 
-                <view class="form-card-schedule">
-                    <text class="form-card-header">优先级设置</text>
+                <view class="fgs-full">
+                    <text class="fg-label">优先级</text>
+                    <picker
+                        :value="priorityIndex"
+                        :range="priorityOptions"
+                        @change="onPriorityChange"
+                    >
+                        <view class="fg-select">{{ priorityOptions[priorityIndex] }}</view>
+                    </picker>
+                </view>
+            </view>
 
-                    <view class="fgs-full">
-                        <text class="fg-label">四象限</text>
-                    </view>
+            <view class="form-card-schedule">
+                <text class="form-card-header">时间与提醒</text>
 
-                    <view class="quad-grid">
+                <view class="fgs-full">
+                    <text class="fg-label">重复设置</text>
+                    <picker
+                        :value="repeatPickerValue"
+                        :range="repeatOptions"
+                        @change="onRepeatChange"
+                    >
+                        <view class="fg-select">{{ repeatOptions[repeatPickerValue] }}</view>
+                    </picker>
+                </view>
+
+                <view class="fgs-full">
+                    <text class="fg-label">🔔 提醒设置</text>
+                    <view class="check-grid">
                         <view
-                            v-for="item in quadrantCards"
-                            :key="item.value"
-                            class="quad-option"
-                            :class="{ active: form.quadrant === item.value }"
-                            @tap="form.quadrant = item.value"
+                            v-for="item in remindOptions"
+                            :key="item.label"
+                            class="check-chip"
+                            :class="{ active: form.remindMinutes.includes(item.minutes) }"
+                            @tap="toggleRemind(item.minutes)"
                         >
-                            <text class="q-icon">{{ item.icon }}</text>
-                            <text>{{ item.label }}</text>
+                            {{ item.label }}
                         </view>
-                    </view>
-
-                    <view class="fgs-full">
-                        <text class="fg-label">优先级</text>
-                        <picker
-                            :value="priorityIndex"
-                            :range="priorityOptions"
-                            @change="onPriorityChange"
-                        >
-                            <view class="fg-select">{{ priorityOptions[priorityIndex] }}</view>
-                        </picker>
                     </view>
                 </view>
 
-                <view class="form-card-schedule">
-                    <text class="form-card-header">时间与提醒</text>
-
-                    <view class="fgs-full">
-                        <text class="fg-label">重复设置</text>
-                        <picker
-                            :value="repeatPickerValue"
-                            :range="repeatOptions"
-                            @change="onRepeatChange"
-                        >
-                            <view class="fg-select">{{ repeatOptions[repeatPickerValue] }}</view>
-                        </picker>
-                    </view>
-
-                    <view class="fgs-full">
-                        <text class="fg-label">🔔 提醒设置</text>
-                        <view class="check-grid">
-                            <view
-                                v-for="item in remindOptions"
-                                :key="item.label"
-                                class="check-chip"
-                                :class="{ active: form.remindMinutes.includes(item.minutes) }"
-                                @tap="toggleRemind(item.minutes)"
-                            >
-                                {{ item.label }}
-                            </view>
-                        </view>
-                    </view>
-
-                    <view class="fgs-full progress-row">
-                        <text class="fg-label">完成进度</text>
-                        <slider
-                            :value="form.progress"
-                            min="0"
-                            max="100"
-                            activeColor="var(--color-primary)"
-                            backgroundColor="var(--color-border)"
-                            block-size="20"
-                            @change="onProgressChange"
-                        />
-                        <text class="progress-val">{{ form.progress }}%</text>
-                    </view>
+                <view class="fgs-full progress-row">
+                    <text class="fg-label">完成进度</text>
+                    <slider
+                        :value="form.progress"
+                        min="0"
+                        max="100"
+                        activeColor="var(--color-primary)"
+                        backgroundColor="var(--color-border)"
+                        block-size="20"
+                        @change="onProgressChange"
+                    />
+                    <text class="progress-val">{{ form.progress }}%</text>
                 </view>
+            </view>
 
-                <view class="form-section-sch">
-                    <view class="more-summary" @tap="moreOpen = !moreOpen">
-                        <text><text class="arrow">{{ moreOpen ? '▼' : '▶' }}</text> 更多设置</text>
-                    </view>
-                    <view class="section-body" :class="{ open: moreOpen }">
-
+            <view class="form-section-sch">
+                <view class="more-summary" @tap="moreOpen = !moreOpen">
+                    <text
+                        ><text class="arrow">{{ moreOpen ? '▼' : '▶' }}</text> 更多设置</text
+                    >
+                </view>
+                <view class="section-body" :class="{ open: moreOpen }">
                     <view class="fgs-full">
                         <text class="fg-label">标签</text>
                         <view class="fg-input-wrap">
-                        <input
-                            v-model="form.tags"
-                            class="fg-input"
-                            placeholder="例如：会议, 工作, 重要"
-                            placeholder-class="field-placeholder"
-                        />
+                            <input
+                                v-model="form.tags"
+                                class="fg-input"
+                                placeholder="例如：会议, 工作, 重要"
+                                placeholder-class="field-placeholder"
+                            />
                             <view class="focus-bar"></view>
                         </view>
                     </view>
@@ -181,17 +170,29 @@
                             <text class="subtask-count">{{ form.subtasks.length }} 项</text>
                         </view>
                         <view class="subtask-list">
-                            <view v-for="(task, index) in form.subtasks" :key="index" class="subtask-row">
+                            <view
+                                v-for="(task, index) in form.subtasks"
+                                :key="index"
+                                class="subtask-row"
+                            >
                                 <input
                                     v-model="form.subtasks[index]"
                                     class="fg-input"
                                     placeholder="子任务内容"
                                     placeholder-class="field-placeholder"
                                 />
-                                <button class="subtask-del" type="button" @tap="removeSubtask(index)">×</button>
+                                <button
+                                    class="subtask-del"
+                                    type="button"
+                                    @tap="removeSubtask(index)"
+                                >
+                                    ×
+                                </button>
                             </view>
                         </view>
-                        <button class="btn-add-sub" type="button" @tap="addSubtask">＋ 添加子任务</button>
+                        <button class="btn-add-sub" type="button" @tap="addSubtask">
+                            ＋ 添加子任务
+                        </button>
                     </view>
 
                     <view class="fgs-full">
@@ -204,22 +205,15 @@
                             @input="onNoteInput"
                         />
                     </view>
-                    </view>
                 </view>
+            </view>
 
             <view class="btn-row">
                 <button class="btn-secondary" type="button" @tap="onCancel">取消</button>
-                <button
-                    class="btn-primary"
-                    type="button"
-                    :disabled="submitting"
-                    @tap="handleSave"
-                >
+                <button class="btn-primary" type="button" :disabled="submitting" @tap="handleSave">
                     {{ submitting ? '保存中...' : isEdit ? '更新日程' : '保存日程' }}
                 </button>
             </view>
-
-
         </view>
     </view>
 </template>
@@ -235,7 +229,9 @@ import {
 import { formatYYYYMMDD } from '@/components/calendar-grid/calendar-utils.js'
 import { useHoverEffect } from '@/hooks/useHoverEffect'
 
-useHoverEffect('.action-btn.cancel,.action-btn.submit,.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.quad-option,.check-chip,.more-summary,.subtask-del,.btn-add-sub,.btn-primary,.btn-secondary')
+useHoverEffect(
+    '.action-btn.cancel,.action-btn.submit,.form-card-schedule,.fg-input,.fg-select,.fg-textarea,.quad-option,.check-chip,.more-summary,.subtask-del,.btn-add-sub,.btn-primary,.btn-secondary'
+)
 
 const props = defineProps({
     visible: { type: Boolean, default: false },
@@ -316,9 +312,7 @@ const repeatSummary = computed(() => {
 })
 
 const remindSummary = computed(() => {
-    return form.remindMinutes.length > 0
-        ? '将在开始前按设定时间提醒'
-        : '保存后不会发送提醒'
+    return form.remindMinutes.length > 0 ? '将在开始前按设定时间提醒' : '保存后不会发送提醒'
 })
 
 const resetForm = () => {
@@ -357,12 +351,15 @@ const initForm = async () => {
     }
 }
 
-watch(() => props.visible, async (val) => {
-    if (val) {
-        resetForm()
-        await initForm()
+watch(
+    () => props.visible,
+    async (val) => {
+        if (val) {
+            resetForm()
+            await initForm()
+        }
     }
-})
+)
 
 const normalizeDate = (dateStr) => dateStr.replace(/-/g, '/')
 
@@ -383,7 +380,10 @@ const formatDateTimeText = (timestamp) => {
 const formatClock = (timestamp) => {
     if (!timestamp) return ''
     const date = new Date(Number(timestamp))
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(
+        2,
+        '0'
+    )}`
 }
 
 const parseSubtasks = (raw) => {
@@ -411,9 +411,7 @@ const parseSubtasks = (raw) => {
 }
 
 const serializeSubtasks = (list) => {
-    const tasks = (list || [])
-        .map((item) => item.trim())
-        .filter(Boolean)
+    const tasks = (list || []).map((item) => item.trim()).filter(Boolean)
     return tasks.length ? JSON.stringify(tasks) : ''
 }
 
@@ -458,8 +456,11 @@ const loadDetail = async (id) => {
         form.repeatType = detail.isRepeat ? detail.repeatType || 0 : 0
         form.cronExpr = detail.cronExpr || ''
         if (detail.remindMinutesList) {
-            try { form.remindMinutes = JSON.parse(detail.remindMinutesList) }
-            catch { form.remindMinutes = [] }
+            try {
+                form.remindMinutes = JSON.parse(detail.remindMinutesList)
+            } catch {
+                form.remindMinutes = []
+            }
         } else if (detail.remindMinutes !== undefined && detail.remindMinutes !== null) {
             form.remindMinutes = [Number(detail.remindMinutes)]
         } else {
@@ -503,7 +504,7 @@ const onRepeatChange = (e) => {
 
 const toggleRemind = (minutes) => {
     if (form.remindMinutes.includes(minutes)) {
-        form.remindMinutes = form.remindMinutes.filter(m => m !== minutes)
+        form.remindMinutes = form.remindMinutes.filter((m) => m !== minutes)
     } else {
         form.remindMinutes = [...form.remindMinutes, minutes]
     }
@@ -618,7 +619,7 @@ const handleSave = async () => {
     padding: 18rpx 24rpx 28rpx;
     border-radius: 32rpx 32rpx 0 0;
     background: var(--color-bg-app, #ffffff);
-    animation: sheetSlideUp 0.3s cubic-bezier(.22,1,.36,1);
+    animation: sheetSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .sheet-handle {
@@ -922,13 +923,19 @@ const handleSave = async () => {
     background: var(--color-surface, #ffffff);
     border: 2rpx solid var(--color-border-light);
     box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.05);
-    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
     animation: cardSlideIn 0.4s ease both;
 }
 
-.form-card-schedule:nth-child(1) { animation-delay: 0s; }
-.form-card-schedule:nth-child(2) { animation-delay: 0.06s; }
-.form-card-schedule:nth-child(3) { animation-delay: 0.12s; }
+.form-card-schedule:nth-child(1) {
+    animation-delay: 0s;
+}
+.form-card-schedule:nth-child(2) {
+    animation-delay: 0.06s;
+}
+.form-card-schedule:nth-child(3) {
+    animation-delay: 0.12s;
+}
 
 .form-card-schedule.hover-active {
     transform: translateY(-2rpx);
@@ -1177,7 +1184,7 @@ const handleSave = async () => {
 
 .arrow {
     margin-right: 10rpx;
-    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: inline-block;
 }
 
@@ -1299,7 +1306,8 @@ const handleSave = async () => {
     font-weight: 600;
     position: relative;
     overflow: hidden;
-    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s, background 0.25s, color 0.25s;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s,
+        background 0.25s, color 0.25s;
 }
 
 .btn-primary::after,
@@ -1311,16 +1319,16 @@ const handleSave = async () => {
     width: 100%;
     padding-bottom: 100%;
     border-radius: 50%;
-    background: rgba(255,255,255,0.22);
-    transform: translate(-50%,-50%) scale(0);
-    transition: transform 0.5s cubic-bezier(.22,1,.36,1), opacity 0.35s;
+    background: rgba(255, 255, 255, 0.22);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s;
     opacity: 0;
     pointer-events: none;
 }
 
 .btn-primary:active::after,
 .btn-secondary:active::after {
-    transform: translate(-50%,-50%) scale(2.5);
+    transform: translate(-50%, -50%) scale(2.5);
     opacity: 1;
     transition-duration: 0s;
 }
@@ -1407,13 +1415,21 @@ const handleSave = async () => {
 
 /* ===== Keyframe animations ===== */
 @keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes sheetSlideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
 }
 
 @keyframes cardSlideIn {
@@ -1426,5 +1442,4 @@ const handleSave = async () => {
         transform: translateY(0);
     }
 }
-
 </style>
