@@ -31,7 +31,7 @@ import { ref, reactive, shallowRef } from 'vue'
 import { getCollect, cancelCollect } from '@/api/news'
 
 const paging = shallowRef()
-        const options = reactive([
+const options = reactive([
     {
         text: '取消收藏',
         style: {

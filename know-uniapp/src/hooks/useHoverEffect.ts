@@ -21,10 +21,7 @@
  */
 import { onMounted, onUnmounted } from 'vue'
 
-export function useHoverEffect(
-    targetSelectors: string | string[],
-    scopeSelector?: string
-) {
+export function useHoverEffect(targetSelectors: string | string[], scopeSelector?: string) {
     if (typeof document === 'undefined') return { clearHover: () => {} } // SSR guard
 
     const selectors = Array.isArray(targetSelectors) ? targetSelectors.join(',') : targetSelectors
@@ -32,7 +29,10 @@ export function useHoverEffect(
 
     function onDocHoverMove(e: MouseEvent) {
         const target = e.target as Element | null
-        if (!target) { clearHover(); return }
+        if (!target) {
+            clearHover()
+            return
+        }
 
         // 作用域检查：鼠标在指定容器外时清除 hover
         if (scopeSelector && !target.closest(scopeSelector)) {

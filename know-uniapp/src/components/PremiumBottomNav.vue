@@ -269,7 +269,9 @@ useHoverEffect('.nav-item', '.premium-bottom-nav')
     color: var(--color-text-tertiary);
     transition: color var(--duration) var(--ease);
 }
-.nav-item.hover-active { color: var(--color-primary); }
+.nav-item.hover-active {
+    color: var(--color-primary);
+}
 .nav-item.active {
     color: var(--color-primary);
 }
