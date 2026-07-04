@@ -169,9 +169,13 @@
                 <view class="detail-swipe-actions">
                     <view
                         class="detail-swipe-btn detail-swipe-btn-complete"
-                        @tap.stop="onDetailSwipeAction(event.status === 1 ? 'uncomplete' : 'complete')"
+                        @tap.stop="
+                            onDetailSwipeAction(event.status === 1 ? 'uncomplete' : 'complete')
+                        "
                     >
-                        <text class="detail-swipe-label">{{ event.status === 1 ? '取消' : '完成' }}</text>
+                        <text class="detail-swipe-label">{{
+                            event.status === 1 ? '取消' : '完成'
+                        }}</text>
                     </view>
                     <view
                         class="detail-swipe-btn detail-swipe-btn-delete"
@@ -345,7 +349,8 @@ const priorityLabel = (priority) => {
 }
 
 const remindLabel = (minutes) => {
-    if (minutes === null || minutes === undefined || minutes === '' || Number(minutes) < 0) return '不提醒'
+    if (minutes === null || minutes === undefined || minutes === '' || Number(minutes) < 0)
+        return '不提醒'
     if (Number(minutes) === 0) return '准时提醒'
     if (Number(minutes) < 60) return `提前 ${minutes} 分钟`
     return `提前 ${Math.round(Number(minutes) / 60)} 小时`
@@ -506,9 +511,9 @@ onMounted(() => {
     background: var(--color-surface);
     border-radius: 24rpx;
     padding: 32rpx;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-left: 8rpx solid var(--color-primary);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .hero-meta {
@@ -565,8 +570,8 @@ onMounted(() => {
 .info-card {
     padding: 24rpx;
     border-radius: 24rpx;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .info-label {
@@ -594,8 +599,8 @@ onMounted(() => {
     margin-left: auto;
     margin-right: auto;
     border-radius: 24rpx;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .summary-chip {
@@ -629,8 +634,8 @@ onMounted(() => {
     margin-left: auto;
     margin-right: auto;
     border-radius: 24rpx;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .section-title {
