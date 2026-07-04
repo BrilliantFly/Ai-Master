@@ -313,7 +313,7 @@
   width: 84rpx;
   height: 84rpx;
   border-radius: var(--radius-sm);
-  background: var(--color-surface-soft);
+  background: var(--color-surface-soft, #f1f5f9);
   border: 2rpx solid var(--color-border-light);
   display: flex;
   align-items: center;
@@ -324,7 +324,7 @@
   transition: all var(--duration) var(--ease);
 }
 .premium-header-btn:active {
-  background: var(--color-primary-soft);
+  background: var(--color-primary-soft, #eef2ff);
   color: var(--color-primary);
   transform: scale(0.94);
 }
