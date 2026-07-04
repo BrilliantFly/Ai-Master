@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <view class="plan-habit-page">
         <view class="page-header">
             <view>
@@ -32,7 +32,8 @@
                     :class="{ active: activeTab === 'checkin' }"
                     @tap="activeTab = 'checkin'"
                 >
-                    打卡 <text class="tab-badge">{{ checkedCount }}/{{ dayHabitRecords.length }}</text>
+                    打卡
+                    <text class="tab-badge">{{ checkedCount }}/{{ dayHabitRecords.length }}</text>
                 </view>
                 <view
                     class="checkin-tab"
@@ -43,7 +44,10 @@
                 </view>
             </view>
 
-            <view v-if="activeTab === 'checkin' && selectedDateLabel" class="day-overview premium-card premium-fade-in premium-d2">
+            <view
+                v-if="activeTab === 'checkin' && selectedDateLabel"
+                class="day-overview premium-card premium-fade-in premium-d2"
+            >
                 <view class="overview-top">
                     <text class="overview-date">{{ selectedDateLabel }}</text>
                     <text class="overview-count">{{ dayHabitRecords.length }} 个习惯</text>
@@ -61,83 +65,105 @@
                 </view>
             </view>
 
-            <view class="day-title premium-fade-in premium-d3" v-if="activeTab === 'checkin' && selectedDateLabel">
+            <view
+                class="day-title premium-fade-in premium-d3"
+                v-if="activeTab === 'checkin' && selectedDateLabel"
+            >
                 <text>{{ selectedDateLabel }} 打卡详情</text>
             </view>
 
-            <view v-if="activeTab === 'checkin' && dayHabitRecords.length === 0 && selectedDateLabel" class="empty-state">
+            <view
+                v-if="activeTab === 'checkin' && dayHabitRecords.length === 0 && selectedDateLabel"
+                class="empty-state"
+            >
                 <text class="empty-icon">🎯</text>
                 <text class="empty-text">该日暂无打卡记录</text>
             </view>
 
-    <template v-if="activeTab === 'checkin'">
-    <view v-for="item in dayHabitRecords" :key="item.habitId" class="goal-card-wrap">
-        <view class="swipe-actions">
-            <view
-                class="swipe-action action-done"
-                @tap.stop="onHabitSwipeAction(item)"
-            >
-                <text class="sa-icon">{{ item.checked ? '↩' : '✓' }}</text>
-                <text class="sa-label">{{ item.checked ? '取消' : '完成' }}</text>
-            </view>
-            <view
-                class="swipe-action action-edit"
-                @tap.stop="editHabitFromCheckin(item)"
-            >
-                <text class="sa-icon">✏️</text>
-                <text class="sa-label">编辑</text>
-            </view>
-            <view
-                class="swipe-action action-archive"
-                @tap.stop="archiveHabit(item)"
-            >
-                <text class="sa-icon">📦</text>
-                <text class="sa-label">结束</text>
-            </view>
-        </view>
-        <view
-            class="swipe-content"
-            :style="habitSwipeStyle(item.habitId)"
-            @touchstart="onHabitTouchStart($event, item.habitId)"
-            @touchmove="onHabitTouchMove($event, item.habitId)"
-            @touchend="onHabitTouchEnd($event, item.habitId)"
-            @tap="openHabitDetail(item)"
-        >
-            <view class="goal-card color-border premium-hover-lift" :style="{ borderLeftColor: item.color || '#5b5bd6' }">
-                <view class="g-header">
-                    <text class="g-icon">{{ item.icon || '🎯' }}</text>
-                    <text class="g-name">{{ item.habitName }}</text>
-                    <text class="g-badge" :style="{ background: (item.color || '#5b5bd6') + '22', color: item.color || '#5b5bd6' }">{{ getFrequencyMeta(item).label }}</text>
-                </view>
-                <view class="g-streak">
-                    <text><text class="fire-icon">🔥</text> 连续 {{ item.currentDays || 0 }} 天</text>
-                </view>
-                <view v-if="getCardWeekData(item).weekDays" class="g-progress">
-                    <view class="g-progress-bar">
-                        <view class="g-progress-fill" :style="{ width: getCardWeekData(item).rate + '%' }"></view>
-                    </view>
-                    <view class="g-progress-label">
-                        <text>本周 {{ getCardWeekData(item).completed }}/7</text>
-                        <text>{{ getCardWeekData(item).rate }}%</text>
-                    </view>
-                </view>
-                <view class="g-footer">
-                    <view class="g-week">
-                        <view v-for="day in getCardWeekData(item).weekDays" :key="day.date" 
-                              class="g-week-day" 
-                              :class="{ done: day.checked, today: day.isToday }">
-                            <text>{{ day.isToday ? '今' : day.label }}</text>
+            <template v-if="activeTab === 'checkin'">
+                <view v-for="item in dayHabitRecords" :key="item.habitId" class="goal-card-wrap">
+                    <view class="swipe-actions">
+                        <view class="swipe-action action-done" @tap.stop="onHabitSwipeAction(item)">
+                            <text class="sa-icon">{{ item.checked ? '↩' : '✓' }}</text>
+                            <text class="sa-label">{{ item.checked ? '取消' : '完成' }}</text>
+                        </view>
+                        <view
+                            class="swipe-action action-edit"
+                            @tap.stop="editHabitFromCheckin(item)"
+                        >
+                            <text class="sa-icon">✏️</text>
+                            <text class="sa-label">编辑</text>
+                        </view>
+                        <view class="swipe-action action-archive" @tap.stop="archiveHabit(item)">
+                            <text class="sa-icon">📦</text>
+                            <text class="sa-label">结束</text>
                         </view>
                     </view>
-                    <button class="checkin-btn" :class="{ checked: item.checked }" 
-                            @tap.stop="onHabitSwipeAction(item)">
-                        <text>{{ item.checked ? '✓' : '○' }}</text>
-                    </button>
+                    <view
+                        class="swipe-content"
+                        :style="habitSwipeStyle(item.habitId)"
+                        @touchstart="onHabitTouchStart($event, item.habitId)"
+                        @touchmove="onHabitTouchMove($event, item.habitId)"
+                        @touchend="onHabitTouchEnd($event, item.habitId)"
+                        @tap="openHabitDetail(item)"
+                    >
+                        <view
+                            class="goal-card color-border premium-hover-lift"
+                            :style="{ borderLeftColor: item.color || '#5b5bd6' }"
+                        >
+                            <view class="g-header">
+                                <text class="g-icon">{{ item.icon || '🎯' }}</text>
+                                <text class="g-name">{{ item.habitName }}</text>
+                                <text
+                                    class="g-badge"
+                                    :style="{
+                                        background: (item.color || '#5b5bd6') + '22',
+                                        color: item.color || '#5b5bd6'
+                                    }"
+                                    >{{ getFrequencyMeta(item).label }}</text
+                                >
+                            </view>
+                            <view class="g-streak">
+                                <text
+                                    ><text class="fire-icon">🔥</text> 连续
+                                    {{ item.currentDays || 0 }} 天</text
+                                >
+                            </view>
+                            <view v-if="getCardWeekData(item).weekDays" class="g-progress">
+                                <view class="g-progress-bar">
+                                    <view
+                                        class="g-progress-fill"
+                                        :style="{ width: getCardWeekData(item).rate + '%' }"
+                                    ></view>
+                                </view>
+                                <view class="g-progress-label">
+                                    <text>本周 {{ getCardWeekData(item).completed }}/7</text>
+                                    <text>{{ getCardWeekData(item).rate }}%</text>
+                                </view>
+                            </view>
+                            <view class="g-footer">
+                                <view class="g-week">
+                                    <view
+                                        v-for="day in getCardWeekData(item).weekDays"
+                                        :key="day.date"
+                                        class="g-week-day"
+                                        :class="{ done: day.checked, today: day.isToday }"
+                                    >
+                                        <text>{{ day.isToday ? '今' : day.label }}</text>
+                                    </view>
+                                </view>
+                                <button
+                                    class="checkin-btn"
+                                    :class="{ checked: item.checked }"
+                                    @tap.stop="onHabitSwipeAction(item)"
+                                >
+                                    <text>{{ item.checked ? '✓' : '○' }}</text>
+                                </button>
+                            </view>
+                        </view>
+                    </view>
                 </view>
-            </view>
-        </view>
-    </view>
-    </template>
+            </template>
 
             <view v-if="activeTab === 'manage'" class="section-pad premium-fade-in premium-d2">
                 <view class="section-sub">进行中的目标</view>
@@ -147,7 +173,9 @@
                 </view>
                 <template v-for="(group, cat) in groupedHabits" :key="cat">
                     <view class="grp-header" @tap="toggleGroup(cat)">
-                        <text class="grp-arrow" :class="{ collapsed: isGroupCollapsed(cat) }">▼</text>
+                        <text class="grp-arrow" :class="{ collapsed: isGroupCollapsed(cat) }"
+                            >▼</text
+                        >
                         <text class="grp-name">{{ cat || '未分类' }}</text>
                         <text class="grp-count">{{ group.length }}项</text>
                     </view>
@@ -160,19 +188,61 @@
                         >
                             <text class="mi-icon">{{ habit.icon || '🎯' }}</text>
                             <view class="mi-info">
-                                <text class="mi-name">{{ habit.habitName || habit.name || '未命名习惯' }}</text>
-                                <text class="mi-sub">连续 {{ habit.currentDays || 0 }} 天 · {{ habit.category || '健康' }}</text>
+                                <text class="mi-name">{{
+                                    habit.habitName || habit.name || '未命名习惯'
+                                }}</text>
+                                <text class="mi-sub"
+                                    >连续 {{ habit.currentDays || 0 }} 天 ·
+                                    {{ habit.category || '健康' }}</text
+                                >
                             </view>
                             <view class="manage-actions">
-                                <button class="mi-action move-btn" type="button" @tap.stop="moveHabit(habit, -1, cat)" :disabled="hIdx === 0">▲</button>
-                                <button class="mi-action move-btn" type="button" @tap.stop="moveHabit(habit, 1, cat)" :disabled="hIdx === group.length - 1">▼</button>
+                                <button
+                                    class="mi-action move-btn"
+                                    type="button"
+                                    @tap.stop="moveHabit(habit, -1, cat)"
+                                    :disabled="hIdx === 0"
+                                >
+                                    ▲
+                                </button>
+                                <button
+                                    class="mi-action move-btn"
+                                    type="button"
+                                    @tap.stop="moveHabit(habit, 1, cat)"
+                                    :disabled="hIdx === group.length - 1"
+                                >
+                                    ▼
+                                </button>
                             </view>
-                            <button class="mi-action end-btn" type="button" @tap.stop="archiveHabitFromManage(habit)">结束</button>
+                            <button
+                                class="mi-action end-btn"
+                                type="button"
+                                @tap.stop="archiveHabitFromManage(habit)"
+                            >
+                                结束
+                            </button>
                         </view>
                     </view>
                 </template>
-                <view style="font-size:12px;color:var(--color-text-tertiary);margin:16px 0 10px;font-weight:500">已结束的目标</view>
-                <view v-if="archivedHabits.length === 0" style="text-align:center;padding:24px 0;font-size:12px;color:var(--color-text-tertiary)">暂无结束的目标</view>
+                <view
+                    style="
+                        font-size: 12px;
+                        color: var(--color-text-tertiary);
+                        margin: 16px 0 10px;
+                        font-weight: 500;
+                    "
+                    >已结束的目标</view
+                >
+                <view
+                    v-if="archivedHabits.length === 0"
+                    style="
+                        text-align: center;
+                        padding: 24px 0;
+                        font-size: 12px;
+                        color: var(--color-text-tertiary);
+                    "
+                    >暂无结束的目标</view
+                >
                 <view
                     v-for="habit in archivedHabits"
                     :key="'arch-' + (habit.habitId || habit.id)"
@@ -181,14 +251,36 @@
                 >
                     <text class="mi-icon">{{ habit.icon || '🎯' }}</text>
                     <view class="mi-info">
-                        <text class="mi-name">{{ habit.habitName || habit.name || '未命名习惯' }}</text>
+                        <text class="mi-name">{{
+                            habit.habitName || habit.name || '未命名习惯'
+                        }}</text>
                         <text class="mi-sub">已结束 · {{ habit.category || '健康' }}</text>
                     </view>
-                    <button class="mi-action" type="button" @tap.stop="restoreHabitFromManage(habit)">恢复</button>
+                    <button
+                        class="mi-action"
+                        type="button"
+                        @tap.stop="restoreHabitFromManage(habit)"
+                    >
+                        恢复
+                    </button>
                 </view>
-                <view style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;border-top:1px solid var(--color-border-light);padding-top:12px">
-                    <button type="button" @tap="goAddHabit" class="manage-bottom-btn">📋 习惯模板</button>
-                    <button type="button" @tap="goStatsPage" class="manage-bottom-btn">🔒 密码锁</button>
+                <view
+                    style="
+                        margin-top: 16px;
+                        display: flex;
+                        gap: 8px;
+                        justify-content: center;
+                        flex-wrap: wrap;
+                        border-top: 1px solid var(--color-border-light);
+                        padding-top: 12px;
+                    "
+                >
+                    <button type="button" @tap="goAddHabit" class="manage-bottom-btn">
+                        📋 习惯模板
+                    </button>
+                    <button type="button" @tap="goStatsPage" class="manage-bottom-btn">
+                        🔒 密码锁
+                    </button>
                 </view>
             </view>
 
@@ -337,7 +429,10 @@
             :visible="showForm"
             :edit-data="editingHabit"
             :selected-date="selectedDateLabel"
-            @close="showForm = false; editingHabit = null"
+            @close="
+                showForm = false;
+                editingHabit = null
+            "
             @saved="onFormSaved"
         />
         <PremiumBottomNav active="plan" />
@@ -923,9 +1018,7 @@ const getCardWeekData = (item) => {
 }
 
 const editHabitFromCheckin = (item) => {
-    const habit = allHabits.value.find(
-        (h) => String(h.habitId || h.id) === String(item.habitId)
-    )
+    const habit = allHabits.value.find((h) => String(h.habitId || h.id) === String(item.habitId))
     editingHabit.value = habit || { habitId: item.habitId }
     showForm.value = true
 }
@@ -1135,7 +1228,7 @@ onShow(async () => {
     animation: cardSlideIn 0.4s ease both;
 }
 .manage-item.hover-active {
-    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 .manage-item:active {
     transform: scale(0.96);
@@ -1310,8 +1403,8 @@ onShow(async () => {
 .premium-card {
     border-radius: 24rpx;
     background: var(--color-surface, #ffffff);
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .milestone-grid {
@@ -1530,13 +1623,13 @@ onShow(async () => {
     background: var(--color-surface);
     border: 1px solid var(--color-border-light);
     padding: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     transition: box-shadow 0.25s ease, border-color 0.25s ease;
     animation: cardSlideIn 0.4s ease both;
 }
 
 .goal-card.hover-active {
-    box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .goal-card:active {
@@ -1618,8 +1711,13 @@ onShow(async () => {
 }
 
 @keyframes firePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
 }
 
 .goal-card .g-progress {
@@ -1695,7 +1793,8 @@ onShow(async () => {
     justify-content: center;
     font-size: 20px;
     color: var(--color-text-tertiary, #b0b0b5);
-    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease,
+        box-shadow 0.25s ease;
     flex-shrink: 0;
     padding: 0;
 }
@@ -1781,7 +1880,7 @@ onShow(async () => {
     padding: 40rpx 32rpx;
     border-radius: 32rpx;
     text-align: center;
-    animation: achievementPopIn 0.4s cubic-bezier(.34,1.56,.64,1);
+    animation: achievementPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes achievementPopIn {

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <view class="plan-schedule-page">
         <view class="page-header">
             <view class="header-left">
@@ -49,7 +49,10 @@
                 <button class="batch-bar-btn" @tap="exitBatchMode">退出</button>
             </view>
 
-            <view v-if="selectedDateLabel && filteredDayEvents.length > 0" class="day-overview premium-card premium-fade-in premium-d2">
+            <view
+                v-if="selectedDateLabel && filteredDayEvents.length > 0"
+                class="day-overview premium-card premium-fade-in premium-d2"
+            >
                 <view class="overview-top">
                     <text class="overview-date">{{ selectedDateLabel }}</text>
                     <text class="overview-count">{{ filteredDayEvents.length }} 项安排</text>
@@ -94,15 +97,27 @@
         <view v-if="matrixVisible" class="matrix-overlay" @tap="toggleMatrix">
             <view class="matrix-modal premium-card premium-fade-in" @tap.stop>
                 <view class="matrix-header">
-                    <text class="matrix-title">艾森豪威尔 <text class="matrix-title-accent">矩阵</text></text>
+                    <text class="matrix-title"
+                        >艾森豪威尔 <text class="matrix-title-accent">矩阵</text></text
+                    >
                     <text class="matrix-sub">将任务分类到四个象限，明确优先级</text>
                     <button class="matrix-close" type="button" @tap="toggleMatrix">✕</button>
                 </view>
                 <view class="matrix-grid">
-                    <view v-for="q in quadrantMatrix" :key="q.value" class="matrix-cell" :style="{ borderTopColor: q.color }">
+                    <view
+                        v-for="q in quadrantMatrix"
+                        :key="q.value"
+                        class="matrix-cell"
+                        :style="{ borderTopColor: q.color }"
+                    >
                         <text class="matrix-cell-title">{{ q.label }}</text>
                         <text class="matrix-cell-count">{{ q.count }} 项</text>
-                        <view v-for="evt in q.events" :key="evt.id" class="matrix-event" @tap="goToDetail(evt)">
+                        <view
+                            v-for="evt in q.events"
+                            :key="evt.id"
+                            class="matrix-event"
+                            @tap="goToDetail(evt)"
+                        >
                             <text class="matrix-event-time">{{ formatEventTime(evt) }}</text>
                             <text class="matrix-event-title">{{ evt.title }}</text>
                         </view>
@@ -113,7 +128,7 @@
         </view>
 
         <!-- Toggle Zone (hidden) -->
-        <view style="display:none">
+        <view style="display: none">
             <view class="toggle-zone">
                 <text>🍅 番茄钟</text>
                 <text>📊 时间追踪</text>
@@ -126,9 +141,14 @@
             <view class="detail-sheet premium-fade-in" @tap.stop>
                 <view class="modal-handle"></view>
                 <view class="detail-hero">
-                    <view class="detail-quadrant-bar" :style="{ background: quadrantColor(detailItem?.quadrant) }"></view>
+                    <view
+                        class="detail-quadrant-bar"
+                        :style="{ background: quadrantColor(detailItem?.quadrant) }"
+                    ></view>
                     <text class="detail-title">{{ detailItem?.title || '' }}</text>
-                    <text v-if="detailItem?.categoryName" class="detail-tag">{{ detailItem.categoryName }}</text>
+                    <text v-if="detailItem?.categoryName" class="detail-tag">{{
+                        detailItem.categoryName
+                    }}</text>
                 </view>
                 <view class="detail-body">
                     <view v-if="detailItem?.startTime || detailItem?.endTime" class="detail-row">
@@ -137,36 +157,75 @@
                     </view>
                     <view v-if="detailItem?.quadrant" class="detail-row">
                         <text class="detail-row-icon">🎯</text>
-                        <text class="detail-row-text">{{ getQuadrantLabel(detailItem.quadrant) }}</text>
+                        <text class="detail-row-text">{{
+                            getQuadrantLabel(detailItem.quadrant)
+                        }}</text>
                     </view>
                     <view v-if="detailItem?.location" class="detail-row">
                         <text class="detail-row-icon">📍</text>
                         <text class="detail-row-text">{{ detailItem.location }}</text>
                     </view>
                     <view v-if="hasRelevantMeta(detailItem)" class="detail-meta-row">
-                        <text v-if="priorityMeta(detailItem).visible" class="detail-meta-chip" :class="priorityMeta(detailItem).className">
+                        <text
+                            v-if="priorityMeta(detailItem).visible"
+                            class="detail-meta-chip"
+                            :class="priorityMeta(detailItem).className"
+                        >
                             {{ priorityMeta(detailItem).label }}
                         </text>
-                        <text v-if="detailItem?.duration" class="detail-meta-chip">⏱ {{ detailItem.duration }}分钟</text>
-                        <text v-if="detailItem?.remind && detailItem.remind.length" class="detail-meta-chip">🔔 {{ detailItem.remind.length > 1 ? detailItem.remind.length + '次提醒' : '1次提醒' }}</text>
-                        <text v-for="t in (detailItem?.tags || [])" :key="t" class="detail-meta-chip"># {{ t }}</text>
+                        <text v-if="detailItem?.duration" class="detail-meta-chip"
+                            >⏱ {{ detailItem.duration }}分钟</text
+                        >
+                        <text
+                            v-if="detailItem?.remind && detailItem.remind.length"
+                            class="detail-meta-chip"
+                            >🔔
+                            {{
+                                detailItem.remind.length > 1
+                                    ? detailItem.remind.length + '次提醒'
+                                    : '1次提醒'
+                            }}</text
+                        >
+                        <text v-for="t in detailItem?.tags || []" :key="t" class="detail-meta-chip"
+                            ># {{ t }}</text
+                        >
                     </view>
-                    <view v-if="detailItem?.subtasks && detailItem.subtasks.length" class="detail-subtasks">
+                    <view
+                        v-if="detailItem?.subtasks && detailItem.subtasks.length"
+                        class="detail-subtasks"
+                    >
                         <text class="detail-subtask-title">📋 子任务</text>
-                        <view v-for="(st, idx) in detailItem.subtasks" :key="idx" class="detail-subtask-item" :class="{ done: st.done }">
+                        <view
+                            v-for="(st, idx) in detailItem.subtasks"
+                            :key="idx"
+                            class="detail-subtask-item"
+                            :class="{ done: st.done }"
+                        >
                             <text>{{ st.done ? '●' : '○' }} {{ st.text || st }}</text>
                         </view>
                     </view>
-                    <text v-if="detailItem?.description" class="detail-desc">{{ detailItem.description }}</text>
-                    <view v-if="detailItem?.progress !== undefined && detailItem.progress !== null" class="detail-progress">
+                    <text v-if="detailItem?.description" class="detail-desc">{{
+                        detailItem.description
+                    }}</text>
+                    <view
+                        v-if="detailItem?.progress !== undefined && detailItem.progress !== null"
+                        class="detail-progress"
+                    >
                         <view class="detail-progress-bar">
-                            <view class="detail-progress-fill" :style="{ width: detailItem.progress + '%' }"></view>
+                            <view
+                                class="detail-progress-fill"
+                                :style="{ width: detailItem.progress + '%' }"
+                            ></view>
                         </view>
                         <text class="detail-progress-label">{{ detailItem.progress }}%</text>
                     </view>
                 </view>
                 <view class="detail-actions">
-                    <view class="detail-action-btn" :class="{ primary: !completedMap[detailItem?.id] }" @tap="toggleCompleteFromDetail">
+                    <view
+                        class="detail-action-btn"
+                        :class="{ primary: !completedMap[detailItem?.id] }"
+                        @tap="toggleCompleteFromDetail"
+                    >
                         <text>{{ completedMap[detailItem?.id] ? '↩ 取消完成' : '✅ 完成' }}</text>
                     </view>
                     <view class="detail-action-btn secondary" @tap="editFromDetail">
@@ -184,7 +243,10 @@
             :visible="showForm"
             :edit-data="editingSchedule"
             :selected-date="selectedDateLabel"
-            @close="showForm = false; editingSchedule = null"
+            @close="
+                showForm = false;
+                editingSchedule = null
+            "
             @saved="onFormSaved"
         />
     </view>
@@ -223,9 +285,15 @@ const batchMode = ref(false)
 const detailVisible = ref(false)
 const detailItem = ref(null)
 
-const toggleMatrix = () => { matrixVisible.value = !matrixVisible.value }
-const showPinSettings = () => { uni.showToast({ title: '锁屏设置', icon: 'none' }) }
-const exitBatchMode = () => { batchMode.value = false }
+const toggleMatrix = () => {
+    matrixVisible.value = !matrixVisible.value
+}
+const showPinSettings = () => {
+    uni.showToast({ title: '锁屏设置', icon: 'none' })
+}
+const exitBatchMode = () => {
+    batchMode.value = false
+}
 
 const showDetail = (item) => {
     detailItem.value = item
@@ -243,7 +311,12 @@ const formatDetailTime = (item) => {
 }
 const hasRelevantMeta = (item) => {
     if (!item) return false
-    return priorityMeta(item).visible || !!item.duration || !!item.remind?.length || !!item.tags?.length
+    return (
+        priorityMeta(item).visible ||
+        !!item.duration ||
+        !!item.remind?.length ||
+        !!item.tags?.length
+    )
 }
 const priorityMeta = (item) => {
     const priority = item?.priority
@@ -277,16 +350,18 @@ const deleteFromDetail = async () => {
 }
 
 const quadrantMatrix = computed(() => {
-    return quadrants.filter(q => q.value > 0).map(q => {
-        const events = (filteredDayEvents.value || []).filter(e => e.quadrant === q.value)
-        return { ...q, events, count: events.length }
-    })
+    return quadrants
+        .filter((q) => q.value > 0)
+        .map((q) => {
+            const events = (filteredDayEvents.value || []).filter((e) => e.quadrant === q.value)
+            return { ...q, events, count: events.length }
+        })
 })
 
 const formatEventTime = (evt) => {
     if (!evt.startTime) return '--:--'
     const d = new Date(evt.startTime)
-    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
 const {
@@ -469,15 +544,15 @@ onShow(async () => {
     border-radius: 24rpx;
     padding: 20rpx;
     background: #ffffff;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     text-align: center;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 .stat-card.hover-active {
     background: var(--color-surface-soft);
-    box-shadow: 0 8px 28px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .stat-card:active {
     transform: scale(0.96);
@@ -534,8 +609,8 @@ onShow(async () => {
     padding: 24rpx;
     border-radius: 24rpx;
     background: #ffffff;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .summary-item {
@@ -563,8 +638,8 @@ onShow(async () => {
     padding: 24rpx;
     border-radius: 24rpx;
     background: #ffffff;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .overview-top {
@@ -648,7 +723,7 @@ onShow(async () => {
 .matrix-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0, 0, 0, 0.4);
     z-index: 400;
     display: flex;
     align-items: center;
@@ -764,8 +839,12 @@ onShow(async () => {
 }
 
 @keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .detail-sheet {
@@ -777,7 +856,7 @@ onShow(async () => {
     padding: 18rpx 24px calc(28rpx + env(safe-area-inset-bottom));
     box-shadow: 0 -8rpx 40rpx rgba(15, 23, 42, 0.12);
     overflow-y: auto;
-    animation: sheetSlideUp 0.3s cubic-bezier(.22,1,.36,1);
+    animation: sheetSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes sheetSlideUp {
@@ -827,7 +906,7 @@ onShow(async () => {
 
 .detail-body {
     padding: 4px 0 16px;
-    border-top: 1px solid var(--color-border-light, rgba(0,0,0,0.06));
+    border-top: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.06));
 }
 
 .detail-row {
@@ -938,7 +1017,7 @@ onShow(async () => {
     display: flex;
     gap: 8px;
     padding-top: 14px;
-    border-top: 1px solid var(--color-border-light, rgba(0,0,0,0.06));
+    border-top: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.06));
 }
 
 .detail-action-btn {
@@ -949,7 +1028,7 @@ onShow(async () => {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
 }
 .detail-action-btn.hover-active {
     transform: translateY(-1px);
