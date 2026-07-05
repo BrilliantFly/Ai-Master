@@ -4,7 +4,6 @@
             <view class="status-bar">
                 <text class="status-time">9:41</text>
                 <view class="status-right">
-                    <ThemeSwitcher />
                     <text class="status-icons">📶 🔋</text>
                 </view>
             </view>
@@ -271,7 +270,6 @@ import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useRouter } from 'uniapp-router-next'
 import PremiumBottomNav from '@/components/PremiumBottomNav.vue'
-import ThemeSwitcher from '@/components/widgets/ThemeSwitcher.vue'
 import { useAppStore } from '@/stores/app'
 import { useUserStore } from '@/stores/user'
 import { getHomeConfig } from '@/api/plan/home'

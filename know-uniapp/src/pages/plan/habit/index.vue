@@ -129,6 +129,10 @@
                                     {{ item.currentDays || 0 }} 天</text
                                 >
                             </view>
+                            <view v-if="hasReminder(item)" class="g-reminder">
+                                <text class="g-reminder-icon">🔔</text>
+                                <text class="g-reminder-text">{{ buildReminderText(item) }}</text>
+                            </view>
                             <view v-if="getCardWeekData(item).weekDays" class="g-progress">
                                 <view class="g-progress-bar">
                                     <view
@@ -191,10 +195,7 @@
                                 <text class="mi-name">{{
                                     habit.habitName || habit.name || '未命名习惯'
                                 }}</text>
-                                <text class="mi-sub"
-                                    >连续 {{ habit.currentDays || 0 }} 天 ·
-                                    {{ habit.category || '健康' }}</text
-                                >
+                                <text class="mi-sub">{{ buildManageMeta(habit) }}</text>
                             </view>
                             <view class="manage-actions">
                                 <button
@@ -254,7 +255,7 @@
                         <text class="mi-name">{{
                             habit.habitName || habit.name || '未命名习惯'
                         }}</text>
-                        <text class="mi-sub">已结束 · {{ habit.category || '健康' }}</text>
+                        <text class="mi-sub">{{ buildArchivedMeta(habit) }}</text>
                     </view>
                     <button
                         class="mi-action"
@@ -708,9 +709,32 @@ const getFrequencyMeta = (habit) => {
     return { label: '每天', period: '天' }
 }
 
-const buildReminderText = (habit) => {
-    const reminders = [habit.reminderTime, habit.secondReminder].filter(Boolean)
+const normalizeReminderTime = (value) => {
+    if (value === null || value === undefined) return ''
+    return String(value).trim()
+}
+
+const buildReminderText = (habit = {}) => {
+    const reminders = [habit.reminderTime, habit.secondReminder].map(normalizeReminderTime).filter(Boolean)
     return reminders.length ? reminders.join(' / ') : '不提醒'
+}
+
+const hasReminder = (habit) => buildReminderText(habit) !== '不提醒'
+
+const buildManageMeta = (habit = {}) => {
+    const parts = [`连续 ${habit.currentDays || 0} 天`, habit.category || '健康']
+    if (hasReminder(habit)) {
+        parts.push(`🔔 ${buildReminderText(habit)}`)
+    }
+    return parts.join(' · ')
+}
+
+const buildArchivedMeta = (habit = {}) => {
+    const parts = ['已结束', habit.category || '健康']
+    if (hasReminder(habit)) {
+        parts.push(`🔔 ${buildReminderText(habit)}`)
+    }
+    return parts.join(' · ')
 }
 
 const mapHabitRecordsForDay = (dateStr) => {
@@ -740,6 +764,7 @@ const mapHabitRecordsForDay = (dateStr) => {
             checkinDays: habit.checkinDays || [],
             reminderTime: habit.reminderTime || '',
             secondReminder: habit.secondReminder || '',
+            reminderText: buildReminderText(habit),
             startDate: formatTimestampDate(habit.startDate),
             endDate: formatTimestampDate(habit.endDate)
         }
@@ -771,6 +796,7 @@ const toHabitRecord = (habit) => {
         checkinDays: habit.checkinDays || [],
         reminderTime: habit.reminderTime || '',
         secondReminder: habit.secondReminder || '',
+        reminderText: buildReminderText(habit),
         startDate: formatTimestampDate(habit.startDate),
         endDate: formatTimestampDate(habit.endDate)
     }
@@ -804,6 +830,7 @@ const fetchCalendarData = async () => {
                 note: habit.note || '',
                 reminderTime: habit.reminderTime || '',
                 secondReminder: habit.secondReminder || '',
+                reminderText: buildReminderText(habit),
                 startDate: habit.startDate || '',
                 endDate: habit.endDate || '',
                 checkinDays: habit.checkinDays || []
@@ -1708,6 +1735,30 @@ onShow(async () => {
 .goal-card .g-streak .fire-icon {
     display: inline-block;
     animation: firePulse 2s infinite;
+}
+
+.goal-card .g-reminder {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    gap: 5px;
+    margin-bottom: 8px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--color-surface-soft, #f8fafc);
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.goal-card .g-reminder-icon {
+    flex-shrink: 0;
+}
+
+.goal-card .g-reminder-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @keyframes firePulse {

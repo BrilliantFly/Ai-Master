@@ -543,9 +543,9 @@ onShow(async () => {
     flex: 1;
     border-radius: 24rpx;
     padding: 20rpx;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    background: var(--color-surface, #ffffff);
+    border: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.06));
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.04));
     text-align: center;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
@@ -608,9 +608,9 @@ onShow(async () => {
     margin: 0 32rpx 20rpx;
     padding: 24rpx;
     border-radius: 24rpx;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    background: var(--color-surface, #ffffff);
+    border: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.06));
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.04));
 }
 
 .summary-item {
@@ -637,9 +637,9 @@ onShow(async () => {
     margin: 0 32rpx 20rpx;
     padding: 24rpx;
     border-radius: 24rpx;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    background: var(--color-surface, #ffffff);
+    border: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.06));
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.04));
 }
 
 .overview-top {
@@ -693,7 +693,7 @@ onShow(async () => {
 .overview-fill {
     height: 100%;
     border-radius: 999rpx;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-mist, #8980f0));
 }
 
 .overview-rate {
@@ -710,7 +710,7 @@ onShow(async () => {
     width: 104rpx;
     height: 104rpx;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary, #ff8700), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary, #ff8700), var(--color-primary-mist, #8980f0));
     color: #fff;
     display: flex;
     align-items: center;
@@ -768,7 +768,7 @@ onShow(async () => {
     height: 64rpx;
     border-radius: 50%;
     border: none;
-    background: var(--color-bg-secondary, #f5f5f7);
+    background: var(--color-surface-soft, #f5f5f7);
     font-size: 32rpx;
     display: flex;
     align-items: center;
@@ -784,7 +784,7 @@ onShow(async () => {
 }
 
 .matrix-cell {
-    background: var(--color-bg-secondary, #f5f5f7);
+    background: var(--color-surface-soft, #f5f5f7);
     padding: 20rpx;
     border-top: 6rpx solid #999;
     min-height: 120rpx;

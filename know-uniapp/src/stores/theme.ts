@@ -50,6 +50,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': '#f5f5ff',
         '--color-minor': '#1890ff',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#e8f5ee',
+        '--color-warning-soft': '#fff8ed',
+        '--color-danger-soft': '#fef0f0',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(0,0,0,0.06)',
+        '--shadow-md': '0 8px 28px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#5b5bd6 0%,#f5f5ff 100%)'
     },
     dark: {
@@ -70,6 +77,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': '#1e1e38',
         '--color-minor': '#4a9eff',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': 'rgba(34,181,115,0.15)',
+        '--color-warning-soft': 'rgba(240,160,32,0.15)',
+        '--color-danger-soft': 'rgba(232,90,90,0.15)',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(0,0,0,0.25)',
+        '--shadow-md': '0 8px 28px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.25)',
+        '--shadow-lg': '0 20px 56px rgba(0,0,0,0.45), 0 4px 16px rgba(0,0,0,0.3)',
         '--gradient-primary': 'linear-gradient(135deg,#6b6be0 0%,#1e1e38 100%)'
     },
     warm: {
@@ -90,6 +104,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': '#faf0e8',
         '--color-minor': '#b8956b',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#f0f0ea',
+        '--color-warning-soft': '#fef5e8',
+        '--color-danger-soft': '#fef0ee',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(150,120,80,0.08)',
+        '--shadow-md': '0 8px 28px rgba(150,120,80,0.08), 0 2px 8px rgba(150,120,80,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(150,120,80,0.1), 0 4px 16px rgba(150,120,80,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#d4956b 0%,#faf0e8 100%)'
     },
     aurora: {
@@ -110,6 +131,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': '#f2f4ff',
         '--color-minor': '#818cf8',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#eef4f8',
+        '--color-warning-soft': '#fef8e8',
+        '--color-danger-soft': '#fef0f4',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(80,80,160,0.06)',
+        '--shadow-md': '0 8px 28px rgba(80,80,160,0.06), 0 2px 8px rgba(80,80,160,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(80,80,160,0.08), 0 4px 16px rgba(80,80,160,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#6366f1 0%,#f2f4ff 100%)'
     },
     purple: {
@@ -130,6 +158,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': '#1e1038',
         '--color-minor': '#a78bfa',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': 'rgba(34,181,115,0.15)',
+        '--color-warning-soft': 'rgba(240,160,32,0.15)',
+        '--color-danger-soft': 'rgba(232,90,90,0.15)',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(0,0,0,0.3)',
+        '--shadow-md': '0 8px 28px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.25)',
+        '--shadow-lg': '0 20px 56px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3)',
         '--gradient-primary': 'linear-gradient(135deg,#7c3aed 0%,#1e1038 100%)'
     },
     glass: {
@@ -150,6 +185,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(102,126,234,0.12)',
         '--color-minor': '#818cf8',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': 'rgba(34,181,115,0.15)',
+        '--color-warning-soft': 'rgba(240,160,32,0.15)',
+        '--color-danger-soft': 'rgba(232,90,90,0.15)',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': 'none',
+        '--shadow-md': 'none',
+        '--shadow-lg': 'none',
         '--gradient-primary': 'linear-gradient(135deg,#667eea 0%,rgba(102,126,234,0.12) 100%)'
     },
     orangold: {
@@ -170,6 +212,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(232,122,93,0.1)',
         '--color-minor': '#c4956b',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': 'rgba(34,181,115,0.1)',
+        '--color-warning-soft': 'rgba(240,160,32,0.1)',
+        '--color-danger-soft': 'rgba(232,90,90,0.1)',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(180,150,120,0.06)',
+        '--shadow-md': '0 8px 28px rgba(180,150,120,0.06), 0 2px 8px rgba(180,150,120,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(180,150,120,0.08), 0 4px 16px rgba(180,150,120,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#e87a5d 0%,rgba(232,122,93,0.1) 100%)'
     },
     macaron: {
@@ -190,6 +239,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(255,139,167,0.08)',
         '--color-minor': '#f472b6',
         '--color-btn-text': '#1a1a2e',
+        '--color-success-soft': '#f0f8f0',
+        '--color-warning-soft': '#fff8e8',
+        '--color-danger-soft': '#fef0f0',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(45,27,31,0.06)',
+        '--shadow-md': '0 8px 28px rgba(45,27,31,0.06), 0 2px 8px rgba(45,27,31,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(45,27,31,0.08), 0 4px 16px rgba(45,27,31,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#ff8ba7 0%,rgba(255,139,167,0.08) 100%)'
     },
     mint: {
@@ -210,6 +266,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(52,211,153,0.08)',
         '--color-minor': '#22c55e',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#eaf5ee',
+        '--color-warning-soft': '#fef8e8',
+        '--color-danger-soft': '#fef0ee',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(6,78,59,0.06)',
+        '--shadow-md': '0 8px 28px rgba(6,78,59,0.06), 0 2px 8px rgba(6,78,59,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(6,78,59,0.08), 0 4px 16px rgba(6,78,59,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#34d399 0%,rgba(52,211,153,0.08) 100%)'
     },
     lavender: {
@@ -230,6 +293,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(167,139,250,0.08)',
         '--color-minor': '#818cf8',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#eef5f0',
+        '--color-warning-soft': '#fff8ea',
+        '--color-danger-soft': '#fef0f4',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(30,27,58,0.06)',
+        '--shadow-md': '0 8px 28px rgba(30,27,58,0.06), 0 2px 8px rgba(30,27,58,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(30,27,58,0.08), 0 4px 16px rgba(30,27,58,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#a78bfa 0%,rgba(167,139,250,0.08) 100%)'
     },
     milky: {
@@ -250,6 +320,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(245,158,11,0.08)',
         '--color-minor': '#f97316',
         '--color-btn-text': '#1a1a2e',
+        '--color-success-soft': '#eef5ee',
+        '--color-warning-soft': '#fef8e8',
+        '--color-danger-soft': '#fef0ee',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(45,36,24,0.06)',
+        '--shadow-md': '0 8px 28px rgba(45,36,24,0.06), 0 2px 8px rgba(45,36,24,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(45,36,24,0.08), 0 4px 16px rgba(45,36,24,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#f59e0b 0%,rgba(245,158,11,0.08) 100%)'
     },
     matcha: {
@@ -270,6 +347,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(101,163,13,0.08)',
         '--color-minor': '#84cc16',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#eef5ea',
+        '--color-warning-soft': '#fef8e8',
+        '--color-danger-soft': '#fef0ee',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(26,46,6,0.06)',
+        '--shadow-md': '0 8px 28px rgba(26,46,6,0.06), 0 2px 8px rgba(26,46,6,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(26,46,6,0.08), 0 4px 16px rgba(26,46,6,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#65a30d 0%,rgba(101,163,13,0.08) 100%)'
     },
     berry: {
@@ -290,6 +374,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(236,72,153,0.08)',
         '--color-minor': '#f472b6',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#f0f5f0',
+        '--color-warning-soft': '#fef8e8',
+        '--color-danger-soft': '#fef0f0',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(45,10,30,0.06)',
+        '--shadow-md': '0 8px 28px rgba(45,10,30,0.06), 0 2px 8px rgba(45,10,30,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(45,10,30,0.08), 0 4px 16px rgba(45,10,30,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#ec4899 0%,rgba(236,72,153,0.08) 100%)'
     },
     ocean: {
@@ -310,6 +401,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(14,165,233,0.08)',
         '--color-minor': '#38bdf8',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#eef5f8',
+        '--color-warning-soft': '#fef8ea',
+        '--color-danger-soft': '#fef0f2',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(10,42,58,0.06)',
+        '--shadow-md': '0 8px 28px rgba(10,42,58,0.06), 0 2px 8px rgba(10,42,58,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(10,42,58,0.08), 0 4px 16px rgba(10,42,58,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#0ea5e9 0%,rgba(14,165,233,0.08) 100%)'
     },
     cream: {
@@ -330,6 +428,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(217,119,6,0.08)',
         '--color-minor': '#f59e0b',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#f0f5ee',
+        '--color-warning-soft': '#fef8e8',
+        '--color-danger-soft': '#fef0ee',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(45,31,10,0.06)',
+        '--shadow-md': '0 8px 28px rgba(45,31,10,0.06), 0 2px 8px rgba(45,31,10,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(45,31,10,0.08), 0 4px 16px rgba(45,31,10,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#d97706 0%,rgba(217,119,6,0.08) 100%)'
     },
     chocolate: {
@@ -350,6 +455,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(141,110,99,0.1)',
         '--color-minor': '#a0786a',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#f0eeea',
+        '--color-warning-soft': '#fef5e8',
+        '--color-danger-soft': '#fef0ee',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(42,31,24,0.06)',
+        '--shadow-md': '0 8px 28px rgba(42,31,24,0.06), 0 2px 8px rgba(42,31,24,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(42,31,24,0.08), 0 4px 16px rgba(42,31,24,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#8d6e63 0%,rgba(141,110,99,0.1) 100%)'
     },
     neon: {
@@ -370,6 +482,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(0,255,136,0.08)',
         '--color-minor': '#22c55e',
         '--color-btn-text': '#0a0f0a',
+        '--color-success-soft': 'rgba(34,181,115,0.15)',
+        '--color-warning-soft': 'rgba(240,160,32,0.15)',
+        '--color-danger-soft': 'rgba(232,90,90,0.15)',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(0,0,0,0.25)',
+        '--shadow-md': '0 8px 28px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.25)',
+        '--shadow-lg': '0 20px 56px rgba(0,0,0,0.45), 0 4px 16px rgba(0,0,0,0.3)',
         '--gradient-primary': 'linear-gradient(135deg,#00ff88 0%,rgba(0,255,136,0.08) 100%)'
     },
     sakura: {
@@ -390,6 +509,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(255,105,180,0.08)',
         '--color-minor': '#f472b6',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#f0f5f0',
+        '--color-warning-soft': '#fff8ea',
+        '--color-danger-soft': '#fef0f0',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(45,10,30,0.06)',
+        '--shadow-md': '0 8px 28px rgba(45,10,30,0.06), 0 2px 8px rgba(45,10,30,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(45,10,30,0.08), 0 4px 16px rgba(45,10,30,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#ff69b4 0%,rgba(255,105,180,0.08) 100%)'
     },
     forest: {
@@ -410,6 +536,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(76,175,80,0.08)',
         '--color-minor': '#22c55e',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#eaf5ea',
+        '--color-warning-soft': '#fef8e8',
+        '--color-danger-soft': '#fef0ee',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(10,42,10,0.06)',
+        '--shadow-md': '0 8px 28px rgba(10,42,10,0.06), 0 2px 8px rgba(10,42,10,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(10,42,10,0.08), 0 4px 16px rgba(10,42,10,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#4caf50 0%,rgba(76,175,80,0.08) 100%)'
     },
     sunset: {
@@ -430,6 +563,13 @@ export const THEME_COLORS: Record<string, Record<string, string>> = {
         '--color-primary-mist': 'rgba(255,107,53,0.08)',
         '--color-minor': '#f97316',
         '--color-btn-text': '#ffffff',
+        '--color-success-soft': '#f0f5f0',
+        '--color-warning-soft': '#fef8e8',
+        '--color-danger-soft': '#fef0ee',
+        '--color-danger-rgb': '232,90,90',
+        '--shadow-sm': '0 1px 4px rgba(45,24,10,0.06)',
+        '--shadow-md': '0 8px 28px rgba(45,24,10,0.06), 0 2px 8px rgba(45,24,10,0.04)',
+        '--shadow-lg': '0 20px 56px rgba(45,24,10,0.08), 0 4px 16px rgba(45,24,10,0.04)',
         '--gradient-primary': 'linear-gradient(135deg,#ff6b35 0%,rgba(255,107,53,0.08) 100%)'
     }
 }

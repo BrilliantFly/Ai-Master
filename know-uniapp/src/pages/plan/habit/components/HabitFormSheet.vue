@@ -1284,10 +1284,15 @@ const saveAsTemplate = () => {
 
 .action-btn.submit {
     flex: 1.15;
-    color: #fff;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
+    color: var(--color-btn-text, #ffffff);
+    background: var(--gradient-primary);
     box-shadow: var(--shadow-glow);
     border: none;
+}
+
+.action-btn.submit.hover-active {
+    transform: translateY(-1rpx);
+    box-shadow: 0 8rpx 32rpx rgba(var(--color-primary-rgb), 0.3);
 }
 
 .action-btn.submit:active {

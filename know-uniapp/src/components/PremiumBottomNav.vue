@@ -65,7 +65,7 @@ const props = defineProps({
 
 const appStore = useAppStore()
 const router = useRouter()
-const remoteTabbar = ref<any[]>([])
+const remoteTabbar = ref<any[]>(appStore.getTabbarConfig || [])
 
 const fallbackItems: NavItem[] = [
     {
@@ -160,6 +160,37 @@ const inferFallbackKey = (menuCode: string, menuName: string, path: string) => {
     return 'article'
 }
 
+const TAB_PAGE_PATHS = ['/pages/index/index', '/pages/news/news', '/pages/user/user'] as const
+
+/** fallbackKey → 默认路径映射 */
+const FALLBACK_PATH_MAP: Record<string, string> = {
+    home: '/pages/index/index',
+    article: '/pages/news/news',
+    profile: '/pages/user/user'
+}
+
+/** 规范化路径：确保有前导 /，去除多余斜杠，转小写 */
+const normalizePath = (raw: string): string => {
+    let p = String(raw || '').trim()
+    if (!p) return ''
+    // 确保以 / 开头
+    if (!p.startsWith('/')) p = `/${p}`
+    // 替换连续斜杠为单斜杠
+    p = p.replace(/\/+/g, '/')
+    // 小写化（在非大小写敏感环境下）
+    p = p.toLowerCase()
+    return p
+}
+
+/** 判断路径是否为已知的 tab 页面 */
+const isTabPath = (path: string): boolean => {
+    const n = normalizePath(path)
+    if (TAB_PAGE_PATHS.includes(n as any)) return true
+    // 也匹配 /pages/index/xxx 前缀（兼容子页面）
+    if (n.startsWith('/pages/index/') || n.startsWith('/pages/news/') || n.startsWith('/pages/user/')) return true
+    return false
+}
+
 const normalizedItems = computed((): NavItem[] => {
     const dynamicMenus = remoteTabbar.value
         .filter(
@@ -170,7 +201,8 @@ const normalizedItems = computed((): NavItem[] => {
     if (!dynamicMenus.length) return fallbackItems
 
     return dynamicMenus.map((menu: any, index: number) => {
-        const path = menu.path || menu.link?.path || ''
+        const rawPath = menu.path || menu.link?.path || ''
+        const path = normalizePath(rawPath)
         const menuName = menu.menuName || menu.menu_name || menu.text || `菜单${index + 1}`
         const menuCode = menu.menuCode || menu.menu_code || `menu-${index}`
         const icon = menu.icon ? normalizeIcon(menu.icon) : ''
@@ -180,15 +212,17 @@ const normalizedItems = computed((): NavItem[] => {
                 : icon
         const fallbackKey = inferFallbackKey(String(menuCode), String(menuName), path)
 
+        // 如果路径为空或非 tab 页面，用 fallbackKey 的默认路径兜底
+        const effectivePath = path || FALLBACK_PATH_MAP[fallbackKey] || ''
+        const isTab = effectivePath ? isTabPath(effectivePath) : false
+
         return {
             key: String(menuCode),
             label: String(menuName),
             icon,
             selectedIcon,
-            path,
-            navType: ['/pages/index/index', '/pages/news/news', '/pages/user/user'].includes(path)
-                ? 'switchTab'
-                : 'navigateTo',
+            path: effectivePath,
+            navType: isTab ? 'switchTab' : 'navigateTo',
             iconIsImage: isImageLike(menu.icon || ''),
             sort: Number(menu.sort || index + 1),
             fallbackKey
@@ -206,27 +240,49 @@ const currentKey = computed(() => {
     const pages = getCurrentPages()
     const currentPage = pages[pages.length - 1]
     const currentRoute = currentPage ? `/${currentPage.route}` : ''
-    const matched = normalizedItems.value.find((item) => item.path === currentRoute)
+    let matched = normalizedItems.value.find((item) => item.path === currentRoute)
+    // 如果精确匹配失败，尝试前缀匹配（兼容 API 返回的路径带额外参数或子路径）
+    if (!matched) {
+        matched = normalizedItems.value.find((item) => {
+            const trimmed = item.path.replace(/\/+$/, '')
+            return currentRoute.startsWith(trimmed) || trimmed.startsWith(currentRoute)
+        })
+    }
     return matched?.key || ''
 })
 
 const fetchTabbar = async () => {
     try {
         const menus = await getTabbarMenu()
-        remoteTabbar.value = Array.isArray(menus) ? menus : []
+        if (Array.isArray(menus) && menus.length) {
+            remoteTabbar.value = menus
+            // 同步缓存到 store
+            if (!appStore.getTabbarConfig?.length) {
+                appStore.menuConfig.tabbar = menus
+            }
+        }
     } catch (error) {
         console.error('加载底部菜单失败', error)
-        remoteTabbar.value = appStore.getTabbarConfig || []
+        if (!remoteTabbar.value.length) {
+            remoteTabbar.value = appStore.getTabbarConfig || []
+        }
     }
 }
 
+/** 取有效导航路径：优先 item.path，兜底 fallbackKey 的默认路径 */
+const resolveNavPath = (item: NavItem): string => {
+    if (item.path) return item.path
+    return FALLBACK_PATH_MAP[item.fallbackKey] || ''
+}
+
 const navigate = (item: NavItem) => {
-    if (!item.path || currentKey.value === item.key) return
+    const path = resolveNavPath(item)
+    if (!path || currentKey.value === item.key) return
     if (item.navType === 'switchTab') {
-        router.switchTab(item.path)
+        uni.switchTab({ url: path })
         return
     }
-    router.navigateTo(item.path)
+    router.navigateTo(path)
 }
 
 onShow(() => {
