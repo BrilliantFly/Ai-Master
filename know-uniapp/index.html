@@ -3,6 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <script>
+      // ★ 在所有 CSS/JS 加载前同步设置 data-theme，确保 themes.scss 第一时间生效
+      (function () {
+        try {
+          var theme = localStorage.getItem('know-theme') || 'white'
+          document.documentElement.setAttribute('data-theme', theme)
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'white')
+        }
+      })()
+    </script>
+    <script>
       var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') ||
         CSS.supports('top: constant(a)'))
       document.write(

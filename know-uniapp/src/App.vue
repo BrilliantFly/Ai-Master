@@ -79,27 +79,9 @@ onLaunch(async () => {
 })
 </script>
 <style lang="scss">
-/* 主题变量通过 v-bind 注入 page 元素（全端兼容）*/
+/* H5 端：主题变量由 themes.scss 通过 html[data-theme='X'] 提供，优先级最高
+   此处仅保留排版属性与主题切换过渡。v-bind 用于非 H5 端（小程序/App）。*/
 page {
-    --color-bg: v-bind('themeStore.themeInlineVars["--color-bg"]');
-    --color-bg-app: v-bind('themeStore.themeInlineVars["--color-bg-app"]');
-    --color-surface: v-bind('themeStore.themeInlineVars["--color-surface"]');
-    --color-surface-soft: v-bind('themeStore.themeInlineVars["--color-surface-soft"]');
-    --color-surface-hover: v-bind('themeStore.themeInlineVars["--color-surface-hover"]');
-    --color-text: v-bind('themeStore.themeInlineVars["--color-text"]');
-    --color-text-secondary: v-bind('themeStore.themeInlineVars["--color-text-secondary"]');
-    --color-text-tertiary: v-bind('themeStore.themeInlineVars["--color-text-tertiary"]');
-    --color-border: v-bind('themeStore.themeInlineVars["--color-border"]');
-    --color-border-light: v-bind('themeStore.themeInlineVars["--color-border-light"]');
-    --color-border-hover: v-bind('themeStore.themeInlineVars["--color-border-hover"]');
-    --color-primary: v-bind('themeStore.themeInlineVars["--color-primary"]');
-    --color-primary-rgb: v-bind('themeStore.themeInlineVars["--color-primary-rgb"]');
-    --color-primary-soft: v-bind('themeStore.themeInlineVars["--color-primary-soft"]');
-    --color-primary-mist: v-bind('themeStore.themeInlineVars["--color-primary-mist"]');
-    --color-minor: v-bind('themeStore.themeInlineVars["--color-minor"]');
-    --color-btn-text: v-bind('themeStore.themeInlineVars["--color-btn-text"]');
-    --gradient-primary: v-bind('themeStore.themeInlineVars["--gradient-primary"]');
-
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -119,4 +101,28 @@ page cover-view,
 page cover-image {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.25s ease;
 }
+
+/* 非 H5 端：通过 v-bind 注入主题变量到 page 元素 */
+/* #ifndef H5 */
+page {
+    --color-bg: v-bind('themeStore.themeInlineVars["--color-bg"]');
+    --color-bg-app: v-bind('themeStore.themeInlineVars["--color-bg-app"]');
+    --color-surface: v-bind('themeStore.themeInlineVars["--color-surface"]');
+    --color-surface-soft: v-bind('themeStore.themeInlineVars["--color-surface-soft"]');
+    --color-surface-hover: v-bind('themeStore.themeInlineVars["--color-surface-hover"]');
+    --color-text: v-bind('themeStore.themeInlineVars["--color-text"]');
+    --color-text-secondary: v-bind('themeStore.themeInlineVars["--color-text-secondary"]');
+    --color-text-tertiary: v-bind('themeStore.themeInlineVars["--color-text-tertiary"]');
+    --color-border: v-bind('themeStore.themeInlineVars["--color-border"]');
+    --color-border-light: v-bind('themeStore.themeInlineVars["--color-border-light"]');
+    --color-border-hover: v-bind('themeStore.themeInlineVars["--color-border-hover"]');
+    --color-primary: v-bind('themeStore.themeInlineVars["--color-primary"]');
+    --color-primary-rgb: v-bind('themeStore.themeInlineVars["--color-primary-rgb"]');
+    --color-primary-soft: v-bind('themeStore.themeInlineVars["--color-primary-soft"]');
+    --color-primary-mist: v-bind('themeStore.themeInlineVars["--color-primary-mist"]');
+    --color-minor: v-bind('themeStore.themeInlineVars["--color-minor"]');
+    --color-btn-text: v-bind('themeStore.themeInlineVars["--color-btn-text"]');
+    --gradient-primary: v-bind('themeStore.themeInlineVars["--gradient-primary"]');
+}
+/* #endif */
 </style>
