@@ -11,6 +11,20 @@
         </view>
 
         <scroll-view scroll-y class="calendar-scroll">
+            <view class="streak-cards premium-fade-in premium-d1">
+                <view class="streak-card" style="--card-accent: #6366f1">
+                    <text class="streak-num">{{ checkedCount }}</text>
+                    <text class="streak-label">今日已打卡</text>
+                </view>
+                <view class="streak-card" style="--card-accent: #f59e0b">
+                    <text class="streak-num">{{ bestHabit?.currentDays || 0 }}</text>
+                    <text class="streak-label">最长连续</text>
+                </view>
+                <view class="streak-card" style="--card-accent: #10b981">
+                    <text class="streak-num">{{ monthlyStats.rate }}%</text>
+                    <text class="streak-label">本月完成率</text>
+                </view>
+            </view>
             <CalendarGrid
                 :year="currentYear"
                 :month="currentMonth"
@@ -42,6 +56,20 @@
                 >
                     管理 <text class="tab-badge">{{ allHabits.length }}</text>
                 </view>
+            </view>
+
+            <view v-if="activeTab === 'checkin'" class="badge-strip premium-fade-in premium-d2">
+                <scroll-view scroll-x class="badge-scroll" show-scrollbar="false">
+                    <view
+                        v-for="ms in milestoneStatus"
+                        :key="ms.days"
+                        class="badge-item"
+                        :class="{ unlocked: ms.unlocked }"
+                    >
+                        <text class="badge-icon">{{ ms.icon }}</text>
+                        <text class="badge-days">{{ ms.days }}天</text>
+                    </view>
+                </scroll-view>
             </view>
 
             <view
@@ -144,6 +172,14 @@
                                     <text>本周 {{ getCardWeekData(item).completed }}/7</text>
                                     <text>{{ getCardWeekData(item).rate }}%</text>
                                 </view>
+                            </view>
+                            <view v-if="item.description" class="g-note">
+                                <text class="g-note-icon">📌</text>
+                                <text class="g-note-text">{{ item.description }}</text>
+                            </view>
+                            <view v-if="item.note" class="g-note">
+                                <text class="g-note-icon">📝</text>
+                                <text class="g-note-text">{{ item.note }}</text>
                             </view>
                             <view class="g-footer">
                                 <view class="g-week">
@@ -2274,5 +2310,119 @@ button.detail-action-btn-primary {
     color: #fff;
     font-size: 28rpx;
     font-weight: 700;
+}
+
+/* ---- streak cards ---- */
+.streak-cards {
+    display: flex;
+    gap: 16rpx;
+    padding: 16rpx 32rpx 24rpx;
+}
+.streak-card {
+    flex: 1;
+    background: var(--color-surface, #ffffff);
+    border-radius: 24rpx;
+    padding: 20rpx 16rpx;
+    border-top: 4rpx solid var(--card-accent, #6366f1);
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6rpx;
+}
+.streak-num {
+    font-size: 36rpx;
+    font-weight: 800;
+    color: var(--card-accent, #6366f1);
+    line-height: 1.2;
+}
+.streak-label {
+    font-size: 22rpx;
+    color: var(--color-text-secondary, #6b7280);
+    font-weight: 500;
+}
+.streak-card:active {
+    transform: scale(0.96);
+}
+
+/* ---- badge strip ---- */
+.badge-strip {
+    padding: 0 32rpx 20rpx;
+}
+.badge-scroll {
+    display: flex;
+    flex-direction: row;
+    white-space: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4rpx 0;
+}
+.badge-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rpx;
+    padding: 12rpx 20rpx;
+    margin-right: 12rpx;
+    border-radius: 20rpx;
+    background: var(--color-surface-soft, #f5f5f7);
+    border: 2rpx solid var(--color-border-light, #e5e7eb);
+    opacity: 0.45;
+    filter: grayscale(1);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+.badge-item.unlocked {
+    opacity: 1;
+    filter: grayscale(0);
+    border-color: var(--color-primary, #6366f1);
+    background: var(--color-surface, #ffffff);
+    box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.12);
+}
+.badge-icon {
+    font-size: 32rpx;
+    line-height: 1;
+}
+.badge-days {
+    font-size: 20rpx;
+    font-weight: 600;
+    color: var(--color-text-secondary, #6b7280);
+}
+.badge-item.unlocked .badge-days {
+    color: var(--color-primary, #6366f1);
+}
+
+/* ---- g-note ---- */
+.g-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 6rpx;
+    margin: -2rpx 0 8rpx;
+    padding: 8rpx 12rpx;
+    background: var(--color-surface-soft, #f5f5f7);
+    border-radius: 8rpx;
+}
+.g-note-icon {
+    font-size: 22rpx;
+    flex-shrink: 0;
+    margin-top: 2rpx;
+}
+.g-note-text {
+    font-size: 22rpx;
+    color: var(--color-text-secondary, #6b7280);
+    line-height: 1.5;
+    flex: 1;
+    word-break: break-all;
+}
+
+/* ---- popCheck animation ---- */
+.checkin-btn.checked {
+    animation: popCheck 0.4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popCheck {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.3); }
+    70% { transform: scale(0.92); }
+    100% { transform: scale(1); }
 }
 </style>
