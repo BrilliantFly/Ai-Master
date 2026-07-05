@@ -8,6 +8,7 @@
             <view class="header-actions">
                 <view class="premium-header-btn" @tap="toggleMatrix" title="矩阵">⊞</view>
                 <view class="premium-header-btn" @tap="showPinSettings" title="加锁">🔒</view>
+                <view class="premium-header-btn" :class="{ active: batchMode }" @tap="toggleBatchMode" title="批量操作">☰</view>
                 <view class="premium-header-btn" @tap="goAddSchedule">+</view>
             </view>
         </view>
@@ -290,6 +291,9 @@ const toggleMatrix = () => {
 }
 const showPinSettings = () => {
     uni.showToast({ title: '锁屏设置', icon: 'none' })
+}
+const toggleBatchMode = () => {
+    batchMode.value = !batchMode.value
 }
 const exitBatchMode = () => {
     batchMode.value = false

@@ -221,15 +221,14 @@
             </view>
 
             <view class="form-actions">
-                <button class="action-btn cancel" type="button" @tap="goBack">取消</button>
-                <button
+                <view class="action-btn cancel" @tap="goBack">取消</view>
+                <view
                     class="action-btn submit"
-                    type="button"
-                    :disabled="submitting"
+                    :class="{ disabled: submitting }"
                     @tap="handleSave"
                 >
                     {{ submitting ? '保存中...' : isEdit ? '更新日程' : '保存日程' }}
-                </button>
+                </view>
             </view>
         </view>
     </view>
@@ -848,18 +847,22 @@ const handleSave = async () => {
 }
 
 .action-btn.cancel {
-    background: var(--color-surface);
-    color: var(--color-text-secondary);
-    border: 2rpx solid var(--color-border-light);
+    background: var(--color-surface-secondary, #f0f1f3);
+    color: var(--color-text-secondary, #6b7280);
+    border: 2rpx solid transparent;
 }
 
 .action-btn.submit {
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
-    color: #fff;
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0) !important;
+    color: #fff !important;
     box-shadow: var(--shadow-glow);
 }
 
-.action-btn[disabled] {
+.action-btn.disabled {
     opacity: 0.65;
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0) !important;
+    color: #fff !important;
+    transform: none !important;
+    box-shadow: none !important;
 }
 </style>

@@ -215,10 +215,10 @@
             </view>
 
             <view class="form-actions">
-                <button class="action-btn cancel" type="button" @tap="onCancel">取消</button>
-                <button class="action-btn submit" type="button" :disabled="submitting" @tap="handleSave">
+                <view class="action-btn cancel" @tap="onCancel">取消</view>
+                <view class="action-btn submit" :class="{ disabled: submitting }" @tap="handleSave">
                     {{ submitting ? '保存中...' : isEdit ? '更新日程' : '保存日程' }}
-                </button>
+                </view>
             </view>
         </view>
     </view>
@@ -866,9 +866,9 @@ const handleSave = async () => {
 }
 
 .action-btn.cancel {
-    background: var(--color-surface, #ffffff);
-    color: var(--color-text-secondary, #64748b);
-    border: 2rpx solid var(--color-border-light);
+    background: var(--color-surface-secondary, #f0f1f3);
+    color: var(--color-text-secondary, #6b7280);
+    border: 2rpx solid transparent;
 }
 
 .action-btn.cancel.hover-active {
@@ -880,17 +880,15 @@ const handleSave = async () => {
     transform: scale(var(--scale-active));
 }
 
-button.action-btn.submit,
 .action-btn.submit {
-    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0);
-    color: #fff;
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0) !important;
+    color: #fff !important;
     box-shadow: var(--shadow-glow);
 }
 
-.action-btn.submit[disabled],
-button.action-btn.submit[disabled] {
-    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0);
-    color: #fff;
+.action-btn.submit.disabled {
+    background: linear-gradient(135deg, var(--color-primary, #6366f1), #8980f0) !important;
+    color: #fff !important;
 }
 
 .action-btn.submit.hover-active {
@@ -903,7 +901,7 @@ button.action-btn.submit[disabled] {
     box-shadow: 0 2rpx 12rpx rgba(var(--color-primary-rgb, 99, 102, 241), 0.15);
 }
 
-.action-btn[disabled] {
+.action-btn.disabled {
     opacity: 0.65;
     transform: none !important;
     box-shadow: none !important;
