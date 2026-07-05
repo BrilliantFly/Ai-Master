@@ -13,6 +13,16 @@ const themeStore = useThemeStore()
 const router = useRouter()
 const route = useRoute()
 
+// 同步设置 data-theme（在首次渲染前确保 themes.scss 的 CSS 变量生效）
+//#ifdef H5
+try {
+    const saved = uni.getStorageSync('know-theme')
+    document.documentElement.setAttribute('data-theme', saved || 'white')
+} catch (_e) {
+    document.documentElement.setAttribute('data-theme', 'white')
+}
+//#endif
+
 //#ifdef H5
 const setH5WebIcon = () => {
     const config = appStore.getWebsiteConfig

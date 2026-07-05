@@ -616,6 +616,14 @@ export const useThemeStore = defineStore({
     },
     actions: {
         async getTheme() {
+            // 1. 先同步恢复保存的视觉主题（渲染前立即生效，配合 App.vue setup 中的 data-theme 设置）
+            const saved = uni.getStorageSync(THEME_STORAGE_KEY)
+            if (saved) {
+                this.currentVisualTheme = saved
+                this.applyVisualTheme(saved)
+            }
+
+            // 2. 再异步拉取服务端配色（覆盖主色/辅色/按钮文字色）
             const data = await getDecorate({
                 id: 5
             })
@@ -634,13 +642,6 @@ export const useThemeStore = defineStore({
                     '--color-btn-text': buttonColor
                 }
             )
-
-            // 恢复保存的视觉主题
-            const saved = uni.getStorageSync(THEME_STORAGE_KEY)
-            if (saved) {
-                this.currentVisualTheme = saved
-                this.applyVisualTheme(saved)
-            }
         },
         /** 切换视觉主题 */
         setVisualTheme(key: string) {
