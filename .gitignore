@@ -18,6 +18,9 @@ logs/
 .superpowers/
 .anchored-summary.md
 
+# Build artifacts
+server/public/mobile/
+
 # Build test logs
 mvn-*-test.log
 npm-*-test.log
