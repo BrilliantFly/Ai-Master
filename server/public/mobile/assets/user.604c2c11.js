@@ -1,1 +1,0 @@
-import{r as t}from"./index-30729371.js";function r(){return t.get({url:"/user/info"},{isAuth:!0})}function u(r){return t.post({url:"/user/setInfo",data:r},{isAuth:!0})}function n(r,u){return t.post({url:"/user/bindMobile",data:r,header:u},{isAuth:!0})}function s(r){return t.get({url:"/account_log/lists",data:r})}export{u as a,s as b,r as g,n as u};
