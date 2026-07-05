@@ -40,8 +40,9 @@
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
+import { useUserStore } from '@/stores/user'
 import { useRouter } from 'uniapp-router-next'
-import { getTabbarMenu } from '@/api/system/menu'
+import { getTabbarMenu, getTabbarMenuByUser } from '@/api/system/menu'
 import { useHoverEffect } from '@/hooks/useHoverEffect'
 
 type NavItem = {
@@ -64,6 +65,7 @@ const props = defineProps({
 })
 
 const appStore = useAppStore()
+const userStore = useUserStore()
 const router = useRouter()
 const remoteTabbar = ref<any[]>(appStore.getTabbarConfig || [])
 
@@ -173,10 +175,13 @@ const FALLBACK_PATH_MAP: Record<string, string> = {
 const normalizePath = (raw: string): string => {
     let p = String(raw || '').trim()
     if (!p) return ''
+    if (/^https?:\/\//i.test(p)) return p
+    p = p.split(/[?#]/)[0]
     // 确保以 / 开头
     if (!p.startsWith('/')) p = `/${p}`
     // 替换连续斜杠为单斜杠
     p = p.replace(/\/+/g, '/')
+    p = p.replace(/\/+$/, '')
     // 小写化（在非大小写敏感环境下）
     p = p.toLowerCase()
     return p
@@ -185,10 +190,7 @@ const normalizePath = (raw: string): string => {
 /** 判断路径是否为已知的 tab 页面 */
 const isTabPath = (path: string): boolean => {
     const n = normalizePath(path)
-    if (TAB_PAGE_PATHS.includes(n as any)) return true
-    // 也匹配 /pages/index/xxx 前缀（兼容子页面）
-    if (n.startsWith('/pages/index/') || n.startsWith('/pages/news/') || n.startsWith('/pages/user/')) return true
-    return false
+    return TAB_PAGE_PATHS.includes(n as any)
 }
 
 const normalizedItems = computed((): NavItem[] => {
@@ -239,7 +241,7 @@ const currentKey = computed(() => {
     }
     const pages = getCurrentPages()
     const currentPage = pages[pages.length - 1]
-    const currentRoute = currentPage ? `/${currentPage.route}` : ''
+    const currentRoute = normalizePath(currentPage ? `/${currentPage.route}` : '')
     let matched = normalizedItems.value.find((item) => item.path === currentRoute)
     // 如果精确匹配失败，尝试前缀匹配（兼容 API 返回的路径带额外参数或子路径）
     if (!matched) {
@@ -253,13 +255,11 @@ const currentKey = computed(() => {
 
 const fetchTabbar = async () => {
     try {
-        const menus = await getTabbarMenu()
+        const menus = await (userStore.isLogin ? getTabbarMenuByUser() : getTabbarMenu())
         if (Array.isArray(menus) && menus.length) {
             remoteTabbar.value = menus
             // 同步缓存到 store
-            if (!appStore.getTabbarConfig?.length) {
-                appStore.menuConfig.tabbar = menus
-            }
+            appStore.menuConfig.tabbar = menus
         }
     } catch (error) {
         console.error('加载底部菜单失败', error)
@@ -298,7 +298,7 @@ useHoverEffect('.nav-item', '.premium-bottom-nav')
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 18rpx;
     z-index: 80;
     pointer-events: none;
 }
@@ -306,12 +306,17 @@ useHoverEffect('.nav-item', '.premium-bottom-nav')
 .nav-shell {
     pointer-events: auto;
     display: flex;
-    background: var(--color-bg-app);
-    border-top: 2rpx solid var(--color-border-light);
+    width: calc(100% - 48rpx);
     max-width: 420px;
     margin: 0 auto;
-    padding: 12rpx 0 calc(12rpx + env(safe-area-inset-bottom));
-    box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.04);
+    border-radius: 28rpx;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 2rpx solid rgba(255, 255, 255, 0.78);
+    box-shadow: 0 14rpx 28rpx rgba(15, 23, 42, 0.06);
+    padding: 4rpx 0 calc(12rpx + env(safe-area-inset-bottom));
+    box-sizing: border-box;
 }
 
 .nav-item {
@@ -320,9 +325,10 @@ useHoverEffect('.nav-item', '.premium-bottom-nav')
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4rpx;
-    padding: 8rpx 0 10rpx;
+    gap: 2rpx;
+    padding: 6rpx 0 10rpx;
     color: var(--color-text-tertiary);
+    font-size: 18rpx;
     transition: color var(--duration) var(--ease);
 }
 .nav-item.hover-active {
@@ -335,12 +341,12 @@ useHoverEffect('.nav-item', '.premium-bottom-nav')
 .nav-item.active::after {
     content: '';
     position: absolute;
-    left: 34%;
-    right: 34%;
-    top: -2rpx;
-    height: 6rpx;
+    left: 38%;
+    right: 38%;
+    top: 0;
+    height: 4rpx;
     border-radius: 999rpx;
-    background: linear-gradient(135deg, var(--color-primary), #8980f0);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
 }
 
 .tab-icon-wrap {
@@ -383,7 +389,7 @@ useHoverEffect('.nav-item', '.premium-bottom-nav')
 }
 
 .nav-label {
-    font-size: 20rpx;
+    font-size: 17rpx;
     line-height: 1.2;
     transition: color var(--duration) var(--ease), font-weight var(--duration) var(--ease);
 }

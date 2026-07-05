@@ -9,11 +9,13 @@
                 <text class="news-desc">{{ item.desc }}</text>
             </view>
         </view>
+        <PremiumBottomNav active="article" />
     </view>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import PremiumBottomNav from '@/components/PremiumBottomNav.vue'
 
 const list = ref([
     { id: 1, title: '欢迎使用', desc: '欢迎使用AI管理系统' },
@@ -25,7 +27,7 @@ const list = ref([
 .news-page {
     min-height: 100vh;
     background: var(--color-bg);
-    padding: 20rpx;
+    padding: 20rpx 20rpx 160rpx;
 }
 .news-header {
     padding: 30rpx 20rpx;

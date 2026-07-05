@@ -1760,38 +1760,4 @@ onShow(async () => {
     white-space: nowrap;
 }
 
-:deep(.premium-bottom-nav) {
-    bottom: 18rpx;
-}
-
-:deep(.premium-bottom-nav .nav-shell) {
-    margin: 0 24rpx;
-    border-radius: 28rpx;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border: 2rpx solid rgba(255, 255, 255, 0.78);
-    box-shadow: 0 14rpx 28rpx rgba(15, 23, 42, 0.06);
-    padding-top: 4rpx;
-}
-
-:deep(.premium-bottom-nav .nav-item) {
-    gap: 2rpx;
-    padding-top: 6rpx;
-    font-size: 18rpx;
-    color: var(--color-text-tertiary);
-}
-
-:deep(.premium-bottom-nav .nav-item.active::after) {
-    left: 38%;
-    right: 38%;
-    bottom: auto;
-    top: 0;
-    height: 4rpx;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-minor));
-}
-
-:deep(.premium-bottom-nav .nav-label) {
-    font-size: 17rpx;
-}
 </style>
